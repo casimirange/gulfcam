@@ -43,7 +43,7 @@ export class SignupComponent implements OnInit {
       pinCode: ['', [Validators.required, Validators.pattern('^[0-9 ]*$')]],
       idStore: ['', [Validators.required]],
       // username: ['', [Validators.required, Validators.minLength(4)]],
-      password: ['', [Validators.required, Validators.pattern("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*+./-]).{8,}$")]],
+      password: ['', [Validators.required, Validators.pattern("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*+./;:-]).{8,}$")]],
       firstName: ['', [Validators.required, Validators.minLength(4)]],
       lastName: ['', [Validators.required, Validators.minLength(4)]],
       position: ['', [Validators.required, Validators.minLength(4)]],

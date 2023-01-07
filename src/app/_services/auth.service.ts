@@ -7,6 +7,8 @@ import {IToken} from "../_model/token";
 import {ICredentialsSignup, ISignup} from "../_model/signup";
 import {catchError, tap} from "rxjs/operators";
 import {CustomResponse} from "../_interfaces/custom-response";
+import {ResetPassword} from "../_model/resetPassword";
+import {ForgetPassword} from "../_interfaces/forget-password";
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +19,14 @@ export class AuthService {
 
   login(credentials: ICredentials): Observable<IToken>{
     return this.http.post<IToken>(environment.signin, credentials);
+  }
+
+  forgetPassword(email: ForgetPassword): Observable<any>{
+    return this.http.post<any>(environment.resetPassword, email);
+  }
+
+  resetPassword(reset: ResetPassword, code: string): Observable<any>{
+    return this.http.put<any>(environment.resetPassword+ `?code=${code}`, reset);
   }
 
   login$ = (credentials: ICredentials) => <Observable<any>> this.http.post<any>(environment.signin, credentials)

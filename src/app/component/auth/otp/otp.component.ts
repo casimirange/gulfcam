@@ -76,7 +76,6 @@ export class OtpComponent implements OnInit {
 
       this.authService.verifyOtp(this.otp).subscribe(
         (resp) => {
-          console.log(resp)
           this.token.saveRefreshToken(resp.refreshToken);
           this.token.saveAuthorities(resp.roles)
           this.token.saveUserInfo(resp.user)

@@ -5,6 +5,8 @@ import {AuthGuard} from "./_helpers/auth.guard";
 
 const routes: Routes = [
   // Dashboard
+  // { path: '', loadChildren: () => import('./component/dashboard/dashboard.module').then(m => m.DashboardModule), canActivate: [AuthGuard]},
+  // Dashboard
   { path: 'dashboard', loadChildren: () => import('./component/dashboard/dashboard.module').then(m => m.DashboardModule), canActivate: [AuthGuard]},
   // Type de bon
   { path: 'typeBon', loadChildren: () => import('./component/type-bon/type-bon.module').then(m => m.TypeBonModule), canActivate: [AuthGuard] },
@@ -38,8 +40,6 @@ const routes: Routes = [
   { path: 'coupons', loadChildren: () => import('./component/coupons/coupons.module').then(m => m.CouponsModule), canActivate: [AuthGuard]},
   // Mouvement de stock
   { path: 'stock', loadChildren: () => import('./component/mvt-stock/mvt-stock.module').then(m => m.MvtStockModule), canActivate: [AuthGuard]},
-  // numéros de série
-  { path: 'serial-number', loadChildren: () => import('./component/serial-number/serial-number.module').then(m => m.SerialNumberModule), canActivate: [AuthGuard]},
   // Page not found
   { path: 'pageNotFound', component: Erreur404Component },
   { path: '', redirectTo: 'dashboard', pathMatch: 'full'},

@@ -3,7 +3,7 @@
   <div class="page-title-wrapper">
     <div class="page-title-heading">
       <div class="page-title-icon">
-        <i class="pe-7s-home icon-gradient bg-night-fade">
+        <i class="pe-7s-home icon-gradient bg-danger">
         </i>
       </div>
       <div>Magasin de {{store.localization}}
@@ -22,55 +22,7 @@
   </div>
 </div>
 
-<div class="row" *ngIf="units">
-  <div class="col-md-6 "  style="cursor: pointer;" *ngFor="let cdp of units" [ngClass]="units.length == 3 ? 'col-lg-4' : units.length == 2 ? 'col-lg-6' : 'col-lg-3'">
-    <div class="mb-3 widget-chart widget-chart2 text-left card" [ngClass]="
-            cdp.amount == 5000 ? 'card-shadow-danger' :
-            cdp.amount == 3000 ? 'card-shadow-warning' : 'card-shadow-success'
-            ">
-      <div class="widget-content p-0 w-100">
-        <div class="widget-content-outer">
-          <div class="widget-content-left fsize-2">
-            <div class="text-muted opacity-6" >Quantité de carnets <span class="float-right text-primary">{{formatNumber(cdp.quantityNoteBook)}}</span></div>
-          </div>
-          <div class="widget-content-wrapper">
-            <div class="widget-content-left pr-2 fsize-1">
-              <div class="widget-numbers mb-0 fsize-3" [ngClass]="cdp.amount == 5000 ? 'text-danger' :
-            cdp.amount == 3000 ? 'text-warning' : 'text-success'">{{formatNumber(cdp.amount)}} <small>FCFA</small></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-<!--<div class="main-card mb-3 card">-->
-<!--  <div class="row">-->
-<!--    <div class="col-md-4" *ngFor="let unit of units; let i = index">-->
-<!--      <div class="widget-content">-->
-<!--        <div class="widget-content-outer">-->
-<!--          <div class="widget-content-wrapper">-->
-<!--            <div class="widget-content-left">-->
-<!--              <div class="widget-heading">Unité {{i + 1}}</div>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--          <div class="widget-progress-wrapper">-->
-<!--            <div class="progress-sub-label">-->
-<!--              <div class="sub-label-left">Type de coupon</div>-->
-<!--              <div class="sub-label-right text-success font-weight-bold">-->
-<!--                <span >{{unit.amount}}</span></div>-->
-<!--&lt;!&ndash;                <span *ngFor="let voucher of vouchers">{{voucher.internalReference == unit.idTypeVoucher ? voucher.amount : ''}}</span></div>&ndash;&gt;-->
-<!--            </div>-->
-<!--            <div class="progress-sub-label">-->
-<!--              <div class="sub-label-left">Quantité de carnet</div>-->
-<!--              <div class="sub-label-right text-alternate">{{unit.quantityNoteBook}}</div>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </div>-->
-<!--  </div>-->
-<!--</div>-->
+<app-unites></app-unites>
 
 <div class="row">
   <div class="col-md-12">

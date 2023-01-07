@@ -10,6 +10,7 @@ import { EditUserComponent } from './edit-user/edit-user.component';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import { AddUserComponent } from './add-user/add-user.component';
 import {NgxPaginationModule} from "ngx-pagination";
+import {ProfileUserComponent} from "./profile-user/profile-user.component";
 
 
 @NgModule({
@@ -18,6 +19,7 @@ import {NgxPaginationModule} from "ngx-pagination";
     IndexUsersComponent,
     DetailsUserComponent,
     EditUserComponent,
+    ProfileUserComponent,
     AddUserComponent
   ],
     imports: [

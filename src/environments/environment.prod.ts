@@ -3,6 +3,7 @@ export const environment = {
   production: true,
   signin: url + 'auth/sign-in',
   signup: url + 'auth/sign-up',
+  resetPassword: url + 'auth/reset-password',
   verification: url + 'auth/verify',
   sendOtp: url + 'auth/resetOtpCode',
   client: url + 'client',

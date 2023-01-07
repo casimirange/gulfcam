@@ -97,7 +97,7 @@ export class IndexClientComponent implements OnInit {
   saveClient() {
     this.isLoading.next(true)
     this.client = this.clientForm.value
-    this.client.phone = this.clientForm.controls['phone'].value.e164Number
+    // this.client.phone = this.clientForm.controls['phone'].value.e164Number
     this.appState$ = this.clientService.addClient$(this.client)
       .pipe(
         map((response ) => {

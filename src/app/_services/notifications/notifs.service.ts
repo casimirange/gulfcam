@@ -76,6 +76,7 @@ export class NotifsService {
       showCancelButton: false,
       confirmButtonText: 'OK',
       allowOutsideClick: false,
+      allowEscapeKey: false,
       focusConfirm: false,
       backdrop: `rgba(0, 0, 0, 0.4)`
     }).then((result) => {

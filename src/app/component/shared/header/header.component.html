@@ -1,6 +1,8 @@
-<div class="app-header header-shadow" [ngClass]="globals.toggleSidebar ? 'closed-sidebar' : ''">
+<div class="app-header header-shadow bg-danger header-text-light" [ngClass]="globals.toggleSidebar ? 'closed-sidebar' : ''">
   <div class="app-header__logo">
-    <div class="logo-src">GULFCAM</div>
+    <div class="logo-src">
+      <img src="assets/images/gulflogo-removebg-preview.png" width="50" alt="">
+    </div>
     <div class="header__pane ml-auto">
       <div>
         <button type="button" class="hamburger close-sidebar-btn hamburger--elastic"
@@ -50,14 +52,57 @@
               <div class="btn-group">
                 <a data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="p-0 btn">
                   <img width="42" class="rounded-circle" src="assets/images/avatar.png" alt="">
+                  <i class="fa fa-angle-down ml-2 opacity-8"></i>
                 </a>
+                <div tabindex="-1" role="menu" aria-hidden="true" class="rm-pointers dropdown-menu-lg dropdown-menu dropdown-menu-right">
+                  <div class="dropdown-menu-header">
+                    <div class="dropdown-menu-header-inner bg-light">
+                      <div class="menu-header-image opacity-2" style="background-color: #FFFFFF"></div>
+                      <div class="menu-header-content text-left">
+                        <div class="widget-content p-0">
+                          <div class="widget-content-wrapper">
+                            <div class="widget-content-left mr-3">
+                              <img width="42" class="rounded-circle" src="assets/images/avatar.png" alt="">
+                            </div>
+                            <div class="widget-content-left">
+                              <div class="widget-heading text-dark">{{lastName | titlecase}}
+                              </div>
+                              <div class="widget-subheading opacity-8 text-dark">{{getStatusAccount(roleUser) | titlecase}}
+                              </div>
+                            </div>
+  <!--                            <div class="widget-content-right mr-2">-->
+  <!--                              <button class="btn-pill btn-shadow btn-shine btn btn-focus" (click)="logout()">Déconnexion</button>-->
+  <!--                            </div>-->
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="scroll-area-xs" style="height: auto">
+                    <div class="scrollbar-container ps">
+                      <ul class="nav flex-column">
+                        <li class="nav-item-header nav-item" style="cursor: pointer" (click)="showProfile()">
+                          <span ><i class="pe-7s-key"></i> Modifier mot de passe</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                  <ul class="nav flex-column">
+                    <li class="nav-item-divider nav-item">
+                    </li>
+                    <li class="nav-item-btn text-center nav-item">
+                      <button class="btn-pill btn-shadow btn-shine btn btn-sm btn-focus" (click)="logout()">Déconnexion</button>
+                    </li>
+                  </ul>
+                </div>
+
               </div>
             </div>
             <div class="widget-content-left  ml-3 header-user-info">
-              <div class="widget-heading">
+              <div class="widget-heading text-white">
                 {{lastName | titlecase}}
               </div>
-              <div class="widget-subheading">
+              <div class="widget-subheading text-white">
                 {{getStatusAccount(roleUser) | titlecase}}
               </div>
             </div>
@@ -66,7 +111,7 @@
       </div>
       <div class="header-btn-lg">
         <button *ngIf="isLogged" (click)="logout()" type="button"  data-toggle="tooltip" title="se déconnecter"   class="hamburger hamburger--elastic open-right-drawer">
-          <i class="fa fa-sign-out-alt "></i>
+          <i class="fa fa-sign-out-alt text-white"></i>
         </button>
       </div>
     </div>

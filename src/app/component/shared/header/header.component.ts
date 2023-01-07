@@ -4,6 +4,8 @@ import {BnNgIdleService} from "bn-ng-idle";
 import {StatusAccountService} from "../../../_services/status/status-account.service";
 import {Observable} from "rxjs";
 import {ConfigOptions} from "../../../configOptions/config-options";
+import {Store} from "../../../_model/store";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-header',
@@ -15,7 +17,7 @@ export class HeaderComponent implements OnInit {
   lastName: string | null = '';
   isLogged: boolean = false;
   roleUser = localStorage.getItem('userAccount').toString()
-  constructor(private tokenService: TokenService, private statusAccountSercive: StatusAccountService, public globals: ConfigOptions) { }
+  constructor(private tokenService: TokenService, private statusAccountSercive: StatusAccountService, public globals: ConfigOptions, private router: Router) { }
 
   ngOnInit(): void {
     this.isLogged = this.tokenService.isLogged();
@@ -44,5 +46,10 @@ export class HeaderComponent implements OnInit {
 
   toggleHeaderMobile() {
     this.globals.toggleHeaderMobile = !this.globals.toggleHeaderMobile;
+  }
+
+  showProfile() {
+    this.router.navigate(['/users/profile', localStorage.getItem('uid')])
+    // [routerLink]=""
   }
 }
