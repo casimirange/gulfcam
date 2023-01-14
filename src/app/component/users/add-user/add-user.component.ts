@@ -66,7 +66,7 @@ export class AddUserComponent implements OnInit {
   }
 
 
-  onSubmit() {
+  saveUser() {
     this.isLoading.next(true);
     this.credentials = this.signup.value;
     // on recherche l'id du magasin dans la liste des magasins

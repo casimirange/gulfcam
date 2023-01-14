@@ -23,6 +23,8 @@ export class DetailsCreditNoteComponent implements OnInit {
   roleUser = localStorage.getItem('userAccount').toString()
   private isLoading = new BehaviorSubject<boolean>(false);
   isLoading$ = this.isLoading.asObservable();
+  private isExporting = new BehaviorSubject<boolean>(false);
+  isExtracting$ = this.isExporting.asObservable();
   statut: string;
   coupons: Coupon[] = []
 
@@ -39,10 +41,8 @@ export class DetailsCreditNoteComponent implements OnInit {
       this.noteService.getCreditNoteByInternqlRef(params['id']).subscribe(
         res => {
           this.creditNote = res;
-          console.log(res)
           this.statut = this.creditNote.status.name
           this.coupons = this.creditNote.coupon
-
         }
       )
     })
@@ -72,5 +72,19 @@ export class DetailsCreditNoteComponent implements OnInit {
 
   padWithZero(num, targetLength) {
     return String(num).padStart(targetLength, '0');
+  }
+
+  exportCreditNote(){
+    this.isExporting.next(true)
+    this.noteService.exportCreditNote(this.creditNote.internalReference).subscribe(
+      respProd => {
+        this.isExporting.next(false)
+        const file = new Blob([respProd], { type: 'application/pdf' });
+        const fileURL = URL.createObjectURL(file);
+        window.open(fileURL);
+      },error => {
+        this.isExporting.next(false)
+      }
+    )
   }
 }

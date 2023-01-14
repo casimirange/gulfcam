@@ -4,7 +4,7 @@ import {ForgetPassword} from "../../../_interfaces/forget-password";
 import {IToken} from "../../../_model/token";
 import {BehaviorSubject} from "rxjs";
 import {AuthService} from "../../../_services/auth.service";
-import {Router} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {NotifsService} from "../../../_services/notifications/notifs.service";
 import {ResetPassword} from "../../../_model/resetPassword";
 
@@ -29,13 +29,12 @@ export class ResetPasswordComponent implements OnInit {
   form: any;
   pass = ''
   confirm_pass = ''
-
+  code: string;
   constructor(
-    private fb: FormBuilder, private authService: AuthService, private router: Router, private notifsService: NotifsService
+    private fb: FormBuilder, private authService: AuthService, private router: Router, private notifsService: NotifsService, private route: ActivatedRoute
   ) {
     this.forgetForm = this.fb.group({
       username: ['', [Validators.required, Validators.email]],
-      code: ['', [Validators.required, ]],
       password: ['', [Validators.required, Validators.pattern("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*+./;:-]).{8,}$")]],
       cpass: ['', [Validators.required, Validators.pattern("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*+./;:-]).{8,}$")]]
     });
@@ -43,12 +42,18 @@ export class ResetPasswordComponent implements OnInit {
   }
 
   ngOnInit(): void {
-
+    this.route.queryParams
+      .subscribe(params => {
+          console.log(params); // { orderby: "price" }
+          this.code = params.code;
+        }
+      );
+    console.log(this.code); // price
   }
 
   onSubmit() {
     this.isLoading.next(true);
-    this.credentials.code = this.forgetForm.controls['code'].value;
+    this.credentials.code = this.code;
     this.credentials.password = this.forgetForm.controls['password'].value;
     this.credentials.email = this.forgetForm.controls['username'].value;
     this.authService.resetPassword(this.credentials, this.credentials.code).subscribe(

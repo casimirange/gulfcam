@@ -65,7 +65,7 @@ export class IndexCommandComponent implements OnInit {
   page: number = 1;
   totalPages: number;
   totalElements: number;
-  size: number = 10;
+  size: number = 3;
   orderState$: Observable<AppState<CustomResponse<Order>>>;
   readonly DataState = DataState;
   private dataSubjects = new BehaviorSubject<CustomResponse<Order>>(null);
@@ -90,7 +90,7 @@ export class IndexCommandComponent implements OnInit {
     this.clientForm = this.fb.group({
       completeName: ['', [Validators.required, Validators.minLength(3)]],
       companyName: ['', [Validators.required, Validators.minLength(3)]],
-      email: ['', [Validators.required, Validators.email]],
+      email: ['', [Validators.email]],
       phone: ['', [Validators.required]],
       address: ['', [Validators.required, Validators.minLength(5)]],
       gulfcamAccountNumber: ['', [Validators.required, Validators.pattern('^[0-9 ]*$')]],
@@ -105,7 +105,7 @@ export class IndexCommandComponent implements OnInit {
       client: ['', [Validators.required, Validators.minLength(3)]],
       store: ['', [Validators.required, ]],
       chanel: ['', [Validators.required, ]],
-      quantity: ['', [Validators.required, Validators.pattern('^[0-9 ]*$')]],
+      quantity: ['', [Validators.required, Validators.pattern('^[1,2,3,4,5,6,7,8,9][0-9]*$')]],
       voucherType: ['', [Validators.required]],
       delais: ['',],
       description: ['',],
@@ -114,7 +114,7 @@ export class IndexCommandComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.getClients()
+    // this.getClients()
     this.getTypeVoucher()
     this.getStores()
     this.getOrders()
@@ -129,12 +129,10 @@ export class IndexCommandComponent implements OnInit {
   }
 
   findClients(event: string): Client[]{
-    console.log(event)
     if (event != '' && event.length >= 3){
       this.clientService.searchClient(event) .subscribe(
         resp => {
           this.clients = resp;
-          console.log(resp)
         }
       )
     }else {
@@ -259,6 +257,10 @@ export class IndexCommandComponent implements OnInit {
     this.formClient();
     this.showOrderForms();
     this.modalService.dismissAll()
+    this.tabProducts = []
+    this.totalOrder = 0
+    this.totalTTC = 0
+    this.orF['client'].reset
   }
 
   annulerCommande() {
@@ -292,11 +294,10 @@ export class IndexCommandComponent implements OnInit {
           //   {...this.dataSubjects.value , content: [response, ...this.dataSubjects.value.content]}
           // )
           this.isLoading.next(false)
-          this.getOrders()
           this.saveProductsOrder(response)
-          setTimeout(() => this.getProforma(response) , 1000);
-          this.tabProducts = []
+          this.getProforma(response);
           this.annuler()
+          this.getOrders()
           return {dataState: DataState.LOADED_STATE, appData: this.dataSubjects.value}
         }),
         startWith({dataState: DataState.LOADED_STATE, appData: this.dataSubjects.value}),

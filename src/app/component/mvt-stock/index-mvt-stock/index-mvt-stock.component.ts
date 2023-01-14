@@ -45,8 +45,8 @@ export class IndexMvtStockComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.getStores();
-    this.getStoreHousess();
+    // this.getStores();
+    // this.getStoreHousess();
     this.getMvtStocks();
   }
 

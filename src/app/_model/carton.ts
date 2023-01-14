@@ -1,4 +1,3 @@
-import {Store} from "./store";
 import {IUser} from "./user";
 import {Status} from "./status";
 
@@ -10,7 +9,6 @@ export class Carton{
   idStoreKeeper: number;
   storeKeeper?: IUser;
   nameStoreHouse?: string;
-  // serialNumber: string;
   createdAt?: Date;
   updateAt?: Date;
   status?: Status;

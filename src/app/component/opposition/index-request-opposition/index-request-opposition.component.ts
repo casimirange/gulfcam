@@ -32,7 +32,7 @@ export class IndexRequestOppositionComponent implements OnInit {
   requestForm: FormGroup;
   stores: Store[] = [];
   users: ISignup[] = [];
-  store: Store = new Store ();
+  store: Store = new Store();
   canaux = ['Appel', 'Courier papier', 'Email', 'Sur site']
   requestOpposition: RequestOpposition = new RequestOpposition();
   requestOppositions: RequestOpposition[] = [];
@@ -47,6 +47,7 @@ export class IndexRequestOppositionComponent implements OnInit {
   totalPages: number;
   totalElements: number;
   size: number = 10;
+
   constructor(private modalService: NgbModal, private fb: FormBuilder, private storeService: StoreService, private router: Router,
               private notifService: NotifsService, private unitService: UnitsService, private voucherService: VoucherService,
               private clientService: ClientService, private userService: UsersService, private requestService: OppositionService,
@@ -61,7 +62,7 @@ export class IndexRequestOppositionComponent implements OnInit {
   }
 
   //initialisation du formulaire de création type de bon
-    formRequest(){
+  formRequest() {
     this.requestForm = this.fb.group({
       idClient: ['', [Validators.required]],
       reason: ['', [Validators.required, Validators.minLength(3)]],
@@ -72,19 +73,31 @@ export class IndexRequestOppositionComponent implements OnInit {
   }
 
   //ouverture du modal
-  open(content: any){
+  open(content: any) {
     const modal = true;
     this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title', size: 'lg'});
   }
 
-  createRequest(){
+  createRequest() {
     this.requestOpposition.reason = this.requestForm.controls['reason'].value
     this.requestOpposition.description = this.requestForm.controls['description'].value
     this.requestOpposition.idServiceClient = parseInt(localStorage.getItem('uid'))
     this.requestOpposition.idClient = this.clients.find(client => client.completeName === this.requestForm.controls['idClient'].value).internalReference
     this.requestOpposition.idManagerCoupon = parseInt(this.requestForm.controls['idManagerCoupon'].value)
-    this.requestOpposition.serialCoupons = this.vouchers
 
+    this.vouchers.forEach(value => {
+      let client = this.clients.find(client => client.completeName === this.requestForm.controls['idClient'].value)
+      this.couponService.getCouponsBySerialNumber(value.toString()).subscribe(
+        res => {
+          if (res.idClient != client.internalReference) {
+            this.notifService.onWarning(`le coupon ${value} n'appartient pas à ce client`)
+          }else {
+            this.requestOpposition.serialCoupons.push(value)
+          }
+        },
+      )
+    })
+    // this.requestOpposition.serialCoupons = this.vouchers
     this.isLoading.next(true);
     console.log('demande d\'opposition', this.requestOpposition)
     this.requestService.saveOppositionRequest(this.requestOpposition).subscribe(
@@ -102,8 +115,8 @@ export class IndexRequestOppositionComponent implements OnInit {
     )
   }
 
-  getRequests(){
-    this.requestService.getOppositionRequest(this.page -1, this.size).subscribe(
+  getRequests() {
+    this.requestService.getOppositionRequest(this.page - 1, this.size).subscribe(
       resp => {
         this.requestOppositions = resp.content
         // this.size = resp.size
@@ -114,7 +127,7 @@ export class IndexRequestOppositionComponent implements OnInit {
     )
   }
 
-  getClients(){
+  getClients() {
     this.clientService.getAllClients().subscribe(
       resp => {
         this.clients = resp.content
@@ -122,7 +135,7 @@ export class IndexRequestOppositionComponent implements OnInit {
     )
   }
 
-  getUsers(){
+  getUsers() {
     console.log(this.requestForm.value)
     this.userService.getUsers().subscribe(
       resp => {
@@ -166,9 +179,9 @@ export class IndexRequestOppositionComponent implements OnInit {
   //   this.router.navigate(['/entrepots/details', store.internalReference])
   // }
 
-  findClients(event: any): void{
+  findClients(event: any): void {
     console.log(event)
-    this.clientService.searchClient(event) .subscribe(
+    this.clientService.searchClient(event).subscribe(
       resp => {
         this.clients = resp;
         console.log(resp)
@@ -179,19 +192,30 @@ export class IndexRequestOppositionComponent implements OnInit {
   }
 
   addCoupon() {
-    this.couponService.getCouponsBySerialNumber(this.requestForm.controls['serialNumber'].value).subscribe(
-      res => {
-        if (res.status.name === 'ACTIVATED' ){
-          this.vouchers.push(this.requestForm.controls['serialNumber'].value)
-          this.requestForm.controls['serialNumber'].reset()
-        }else{
-          this.notifService.onWarning(`Seuls les coupons activés peuvent être utilisés. statut du coupon: ${this.getStatuts(res.status.name)}`)
+    // let str= this.requestForm.controls['serialNumber'].value.toString();
+    let str = parseInt(this.requestForm.controls['serialNumber'].value).toString();
+    let client;
+    if (this.requestForm.controls['idClient'].value) {
+      client = this.clients.find(client => client.completeName === this.requestForm.controls['idClient'].value)
+      this.couponService.getCouponsBySerialNumber(str).subscribe(
+        res => {
+          if (res.status.name === 'ACTIVATED') {
+            if (res.idClient === client.internalReference) {
+              this.vouchers.push(this.requestForm.controls['serialNumber'].value)
+              this.requestForm.controls['serialNumber'].reset()
+            } else {
+              this.notifService.onWarning('Ce coupon n\'appartient pas à ce client')
+            }
+          } else {
+            this.notifService.onWarning(`Seuls les coupons activés peuvent être utilisés. statut du coupon: ${this.getStatuts(res.status.name)}`)
+          }
+        }, error => {
+          this.notifService.onError("Ce coupon n'existe pas", '')
         }
-      }, error => {
-        this.notifService.onError("Ce coupon n'existe pas", '')
-      }
-    )
-    console.log(this.vouchers)
+      )
+    } else {
+      this.notifService.onWarning('Veuillez sélectionner un client')
+    }
   }
 
   removeCoupon(coupon: number) {
@@ -210,7 +234,7 @@ export class IndexRequestOppositionComponent implements OnInit {
     return this.statusService.allStatus(status)
   }
 
-  pageChange(event: number){
+  pageChange(event: number) {
     this.page = event
     this.getRequests()
   }

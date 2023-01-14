@@ -107,6 +107,7 @@ export class EditComponent implements OnInit {
     this.orderState$ = this.orderService.showOrder$(parseInt(this.IdParam))
       .pipe(
         map((response) => {
+          console.log(response)
           this.dataSubjects.next(response)
           this.order = response
           this.statut = response.status.name
@@ -207,6 +208,8 @@ export class EditComponent implements OnInit {
         this.notifsService.onSuccess('Commande Terminée')
         this.refreshOrder()
         this.editForm.controls['fileBordereau'].reset()
+      }, error => {
+        this.isLoading.next(false)
       }
     )
   }
@@ -258,15 +261,30 @@ export class EditComponent implements OnInit {
   }
 
   refreshOrder(){
+    // this.orderState$ = this.orderService.showOrder$(parseInt(this.IdParam))
+    //   .pipe(
+    //     map((response) => {
+    //       this.dataSubjects.next(response)
+    //       this.order = response
+    //       this.statut = response.status.name
+    //       return {dataState: DataState.LOADED_STATE, appData: response}
+    //     }),
+    //     startWith({dataState: DataState.LOADED_STATE, appData: null}),
+    //     catchError((error: string) => {
+    //       return of({dataState: DataState.ERROR_STATE, error: error})
+    //     })
+    //   )
+
     this.orderState$ = this.orderService.showOrder$(parseInt(this.IdParam))
       .pipe(
         map((response) => {
+          console.log(response)
           this.dataSubjects.next(response)
           this.order = response
           this.statut = response.status.name
           return {dataState: DataState.LOADED_STATE, appData: response}
         }),
-        startWith({dataState: DataState.LOADED_STATE, appData: null}),
+        startWith({dataState: DataState.LOADING_STATE, appData: null}),
         catchError((error: string) => {
           return of({dataState: DataState.ERROR_STATE, error: error})
         })
@@ -392,11 +410,12 @@ export class EditComponent implements OnInit {
     }
   }
 
-  addProduct(){
+  affectCouponClient(){
     this.isLoading.next(true)
-
     this.listVouchers.forEach(coupon => {
-      this.couponService.affectCouponClient(coupon.toString(), this.order.idClient).subscribe();
+      let cp = coupon.toString()
+      let cps = parseInt(cp)
+      this.couponService.affectCouponClient(cps.toString(), this.order.idClient).subscribe();
     })
     this.notifsService.onSuccess('carnet(s) attribué(s) avec succès')
     this.orF['coupon'].reset();
@@ -447,8 +466,19 @@ export class EditComponent implements OnInit {
   }
 
   addCoupon() {
-    this.listVouchers.push(this.addCouponClientForm.controls['coupon'].value)
-    this.addCouponClientForm.controls['coupon'].reset()
+    let str= parseInt(this.addCouponClientForm.controls['coupon'].value).toString();
+    this.couponService.getCouponsBySerialNumber(str).subscribe(
+      res => {
+        if (res.status.name !== 'AVAILABLE' ){
+            this.notifsService.onWarning('Ce coupon n\'une plus dans notre espace de stockage')
+          }else {
+            this.listVouchers.push(this.addCouponClientForm.controls['coupon'].value)
+            this.addCouponClientForm.controls['coupon'].reset()
+          }
+      }, error => {
+        this.notifsService.onError("Ce coupon n'existe pas", '')
+      }
+    )
   }
 
   removeCoupon(coupon: number) {

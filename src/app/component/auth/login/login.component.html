@@ -72,7 +72,7 @@
               <div class="modal-footer clearfix">
                 <div class="float-right">
 <!--                  <button class="btn btn-primary btn-lg" [disabled]="loginForm.invalid " (click)="onSubmit()">Login</button>-->
-                  <button type="submit" class="btn btn-success" [disabled]="loginForm.invalid || (isLoading$ | async)" (click)="onSubmit()">
+                  <button type="submit" class="btn btn-success" [disabled]="loginForm.invalid || (isLoading$ | async)" (click)="login()">
                     <i *ngIf="isLoading$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
                     <span *ngIf="isLoading$ | async">Connexion ...</span>
                     <span *ngIf="!(isLoading$ | async)">Login</span>

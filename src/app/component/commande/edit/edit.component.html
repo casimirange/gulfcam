@@ -175,7 +175,7 @@
                     <div class="position-relative form-group">
                       <label for="exampleEmail" class="">Ref. paeiment</label>
                       <input name="email" id="exampleEmail" placeholder="entrer la référence" type="text"
-                             value="{{order.paymentReference}}"
+                             ngModel="{{order.paymentReference}}"
                              [disabled]="statut != 'CREATED'"
                              class="form-control" formControlName="peimentRef">
                     </div>
@@ -362,7 +362,7 @@
 
                         <button class="mt-1 btn btn-primary float-right"
                                 [disabled]="(listVouchers.length == 0 ) || (isLoading$ | async)"
-                                (click)="addProduct()">
+                                (click)="affectCouponClient()">
                           <i *ngIf="isLoading$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
                           <span *ngIf="isLoading$ | async">Affectation ...</span>
                           <span

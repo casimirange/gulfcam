@@ -151,14 +151,17 @@ export class IndexCouponComponent implements OnInit {
   }
 
   accepterCoupon() {
+    let str= parseInt(this.couponForm.controls['coupon'].value).toString();
     this.store.localization = this.couponForm.value
-    this.coupon.serialNumber = this.couponForm.controls['coupon'].value
+    this.coupon.serialNumber = str
     const body = {
       "idStation": 0,
       "modulo": 0,
       "productionDate": "2022-12-16"
     }
     body.idStation = this.couponForm.controls['idStation'].value
+    // body.productionDate = new Date().toLocaleString().toString()
+    // console.log(body.productionDate)
     this.isLoading.next(true);
     this.couponService.acceptCoupon(this.coupon.serialNumber, body).subscribe(
       resp => {
@@ -172,5 +175,9 @@ export class IndexCouponComponent implements OnInit {
         this.isLoading.next(false)
       }
     )
+  }
+
+  formatNumber(amount: any): string{
+    return parseInt(amount).toFixed(0).replace(/(\d)(?=(\d{3})+\b)/g,'$1 ');
   }
 }

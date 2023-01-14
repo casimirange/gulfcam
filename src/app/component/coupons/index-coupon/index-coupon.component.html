@@ -96,7 +96,7 @@
                 <td>{{i + 1}}</td>
                 <td>{{coupon.internalReference}}</td>
                 <td>{{padWithZero(coupon.serialNumber, 7)}}</td>
-                <td>{{coupon.amount}}</td>
+                <td>{{formatNumber(coupon.amount)}}</td>
                 <td>{{coupon.nameClient}}</td>
                 <td>{{coupon.idTicket}}</td>
                 <td>{{coupon.idNotebook}}</td>
@@ -154,7 +154,7 @@
             <div class="col-md-12">
               <div class="position-relative form-group">
                 <label for="localisation" class="">Coupon</label>
-                <input name="amount" id="localisation" placeholder="localisation"
+                <input name="amount" id="localisation" placeholder="numéro de série du coupon"
                        type="text" class="form-control" formControlName="coupon">
               </div>
             </div>

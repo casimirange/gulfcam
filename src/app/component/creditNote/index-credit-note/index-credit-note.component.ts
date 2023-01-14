@@ -218,14 +218,19 @@ export class IndexCreditNoteComponent implements OnInit {
   }
 
   addCoupon() {
-    this.couponService.getCouponsBySerialNumber(this.creditForm.controls['serialNumber'].value).subscribe(
+    let str= parseInt(this.creditForm.controls['serialNumber'].value).toString();
+    this.couponService.getCouponsBySerialNumber(str).subscribe(
       res => {
         if (res.status.name === 'USED' ){
           if (res.idCreditNote != null){
             this.notifService.onWarning('Ce coupon a déjà fait l\'objet d\'une note de crédit')
           }else {
-            this.vouchers.push(this.creditForm.controls['serialNumber'].value)
-            this.creditForm.controls['serialNumber'].reset()
+            if (res.idStation === parseInt(this.creditForm.controls['idStation'].value)){
+              this.vouchers.push(parseInt(this.creditForm.controls['serialNumber'].value))
+              this.creditForm.controls['serialNumber'].reset()
+            }else {
+             this.notifService.onWarning('Ce coupon n\'a pas été utilisé dans cette station')
+            }
           }
         }else{
           this.notifService.onWarning("Ce coupon n'a pas encore été utilisé en station")
@@ -248,5 +253,9 @@ export class IndexCreditNoteComponent implements OnInit {
 
   creditNoteDetails(note: CreditNote) {
     this.router.navigate(['/credit-note/details', note.internalReference])
+  }
+
+  formatNumber(amount: any): string{
+    return parseInt(amount).toFixed(0).replace(/(\d)(?=(\d{3})+\b)/g,'$1 ');
   }
 }

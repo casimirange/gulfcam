@@ -35,7 +35,7 @@ export class IndexClientComponent implements OnInit {
   page: number = 1;
   totalPages: number;
   totalElements: number;
-  size: number = 20;
+  size: number = 1;
   roleUser = localStorage.getItem('userAccount').toString()
   modalTitle = 'Enregistrer nouveau client'
 
@@ -85,7 +85,7 @@ export class IndexClientComponent implements OnInit {
     this.clientForm = this.fb.group({
       completeName: ['', [Validators.required, Validators.minLength(3)]],
       companyName: ['', [Validators.required, Validators.minLength(3)]],
-      email: ['', [Validators.required, Validators.email]],
+      email: ['', [Validators.email]],
       phone: ['', [Validators.required, ]],
       address: ['', [Validators.required, Validators.minLength(5)]],
       gulfcamAccountNumber: ['', [Validators.required, Validators.pattern('^[0-9 ]*$')]],

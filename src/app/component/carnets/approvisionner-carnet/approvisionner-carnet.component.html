@@ -74,7 +74,7 @@
                 <button type="submit" class="btn btn-primary" [disabled]="supplyForm.invalid || (isLoading$ | async)">
                   <i *ngIf="isLoading$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
                   <span *ngIf="isLoading$ | async">Approvisionnement...</span>
-                  <span *ngIf="!(isLoading$ | async)" (click)="supplyCarton()">Approvisionner</span>
+                  <span *ngIf="!(isLoading$ | async)" (click)="supplyNoteBook()">Approvisionner</span>
                 </button>
               </div>
             </div>

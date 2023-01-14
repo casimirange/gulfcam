@@ -73,7 +73,7 @@ export class ApprovisionnerCarnetComponent implements OnInit {
     )
   }
   //save carton
-  supplyCarton(){
+  supplyNoteBook(){
     this.isLoading.next(true);
     this.supply.idCarton = this.supplyForm.controls['idCarton'].value
     this.supply.idStoreHouseSell = this.supplyForm.controls['idStoreHouseSell'].value

@@ -7,7 +7,7 @@ import {ICredentials} from "../../../_interfaces/credentials";
 import {IToken} from "../../../_model/token";
 import {BehaviorSubject, Observable, of} from "rxjs";
 import {AppState} from "../../../_interfaces/app-state";
-import {catchError, map, startWith} from "rxjs/operators";
+import {catchError, count, map, startWith} from "rxjs/operators";
 import {DataState} from "../../../_enum/data.state.enum";
 import {NotifsService} from "../../../_services/notifications/notifs.service";
 
@@ -32,6 +32,7 @@ export class LoginComponent implements OnInit {
   isLoginFailed: boolean;
   isLoggedIn: boolean;
   form: any;
+  count: number = 0;
   constructor(
     private fb: FormBuilder, private http: HttpClient, private authService: AuthService, private tokenService: TokenService,
     private notifsService: NotifsService
@@ -53,7 +54,7 @@ export class LoginComponent implements OnInit {
   }
 
 
-  onSubmit() {
+  login() {
     this.isLoading.next(true);
     this.credentials.login = this.loginForm.controls['username'].value;
     this.credentials.password = this.loginForm.controls['password'].value;
@@ -98,7 +99,9 @@ export class LoginComponent implements OnInit {
         this.isLoggedIn = true;
       },
       (error: any) => {
-        this.errorMessage = error.error.message;
+        this.errorMessage = error.error.error[0];
+        this.count += this.count
+        console.log(this.count)
         // this.notifsService.onError(error.error.error[0], 'Echec de connexioon')
         this.isLoginFailed = true;
         this.isLoading.next(false);

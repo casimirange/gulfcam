@@ -7,7 +7,23 @@
         </i>
       </div>
       <div>Note de crédit N° {{creditNote.internalReference}}
-        <div class="page-title-subheading">Date :{{creditNote.createdAt | date: 'dd/MM/yyyy'}}&nbsp;</div>
+        <div class="page-title-subheading">
+<!--          Date :{{creditNote.createdAt | date: 'dd/MM/yyyy'}}&nbsp;-->
+          <nav class="" aria-label="breadcrumb">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item">
+                <a>
+                  <i aria-hidden="true" class="fa fa-calendar"></i> Date: &nbsp; {{creditNote.createdAt | date: 'dd/MM/yyyy'}}
+                </a>
+              </li>
+              <li class="active breadcrumb-item" aria-current="page">
+                <a>
+                  <i class="fa fa-charging-station"></i> Statut&nbsp; {{getStatuts(statut)}}
+                </a>
+              </li>
+            </ol>
+          </nav>
+        </div>
       </div>
     </div>
     <div class="page-title-actions">
@@ -29,12 +45,19 @@
         Liste de ses coupons
         <div class="btn-actions-pane-right">
           <div role="group" class="btn-group-sm btn-group">
-            <button *ngIf="statut == 'CREATED'" class="btn btn-success" [disabled]="(isLoading$ | async)"
+            <button  *ngIf="statut == 'CREATED'" class="btn btn-outline-primary" [disabled]="(isLoading$ | async)"
                     title="valider une note de crédit" (click)="validCreditNote()">
               <i *ngIf="isLoading$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
               <span *ngIf="isLoading$ | async">Validation ...</span>
               <span
                 *ngIf="!(isLoading$ | async)"><i class="pe-7s-check" ></i> Valider</span>
+            </button> &nbsp;
+            <button class="btn btn-outline-alternate" [disabled]="(isExtracting$ | async)"
+                    title="exporter une note de crédit" (click)="exportCreditNote()">
+              <i *ngIf="isExtracting$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
+              <span *ngIf="isExtracting$ | async">Exportation ...</span>
+              <span
+                *ngIf="!(isExtracting$ | async)"><i class="fa fa-file-pdf" ></i> Exporter</span>
             </button>
           </div>
         </div>

@@ -26,9 +26,11 @@ export class ForgetPasswordComponent implements OnInit {
   isLoading$ = this.isLoading.asObservable();
 
   form: any;
+  isSend: boolean = false;
+  email: string;
 
   constructor(
-    private fb: FormBuilder, private authService: AuthService, private router: Router, private notifsService: NotifsService
+    private fb: FormBuilder, private authService: AuthService, private notifsService: NotifsService
   ) {
     this.forgetForm = this.fb.group({
       username: ['', [Validators.required, Validators.email]],
@@ -47,7 +49,10 @@ export class ForgetPasswordComponent implements OnInit {
       (data) => {
         console.log(data)
         this.notifsService.onSuccess(data.message)
-        this.router.navigate(['auth/reset-password']);
+        this.isLoading.next(false)
+        this.email = this.forgetForm.controls['username'].value
+        this.forgetForm.controls['username'].reset()
+        this.isSend = true
       },
       (error: any) => {
         console.log(error)

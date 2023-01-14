@@ -242,7 +242,7 @@
               </div>
               <div class="row">
               <div class="float-right">
-                <button type="submit" class="btn btn-primary" [disabled]="signup.invalid || (isLoading$ | async)"  (click)="onSubmit()">
+                <button type="submit" class="btn btn-primary" [disabled]="signup.invalid || (isLoading$ | async)"  (click)="saveUser()">
                   <i *ngIf="isLoading$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
                   <span *ngIf="isLoading$ | async">Enregistrement...</span>
                   <span *ngIf="!(isLoading$ | async)">Enregistrer</span>
