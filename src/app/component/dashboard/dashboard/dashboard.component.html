@@ -1,7 +1,7 @@
 <div class="app-container app-theme-white body-tabs-shadow fixed-header ">
   <app-header></app-header>
   <div class="app-main">
-<!--    <app-sidebar></app-sidebar>-->
+    <!--    <app-sidebar></app-sidebar>-->
     <div class="app-main__outer">
       <div class="app-main__inner">
 
@@ -17,91 +17,101 @@
               </div>
             </div>
             <div class="page-title-actions">
-            <div class="d-inline-block ">
-              <img src="assets/images/logo-removebg-preview.png" class="img-fluid" height="60" width="60" alt="">
+              <div class="d-inline-block ">
+                <img src="assets/images/logo-removebg-preview.png" class="img-fluid" height="60" width="60" alt="">
+              </div>
             </div>
-          </div>
           </div>
         </div>
         <div class="col-lg-12 col-xl-12">
           <div class="main-card mb-3 card">
             <div class="card-body">
-<!--              <h5 class="card-title">Grid Menu Bigger</h5>-->
+              <!--              <h5 class="card-title">Grid Menu Bigger</h5>-->
               <div class="grid-menu grid-menu-3col">
                 <div class="no-gutters row">
-                  <div class="col-sm-6 col-xl-4" routerLink="/commandes">
-                  <!--<div class="col-sm-6 col-xl-4" routerLink="/commandes" *ngIf="roleUser === 'MANAGER_STORE' ||-->
-                  <!-- roleUser === 'MANAGER_ORDER' || roleUser === 'MANAGER_COUPON' || role.includes('ROLE_ADMIN')">-->
+                  <div class="col-sm-6 col-xl-4" routerLink="/commandes" *ngIf="roleUser === 'MANAGER_STORE' ||
+                   roleUser === 'MANAGER_ORDER' || roleUser === 'MANAGER_COUPON' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
                     <button class="btn-icon-vertical btn-square btn-transition btn btn-outline-link">
                       <i class="pe-7s-news-paper btn-icon-wrapper btn-icon-lg mb-3"></i>Commandes
                     </button>
                   </div>
-                  <div class="col-sm-6 col-xl-4" routerLink="/cartons">
+                  <div class="col-sm-6 col-xl-4" routerLink="/cartons"
+                       *ngIf="roleUser === 'MANAGER_STORE' || roleUser === 'MANAGER_COUPON' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
                     <button class="btn-icon-vertical btn-square btn-transition btn btn-outline-link">
                       <i class="pe-7s-box1 btn-icon-wrapper btn-icon-lg mb-3"></i>Cartons
                     </button>
                   </div>
-                  <div class="col-sm-6 col-xl-4" routerLink="/magasins" *ngIf="roleUser === 'MANAGER_STORE' || roleUser === 'MANAGER_COUPON'">
+                  <div class="col-sm-6 col-xl-4" routerLink="/magasins"
+                       *ngIf="roleUser === 'MANAGER_STORE' || roleUser === 'MANAGER_COUPON' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
                     <button class="btn-icon-vertical btn-square btn-transition btn btn-outline-link">
                       <i class="pe-7s-home btn-icon-wrapper btn-icon-lg mb-3"></i>Magasins
                     </button>
                   </div>
-                  <div class="col-sm-6 col-xl-4" routerLink="/coupons" >
+                  <div class="col-sm-6 col-xl-4" routerLink="/coupons"
+                       *ngIf="roleUser === 'MANAGER_STORE' || roleUser === 'MANAGER_COUPON' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
                     <button class="btn-icon-vertical btn-square btn-transition btn btn-outline-link">
                       <i class="pe-7s-ribbon btn-icon-wrapper btn-icon-lg mb-3"></i>Coupons
                     </button>
                   </div>
-                  <div class="col-sm-6 col-xl-4" routerLink="/stations" >
+                  <div class="col-sm-6 col-xl-4" routerLink="/stations"
+                       *ngIf="roleUser === 'MANAGER_STATION' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
                     <button class="btn-icon-vertical btn-square btn-transition btn btn-outline-link">
                       <i class="pe-7s-paint-bucket btn-icon-wrapper btn-icon-lg mb-3"></i>Station
                     </button>
                   </div>
-                  <div class="col-sm-6 col-xl-4" routerLink="/carnets" >
+                  <div class="col-sm-6 col-xl-4" routerLink="/carnets"
+                       *ngIf="roleUser === 'MANAGER_STORE' || roleUser === 'MANAGER_COUPON' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
                     <button class="btn-icon-vertical btn-square btn-transition btn btn-outline-link">
                       <i class="pe-7s-note2 btn-icon-wrapper btn-icon-lg mb-3"></i>Carnets
                     </button>
                   </div>
-                  <div class="col-sm-6 col-xl-4" routerLink="/paiement-method" >
+                  <div class="col-sm-6 col-xl-4" routerLink="/paiement-method" *ngIf="role.includes('ROLE_SUPERADMIN')">
                     <button class="btn-icon-vertical btn-square btn-transition btn btn-outline-link">
                       <i class="pe-7s-piggy btn-icon-wrapper btn-icon-lg mb-3"></i>Modes de paiement
                     </button>
                   </div>
-                  <div class="col-sm-6 col-xl-4" routerLink="/users" >
+                  <div class="col-sm-6 col-xl-4" routerLink="/users" *ngIf="role.includes('ROLE_SUPERADMIN')">
                     <button class="btn-icon-vertical btn-square btn-transition btn btn-outline-link">
                       <i class="pe-7s-user btn-icon-wrapper btn-icon-lg mb-3"></i>Utilisateurs
                     </button>
                   </div>
-                  <div class="col-sm-6 col-xl-4" routerLink="/clients" >
+                  <div class="col-sm-6 col-xl-4" routerLink="/clients"
+                       *ngIf="roleUser === 'MANAGER_ORDER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
                     <button class="btn-icon-vertical btn-square btn-transition btn btn-outline-link">
                       <i class="pe-7s-users btn-icon-wrapper btn-icon-lg mb-3"></i>Clients
                     </button>
                   </div>
-                  <div class="col-sm-6 col-xl-4" routerLink="/entrepots" >
+                  <div class="col-sm-6 col-xl-4" routerLink="/entrepots"
+                       *ngIf="roleUser === 'MANAGER_STORE' || roleUser === 'MANAGER_COUPON' || roleUser === 'STORE_KEEPER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
                     <button class="btn-icon-vertical btn-square btn-transition btn btn-outline-link">
                       <i class="pe-7s-server btn-icon-wrapper btn-icon-lg mb-3"></i>Espace de stockage
                     </button>
                   </div>
-                  <div class="col-sm-6 col-xl-4" routerLink="/request-opposition">
+                  <div class="col-sm-6 col-xl-4" routerLink="/request-opposition"
+                       *ngIf="roleUser === 'MANAGER_COUPON' || roleUser === 'CUSTOMER_SERVICE' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
                     <button class="btn-icon-vertical btn-square btn-transition btn btn-outline-link">
                       <i class="pe-7s-close-circle btn-icon-wrapper btn-icon-lg mb-3"></i>Demande d'opposition
                     </button>
                   </div>
-                  <div class="col-sm-6 col-xl-4" routerLink="/credit-note">
+                  <div class="col-sm-6 col-xl-4" routerLink="/credit-note"
+                       *ngIf="roleUser === 'CUSTOMER_SERVICE' || roleUser === 'TREASURY' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
                     <button class="btn-icon-vertical btn-square btn-transition btn btn-outline-link">
                       <i class="pe-7s-cash btn-icon-wrapper btn-icon-lg mb-3"></i>Note de credit
                     </button>
                   </div>
-                  <div class="col-sm-6 col-xl-4" routerLink="/caisse">
+                  <div class="col-sm-6 col-xl-4" routerLink="/caisse"
+                       *ngIf="roleUser === 'TREASURY' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
                     <button class="btn-icon-vertical btn-square btn-transition btn btn-outline-link">
-                      <i class="pe-7s-wallet btn-icon-wrapper btn-icon-lg mb-3"></i>Trésorerie
+                      <i class="pe-7s-wallet btn-icon-wrapper btn-icon-lg mb-3"></i>Gestion des paiements
                     </button>
                   </div>
-                  <div class="col-sm-6 col-xl-4" routerLink="/stock" >
+                  <div class="col-sm-6 col-xl-4" routerLink="/stock"
+                       *ngIf="roleUser === 'MANAGER_COUPON' || roleUser==='MANAGER_STORE' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
                     <button class="btn-icon-vertical btn-square btn-transition btn btn-outline-link">
                       <i class="pe-7s-drawer btn-icon-wrapper btn-icon-lg mb-3"></i>Stock
                     </button>
                   </div>
-                  <div class="col-sm-6 col-xl-4" routerLink="/typeBon" >
+                  <div class="col-sm-6 col-xl-4" routerLink="/typeBon" *ngIf="role.includes('ROLE_SUPERADMIN')">
                     <button class="btn-icon-vertical btn-square btn-transition btn btn-outline-link">
                       <i class="pe-7s-credit btn-icon-wrapper btn-icon-lg mb-3"></i>Type de bon
                     </button>

@@ -1,5 +1,6 @@
 import {IUser} from "./user";
 import {Status} from "./status";
+import {StoreHouse} from "./storehouse";
 
 export class Carton{
   id?: number;
@@ -12,7 +13,7 @@ export class Carton{
   createdAt?: Date;
   updateAt?: Date;
   status?: Status;
-
+  storeHouse?: StoreHouse;
   serialTo: number;
   number: number;
   serialFrom: number;

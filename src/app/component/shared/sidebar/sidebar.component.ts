@@ -11,6 +11,7 @@ import {ActivatedRoute} from "@angular/router";
 export class SidebarComponent implements OnInit {
   roleUser = localStorage.getItem('userAccount').toString()
   public extraParameter: any;
+  role: string[] = []
 
   constructor(public globals: ConfigOptions, private activatedRoute: ActivatedRoute) {
 
@@ -35,7 +36,9 @@ export class SidebarComponent implements OnInit {
       }
     });
 
-    console.log(this.globals.toggleSidebar)
+    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
+      this.role.push(authority);
+    });
 
     this.extraParameter = this.activatedRoute.snapshot.firstChild.data.extraParameter;
 

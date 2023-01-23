@@ -11,4 +11,5 @@ export class StoreHouse{
   createAt?: Date;
   updateAt?: Date;
   status?: Status;
+  store?: Store
 }

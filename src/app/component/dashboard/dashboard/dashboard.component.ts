@@ -13,9 +13,9 @@ export class DashboardComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
-    this.role.push(localStorage.getItem('Roles'))
-    console.log(this.role)
-    this.role.includes('ROLE_ADMIN') ? console.log('oui') : console.log('non')
+    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
+      this.role.push(authority);
+    });
   }
 
 }

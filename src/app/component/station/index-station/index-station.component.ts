@@ -1,6 +1,6 @@
-import {Component, ElementRef, OnInit, TemplateRef, ViewChild} from '@angular/core';
+import {Component, ElementRef, OnDestroy, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
-import {BehaviorSubject} from "rxjs";
+import {BehaviorSubject, Subscription} from "rxjs";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {NotifsService} from "../../../_services/notifications/notifs.service";
 import Swal from "sweetalert2";
@@ -17,7 +17,7 @@ import {Router} from "@angular/router";
   templateUrl: './index-station.component.html',
   styleUrls: ['./index-station.component.scss']
 })
-export class IndexStationComponent implements OnInit {
+export class IndexStationComponent implements OnInit, OnDestroy {
 
   stations: Station[] = [];
   users: ISignup[] = [];
@@ -32,6 +32,7 @@ export class IndexStationComponent implements OnInit {
   totalElements: number;
   size: number = 10;
   roleUser = localStorage.getItem('userAccount').toString()
+  suscription: Subscription;
   constructor(private fb: FormBuilder, private modalService: NgbModal, private stationService: StationService,
               private notifService: NotifsService, private statusService: StatusService, private router: Router,
               private userService: UsersService) {
@@ -41,6 +42,11 @@ export class IndexStationComponent implements OnInit {
   ngOnInit(): void {
     this.getStations();
     this.getUsers();
+
+    this.suscription = this.stationService.refresh$.subscribe(() => {
+      this.getStations()
+    })
+
   }
 
   //formulaire de création
@@ -88,7 +94,7 @@ export class IndexStationComponent implements OnInit {
 
     this.stationService.createStation(this.station).subscribe(
       resp => {
-        this.stations.push(resp)
+        // this.stations.push(resp)
         this.isLoading.next(false);
         this.notifService.onSuccess('enregistrement effectué')
         this.annuler()
@@ -148,5 +154,9 @@ export class IndexStationComponent implements OnInit {
 
   showDetails(station: Station) {
     this.router.navigate(['/stations/details', station.internalReference])
+  }
+
+  ngOnDestroy(): void {
+    this.suscription.unsubscribe()
   }
 }

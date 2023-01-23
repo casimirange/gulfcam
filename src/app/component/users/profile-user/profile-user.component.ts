@@ -50,19 +50,6 @@ export class ProfileUserComponent implements OnInit {
 
   ngOnInit(): void {
     this.getUser()
-    this.getStores()
-  }
-
-  getStores(){
-    this.storeService.getStore().subscribe(
-      resp => {
-        console.log(resp)
-        this.stores = resp.content
-      },
-      error => {
-
-      }
-    )
   }
 
   getUser() {

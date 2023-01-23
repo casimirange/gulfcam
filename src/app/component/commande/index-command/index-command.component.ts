@@ -40,9 +40,7 @@ export class IndexCommandComponent implements OnInit {
   client: Client;
   store: Store;
   showClientForm = false;
-  clientForm: FormGroup ;
   orderForm: FormGroup ;
-  clF: any;
   orF: any;
   canaux = ['Appel', 'Courier papier', 'Email', 'Sur site']
   stores: Store[] = [];
@@ -74,36 +72,21 @@ export class IndexCommandComponent implements OnInit {
   private isLoading = new BehaviorSubject<boolean>(false);
   isLoading$ = this.isLoading.asObservable();
   roleUser = localStorage.getItem('userAccount').toString()
+  clientNotFound: boolean = false;
   constructor(private fb: FormBuilder, private modalService: NgbModal, private clientService: ClientService,
               private voucherService: VoucherService, private notifsService: NotifsService, private storeService: StoreService,
               private productService: ProductService, private orderService: OrderService, private statusService: StatusOrderService,
               public global: ConfigOptions
   ) {
-    this.formClient();
     this.formOrder();
-    this.clF = this.clientForm.controls;
     this.orF = this.orderForm.controls;
-  }
-
-  //initialisation du formulaire de création client
-  formClient(){
-    this.clientForm = this.fb.group({
-      completeName: ['', [Validators.required, Validators.minLength(3)]],
-      companyName: ['', [Validators.required, Validators.minLength(3)]],
-      email: ['', [Validators.email]],
-      phone: ['', [Validators.required]],
-      address: ['', [Validators.required, Validators.minLength(5)]],
-      gulfcamAccountNumber: ['', [Validators.required, Validators.pattern('^[0-9 ]*$')]],
-      rccm: ['', [Validators.required, Validators.minLength(2)]],
-      typeClient: ['', [Validators.required]],
-    });
   }
 
   //initialisation de création du formulaire de commande
   formOrder(){
     this.orderForm = this.fb.group({
       client: ['', [Validators.required, Validators.minLength(3)]],
-      store: ['', [Validators.required, ]],
+      // store: ['', [Validators.required, ]],
       chanel: ['', [Validators.required, ]],
       quantity: ['', [Validators.required, Validators.pattern('^[1,2,3,4,5,6,7,8,9][0-9]*$')]],
       voucherType: ['', [Validators.required]],
@@ -132,7 +115,15 @@ export class IndexCommandComponent implements OnInit {
     if (event != '' && event.length >= 3){
       this.clientService.searchClient(event) .subscribe(
         resp => {
+          console.log(resp)
+          console.log(resp.length)
           this.clients = resp;
+          if (!resp.length){
+            this.notifsService.onError('Ce client n\'existe pas', '')
+            this.clientNotFound = true
+          }else {
+            this.clientNotFound = false
+          }
         }
       )
     }else {
@@ -219,23 +210,6 @@ export class IndexCommandComponent implements OnInit {
     this.title = 'Enregistrer nouvelle commande';
   }
 
-
-  saveClientt(){
-    this.client = this.clientForm.value
-    this.client.phone = this.clientForm.controls['phone'].value.e164Number
-    this.clientService.addClient(this.client).subscribe(
-      resp => {
-        this.clients.push(resp)
-        this.notifsService.onSuccess('client rajouté avec succès')
-        this.showOrderForms();
-        this.annulerCommande()
-      },
-      err => {
-        // this.notifsService.onError(err.error.message, 'échec d\'enregistrement')
-      }
-    )
-  }
-
   getOrders(){
     this.orderState$ = this.orderService.orders$(this.page - 1, this.size)
       .pipe(
@@ -254,7 +228,6 @@ export class IndexCommandComponent implements OnInit {
 
   annuler() {
     this.formOrder();
-    this.formClient();
     this.showOrderForms();
     this.modalService.dismissAll()
     this.tabProducts = []
@@ -264,18 +237,18 @@ export class IndexCommandComponent implements OnInit {
   }
 
   annulerCommande() {
-    this.formClient();
     this.showOrderForms();
   }
 
   saveOrder(){
     this.isLoading.next(true);
     //on récupère les informations du client
-      this.client = this.findClients(this.orF['client'].value)[0]
+    this.client = this.findClients(this.orF['client'].value)[0]
     //on récupère les informations du magasin
-    this.store = this.findStore(this.orF['store'].value)[0]
+    // this.store = this.findStore(this.orF['store'].value)[0]
 
-    this.order.idStore = this.store.internalReference
+    // this.order.idStore = this.store.internalReference
+    this.order.idStore = parseInt(localStorage.getItem("store"))
     this.order.idClient = this.client.internalReference
     this.order.channel = this.orF['chanel'].value
     this.order.description = this.orF['description'].value

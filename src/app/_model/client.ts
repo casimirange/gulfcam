@@ -10,6 +10,7 @@ export class Client {
   email: string;
   gulfcamAccountNumber: string;
   rccm: string;
+  niu: string;
   typeClient: TypeClient;
   createdAt?: Date
   updateAt?: Date

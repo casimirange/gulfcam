@@ -1,4 +1,4 @@
-<ng-container>
+<ng-container *ngIf="roleUser === 'MANAGER_ORDER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
   <div class="app-page-title">
     <div class="page-title-wrapper">
       <div class="page-title-heading">
@@ -65,6 +65,7 @@
                   <th>Téléphone</th>
                   <th>Email</th>
                   <th>N° compte</th>
+                  <th>NIU</th>
                   <th>Type</th>
                   <th>RCCM</th>
                   <th>Actions</th>
@@ -84,6 +85,7 @@
                   <td>{{client.phone}}</td>
                   <td>{{client.email}}</td>
                   <td>{{client.gulfcamAccountNumber}}</td>
+                  <td>{{client.niu}}</td>
                   <td>{{client.typeClient.name === 'PARTICULAR' ? 'PARTICULIER' : client.typeClient.name }}</td>
                   <td>{{client.rccm}}</td>
                   <td>
@@ -188,17 +190,6 @@
                 <input name="email" id="reason" ngModel="{{client.companyName}}" placeholder="nom de la société"
                        type="text" class="form-control" formControlName="companyName">
               </div>
-              <div
-                *ngIf="clientForm.controls['companyName'].invalid && (clientForm.controls['companyName'].dirty || clientForm.controls['companyName'].touched)"
-                class="mb-2" style="color: #f65656; font-style: italic;">
-
-                <div *ngIf="clientForm.controls['companyName'].errors?.['required']" class="ml-3">
-                  le nom de la compagnie est obligatoire.
-                </div>
-                <div *ngIf="clientForm.controls['companyName'].errors?.['minLength']" class="ml-3">
-                  entrez un nom de compagnie valide d'au moins 3 caractères
-                </div>
-              </div>
             </div>
             <div class="col-md-6">
               <div class="position-relative form-group">
@@ -220,29 +211,11 @@
             </div>
           </div>
           <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-4">
               <div class="position-relative form-group">
                 <label for="phone" class="">Numéro de téléphone</label>
                 <input name="email" id="phone" ngModel="{{client.phone}}"  type="text" placeholder="6937542108"
                        class="form-control" formControlName="phone">
-
-<!--                <ngx-intl-tel-input-->
-<!--                  [cssClass]="'form-control'"-->
-<!--                  [preferredCountries]="preferredCountries"-->
-<!--                  [enableAutoCountrySelect]="true"-->
-<!--                  [enablePlaceholder]="true"-->
-<!--                  [searchCountryFlag]="true"-->
-<!--                  [searchCountryField]="[SearchCountryField.Iso2, SearchCountryField.Name]"-->
-<!--                  [selectFirstCountry]="false"-->
-<!--                  [selectedCountryISO]="CountryISO.Cameroon"-->
-<!--                  [maxLength]="15"-->
-<!--                  [separateDialCode]="true"-->
-<!--                  [phoneValidation]="true"-->
-<!--                  name="phone"-->
-<!--                  id="phone"-->
-<!--                  ngModel="{{client.phone}}"-->
-<!--                  formControlName="phone"-->
-<!--                ></ngx-intl-tel-input>-->
               </div>
               <div
                 *ngIf="clientForm.controls['phone'].invalid && ( clientForm.controls['phone'].touched)"
@@ -256,22 +229,18 @@
                 </div>
               </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
               <div class="position-relative form-group">
                 <label for="rccm" class="">RCCM</label>
                 <input name="email" id="rccm" ngModel="{{client.rccm}}" placeholder="RCCM" type="text"
                        class="form-control" formControlName="rccm">
               </div>
-              <div
-                *ngIf="clientForm.controls['rccm'].invalid && (clientForm.controls['rccm'].dirty || clientForm.controls['rccm'].touched)"
-                class="mb-2" style="color: #f65656; font-style: italic;">
-
-                <div *ngIf="clientForm.controls['rccm'].errors?.['required']" class="ml-3">
-                  rccm est obligatoire.
-                </div>
-                <div *ngIf="clientForm.controls['rccm'].errors?.['pattern']" class="ml-3">
-                  rccm doit être en chiffres
-                </div>
+            </div>
+            <div class="col-md-4">
+              <div class="position-relative form-group">
+                <label for="niu" class="">NIU</label>
+                <input name="email" id="niu" ngModel="{{client.niu}}" placeholder="numéro d'identifiant unique" type="text"
+                       class="form-control" formControlName="niu">
               </div>
             </div>
           </div>

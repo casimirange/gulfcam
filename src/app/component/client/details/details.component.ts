@@ -28,6 +28,7 @@ export class DetailsComponent implements OnInit {
   order: Order = new Order();
   stores: Store[] = [];
   roleUser = localStorage.getItem('userAccount').toString()
+  role: string[] = []
   appState$: Observable<AppState<Client>>;
   sendMailOrder$: Observable<AppState<Order>>;
   sendMailCoupon$: Observable<AppState<Coupon>>;
@@ -53,6 +54,9 @@ export class DetailsComponent implements OnInit {
               private couponService: CouponService, private statusService: StatusOrderService) {
     this.client = new Client()
     this.IdParam = this.route.snapshot.paramMap.get('id');
+    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
+      this.role.push(authority);
+    });
   }
 
   ngOnInit(): void {

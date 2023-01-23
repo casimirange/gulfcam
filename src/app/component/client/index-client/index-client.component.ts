@@ -35,16 +35,19 @@ export class IndexClientComponent implements OnInit {
   page: number = 1;
   totalPages: number;
   totalElements: number;
-  size: number = 1;
+  size: number = 10;
   roleUser = localStorage.getItem('userAccount').toString()
   modalTitle = 'Enregistrer nouveau client'
-
+  role: string[] = []
 
   @ViewChild('mymodal', {static: false}) viewMe?: ElementRef<HTMLElement>;
 
   constructor(private fb: FormBuilder, private modalService: NgbModal, private clientService: ClientService, private router: Router,
               private notifService: NotifsService) {
     this.formClient();
+    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
+      this.role.push(authority);
+    });
   }
 
   ngOnInit(): void {
@@ -84,12 +87,12 @@ export class IndexClientComponent implements OnInit {
   formClient() {
     this.clientForm = this.fb.group({
       completeName: ['', [Validators.required, Validators.minLength(3)]],
-      companyName: ['', [Validators.required, Validators.minLength(3)]],
+      companyName: [''],
       email: ['', [Validators.email]],
       phone: ['', [Validators.required, ]],
       address: ['', [Validators.required, Validators.minLength(5)]],
       gulfcamAccountNumber: ['', [Validators.required, Validators.pattern('^[0-9 ]*$')]],
-      rccm: ['', [Validators.required, Validators.minLength(2)]],
+      rccm: [''],
       typeClient: ['', [Validators.required]],
     });
   }

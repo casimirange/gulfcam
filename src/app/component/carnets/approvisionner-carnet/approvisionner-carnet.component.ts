@@ -31,9 +31,6 @@ export class ApprovisionnerCarnetComponent implements OnInit {
   private isLoading = new BehaviorSubject<boolean>(false);
   isLoading$ = this.isLoading.asObservable();
   sn: any;
-  storeHouse1: StoreHouse = new StoreHouse();
-  storeHouse2: StoreHouse = new StoreHouse();
-  storeHouses1: StoreHouse[] = [];
   storeHouses2: StoreHouse[] = [];
   roleUser = localStorage.getItem('userAccount').toString()
   constructor(private userService: UsersService,  private notifsService: NotifsService, private route: ActivatedRoute,
@@ -60,7 +57,7 @@ export class ApprovisionnerCarnetComponent implements OnInit {
   getCartons(): void{
     this.cartonService.getAllCartonWithPagination(0, 500).subscribe(
       resp => {
-        this.cartons = resp.content.filter((carton: Carton) => carton.status.name === 'AVAILABLE')
+        this.cartons = resp.content.filter((carton: Carton) => carton.status.name === 'AVAILABLE' && carton.storeHouse.idStore == parseInt(localStorage.getItem('store')))
       }
     )
   }
@@ -68,7 +65,7 @@ export class ApprovisionnerCarnetComponent implements OnInit {
   getStoreHouses(){
     this.storeHouseService.getAllStoreHousesWithPagination(0, 500).subscribe(
       resp => {
-        this.storeHouses2 = resp.content.filter(st => st.type == 'vente')
+        this.storeHouses2 = resp.content.filter(st => st.type == 'vente' && st.store.internalReference == parseInt(localStorage.getItem('store')))
       },
     )
   }

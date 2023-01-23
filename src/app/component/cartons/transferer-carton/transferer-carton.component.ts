@@ -53,7 +53,7 @@ export class TransfererCartonComponent implements OnInit {
   getCartons(): void{
     this.cartonService.getAllCartonWithPagination(0, 500).subscribe(
       resp => {
-        this.cartons = resp.content.filter((carton: Carton) => carton.status.name === 'AVAILABLE')
+        this.cartons = resp.content.filter((carton: Carton) => carton.status.name === 'AVAILABLE' && carton.storeHouse.idStore == parseInt(localStorage.getItem('store')))
       }
     )
   }
@@ -61,7 +61,7 @@ export class TransfererCartonComponent implements OnInit {
   getStoreHouses(){
     this.storeHouseService.getAllStoreHousesWithPagination(0, 500).subscribe(
       resp => {
-        this.storeHouses1 = resp.content.filter(st => st.type == 'stockage')
+        this.storeHouses1 = resp.content.filter(st => st.type == 'stockage' && st.store.internalReference != parseInt(localStorage.getItem('store')))
       },
     )
   }

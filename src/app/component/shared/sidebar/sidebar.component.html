@@ -5,12 +5,12 @@
     <div class="logo-src"></div>
     <div class="header__pane ml-auto">
       <div>
-                <button type="button" class="hamburger close-sidebar-btn hamburger--elastic" data-class="closed-sidebar"
-                        [ngClass]="globals.toggleSidebar ? 'is-active' : ''" (click)="toggleSidebar()">
+        <button type="button" class="hamburger close-sidebar-btn hamburger--elastic" data-class="closed-sidebar"
+                [ngClass]="globals.toggleSidebar ? 'is-active' : ''" (click)="toggleSidebar()">
                                         <span class="hamburger-box">
                                             <span class="hamburger-inner"></span>
                                         </span>
-                </button>
+        </button>
       </div>
     </div>
   </div>
@@ -44,91 +44,92 @@
           </a>
         </li>
         <li class="app-sidebar__heading">Menu</li>
-        <li>
+        <li *ngIf="roleUser === 'MANAGER_ORDER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
           <a routerLink="/clients" routerLinkActive="mm-active">
             <i class="metismenu-icon pe-7s-users">
             </i>Clients
           </a>
         </li>
-        <li>
+        <li
+          *ngIf="roleUser === 'MANAGER_STORE' || roleUser === 'MANAGER_ORDER' || roleUser === 'MANAGER_COUPON' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
           <a routerLink="/commandes" routerLinkActive="mm-active">
             <i class="metismenu-icon pe-7s-news-paper">
             </i>Commandes
           </a>
         </li>
-        <li>
+        <li  *ngIf="roleUser === 'MANAGER_STORE' || roleUser === 'MANAGER_COUPON' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
           <a routerLink="/coupons" routerLinkActive="mm-active">
             <i class="metismenu-icon pe-7s-ribbon">
             </i>Coupons
           </a>
         </li>
-        <li>
+        <li *ngIf="roleUser === 'MANAGER_STORE' || roleUser === 'MANAGER_COUPON' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
           <a routerLink="/carnets" routerLinkActive="mm-active">
             <i class="metismenu-icon pe-7s-note2">
             </i>Carnets
           </a>
         </li>
-        <li>
+        <li *ngIf="roleUser === 'MANAGER_STORE' || roleUser === 'MANAGER_COUPON' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
           <a routerLink="/cartons" routerLinkActive="mm-active">
             <i class="metismenu-icon pe-7s-box1">
             </i>Cartons
           </a>
         </li>
-        <li>
+        <li *ngIf="roleUser === 'TREASURY' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
           <a routerLink="/caisse" routerLinkActive="mm-active">
             <i class="metismenu-icon pe-7s-wallet">
-            </i>Trésorerie
+            </i>Gestion des paiements
           </a>
         </li>
-        <li>
+        <li  *ngIf="roleUser === 'MANAGER_STATION' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
           <a routerLink="/stations" routerLinkActive="mm-active">
             <i class="metismenu-icon pe-7s-paint-bucket">
             </i>Stations
           </a>
         </li>
-        <li>
+        <li *ngIf="roleUser === 'MANAGER_COUPON' || roleUser==='MANAGER_STORE' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
           <a routerLink="/stock" routerLinkActive="mm-active">
             <i class="metismenu-icon pe-7s-drawer">
             </i>Stock
           </a>
         </li>
-        <li routerLinkActive="mm-active">
-          <a routerLink="/magasins">
+        <li *ngIf="roleUser === 'MANAGER_STORE' || roleUser === 'MANAGER_COUPON' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+          <a routerLink="/magasins" routerLinkActive="mm-active">
             <i class="metismenu-icon pe-7s-home"></i>Magasins
           </a>
         </li>
-        <li>
-          <a routerLink="/typeBon" routerLinkActive="mm-active">
-            <i class="metismenu-icon pe-7s-credit">
-            </i>Type de bons
-          </a>
-        </li>
-        <li>
+        <li *ngIf="roleUser === 'MANAGER_STORE' || roleUser === 'MANAGER_COUPON' || roleUser === 'STORE_KEEPER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
           <a routerLink="/entrepots" routerLinkActive="mm-active">
             <i class="metismenu-icon pe-7s-server">
             </i>Espace de stockage
           </a>
         </li>
-        <li>
+        <li *ngIf="roleUser === 'MANAGER_COUPON' || roleUser === 'CUSTOMER_SERVICE' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
           <a routerLink="/request-opposition" routerLinkActive="mm-active">
             <i class="metismenu-icon pe-7s-close-circle">
             </i>Demande d'opposition
           </a>
         </li>
-        <li>
+        <li  *ngIf="roleUser === 'CUSTOMER_SERVICE' || roleUser === 'TREASURY' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
           <a routerLink="/credit-note" routerLinkActive="mm-active">
             <i class="metismenu-icon pe-7s-cash">
             </i>Note de crédit
           </a>
         </li>
-        <li class="app-sidebar__heading">Admin</li>
-        <li>
+        <li class="app-sidebar__heading"  *ngIf="role.includes('ROLE_SUPERADMIN')">Admin</li>
+        <li  *ngIf="role.includes('ROLE_SUPERADMIN')">
           <a routerLink="/paiement-method" routerLinkActive="mm-active">
             <i class="metismenu-icon pe-7s-display2">
             </i>Modes de paiement
           </a>
         </li>
-        <li>
+        <li *ngIf="role.includes('ROLE_SUPERADMIN')">
+          <a routerLink="/typeBon" routerLinkActive="mm-active">
+            <i class="metismenu-icon pe-7s-credit">
+            </i>Type de bons
+          </a>
+        </li>
+        <li  *ngIf="role.includes('ROLE_SUPERADMIN')">
           <a routerLink="/users" routerLinkActive="mm-active">
             <i class="metismenu-icon pe-7s-user">
             </i>Utilisateurs
