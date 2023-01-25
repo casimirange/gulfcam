@@ -30,7 +30,7 @@ import {BehaviorSubject} from "rxjs";
   templateUrl: './details-station.component.html',
   styleUrls: ['./details-station.component.css']
 })
-export class DetailsStationComponent implements OnInit, AfterContentInit {
+export class DetailsStationComponent implements OnInit {
 
   station: Station = new Station();
   roleUser = localStorage.getItem('userAccount').toString()
@@ -178,7 +178,4 @@ export class DetailsStationComponent implements OnInit, AfterContentInit {
     this.modalService.dismissAll()
   }
 
-  ngAfterContentInit(): void {
-    this.getStatutsCoupon()
-  }
 }
