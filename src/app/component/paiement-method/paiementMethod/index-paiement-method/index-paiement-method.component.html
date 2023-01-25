@@ -1,4 +1,4 @@
-<div class="app-page-title">
+<div class="app-page-title" *ngIf="role.includes('ROLE_SUPERADMIN')">
   <div class="page-title-wrapper">
     <div class="page-title-heading">
       <div class="page-title-icon">
@@ -18,7 +18,7 @@
     </div>    </div>
 </div>
 
-<div class="col-lg-12 col-xl-12">
+<div class="col-lg-12 col-xl-12" *ngIf="role.includes('ROLE_SUPERADMIN')">
   <div class="main-card mb-3 card">
     <div class="card-body">
       <h5 class="card-title">Liste des modes de paiement</h5>

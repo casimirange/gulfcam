@@ -27,6 +27,7 @@ export class AddUserComponent implements OnInit {
   isLoading$ = this.isLoading.asObservable();
   // readonly DataState = DataState;
   form: any;
+  role: string[] = []
   constructor(
     private fb: FormBuilder, private authService: AuthService, private router: Router, private storeService: StoreService,
     private notifService: NotifsService) {
@@ -46,6 +47,9 @@ export class AddUserComponent implements OnInit {
 
     this.form = this.signup.controls;
     this.findStore = new Store()
+    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
+      this.role.push(authority);
+    });
   }
 
 

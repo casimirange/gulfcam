@@ -23,10 +23,14 @@ export class TypeBonComponent implements OnInit {
   isLoading$ = this.isLoading.asObservable();
   modalTitle: string = 'Enregistrer nouveau bon';
   roleUser = localStorage.getItem('userAccount').toString()
+  role: string[] = []
   constructor(private modalService: NgbModal, private fb: FormBuilder, private voucherService: VoucherService,
               private statusService: StatusService, private notifService: NotifsService) {
     this.formVoucherType();
     this.voucher = new TypeVoucher()
+    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
+      this.role.push(authority);
+    });
   }
 
 

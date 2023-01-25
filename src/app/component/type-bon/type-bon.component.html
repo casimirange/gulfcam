@@ -1,4 +1,4 @@
-<div class="app-container app-theme-white body-tabs-shadow fixed-header fixed-sidebar">
+<div class="app-container app-theme-white body-tabs-shadow fixed-header fixed-sidebar" *ngIf="role.includes('ROLE_SUPERADMIN')">
   <app-header></app-header>
   <div class="app-main">
     <app-sidebar></app-sidebar>

@@ -23,8 +23,12 @@ export class IndexPaiementMethodComponent implements OnInit {
   isLoading$ = this.isLoading.asObservable();
   modalTitle = 'Enregistrer mode de paiement';
   roleUser = localStorage.getItem('userAccount').toString()
+  role: string[] = []
   constructor(private modalService: NgbModal, private fb: FormBuilder, private paiementService: PaiementService, private notifServices: NotifsService) {
     this.formPaiement()
+    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
+      this.role.push(authority);
+    });
   }
 
   ngOnInit(): void {

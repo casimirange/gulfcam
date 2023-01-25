@@ -32,6 +32,7 @@ export class DetailsUserComponent implements OnInit {
   form: any;
   private isLoading = new BehaviorSubject<boolean>(false);
   isLoading$ = this.isLoading.asObservable();
+  role: string[] = []
   constructor(private userService: UsersService,  private notifsService: NotifsService, private route: ActivatedRoute,
               private storeService: StoreService, private fb: FormBuilder, private statusAccountService: StatusAccountService,
               private statusUserService: StatusUserService, private roleUserService: RoleUserService) {
@@ -48,6 +49,9 @@ export class DetailsUserComponent implements OnInit {
     });
 
     this.form = this.updateUser.controls;
+    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
+      this.role.push(authority);
+    });
   }
 
   ngOnInit(): void {

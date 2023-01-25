@@ -23,9 +23,14 @@ export class IndexUsersComponent implements OnInit {
   totalPages: number;
   totalElements: number;
   size: number = 10;
+  role: string[] = []
   constructor(private modalService: NgbModal, private userService: UsersService, private notifsService: NotifsService,
               private storeService: StoreService, private statusAccountService: StatusAccountService,
-              private statusUserService: StatusUserService, private router: Router,) { }
+              private statusUserService: StatusUserService, private router: Router,) {
+    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
+      this.role.push(authority);
+    });
+  }
 
   ngOnInit(): void {
     this.getUsers()

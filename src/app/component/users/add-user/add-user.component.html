@@ -1,5 +1,5 @@
 
-<div class="app-page-title">
+<div class="app-page-title" *ngIf="role.includes('ROLE_SUPERADMIN')">
   <div class="page-title-wrapper">
     <div class="page-title-heading">
       <div class="page-title-icon">
@@ -38,7 +38,7 @@
 <!--  </li>-->
 <!--</ul>-->
 
-<div class="tab-content">
+<div class="tab-content" *ngIf="role.includes('ROLE_SUPERADMIN')">
   <div class="" id="tab-content-1" >
     <div class="row">
       <div class="col-md-12">
