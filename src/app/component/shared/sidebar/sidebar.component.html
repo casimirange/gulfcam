@@ -87,7 +87,7 @@
             </i>Stations
           </a>
         </li>
-        <li *ngIf="roleUser === 'MANAGER_COUPON' || roleUser==='MANAGER_STORE' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+        <li *ngIf="roleUser === 'MANAGER_COUPON' || roleUser==='MANAGER_STORE' || roleUser==='STORE_KEEPER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
           <a routerLink="/stock" routerLinkActive="mm-active">
             <i class="metismenu-icon pe-7s-drawer">
             </i>Stock

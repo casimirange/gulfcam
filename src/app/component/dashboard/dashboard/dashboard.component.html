@@ -106,7 +106,7 @@
                     </button>
                   </div>
                   <div class="col-sm-6 col-xl-4" routerLink="/stock"
-                       *ngIf="roleUser === 'MANAGER_COUPON' || roleUser==='MANAGER_STORE' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+                       *ngIf="roleUser === 'MANAGER_COUPON' || roleUser==='MANAGER_STORE' || roleUser==='STORE_KEEPER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
                     <button class="btn-icon-vertical btn-square btn-transition btn btn-outline-link">
                       <i class="pe-7s-drawer btn-icon-wrapper btn-icon-lg mb-3"></i>Stock
                     </button>
