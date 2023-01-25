@@ -1,374 +1,384 @@
-<!--<app-loader></app-loader>-->
-<ng-container class="bg-white" *ngIf="(orderState$ | async) as appState" [ngSwitch]="appState.dataState">
-  <ng-container class="bg-white" *ngSwitchCase="DataState.LOADING_STATE">
-    <div class="col-md-12 text-center my-3">
-      <!--                <div class="spinner-border text-primary my-3" role="status"></div>-->
-      <div class="ball-clip-rotate">
-        <div style="background-color: rgb(68, 64, 84);"></div>
-      </div>
-    </div>
-  </ng-container>
-  <ng-container class="bg-white py-1 px-1" *ngSwitchCase="DataState.LOADED_STATE">
-    <div class="app-page-title">
-      <div class="page-title-wrapper">
-        <div class="page-title-heading">
-          <div class="page-title-icon">
-            <i class="pe-7s-news-paper icon-gradient bg-danger">
-            </i>
-          </div>
-          <div>Edition de Commande
-            <div class="page-title-subheading">compléter la commande</div>
-          </div>
+<div *ngIf="roleUser === 'MANAGER_STORE' || roleUser === 'STORE_KEEPER' || roleUser === 'TREASURY' ||
+                   roleUser === 'MANAGER_ORDER' || roleUser === 'MANAGER_COUPON' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+  <ng-container class="bg-white" *ngIf="(orderState$ | async) as appState" [ngSwitch]="appState.dataState">
+    <ng-container class="bg-white" *ngSwitchCase="DataState.LOADING_STATE">
+      <div class="col-md-12 text-center my-3">
+        <!--                <div class="spinner-border text-primary my-3" role="status"></div>-->
+        <div class="ball-clip-rotate">
+          <div style="background-color: rgb(68, 64, 84);"></div>
         </div>
-        <div class="page-title-actions">
-          <!--              <div class="d-inline-block">-->
-          <!--                <div class="page-title-icon bg-primary btn btn-success" disabled="" (click)="acceptOrder()">-->
-          <!--                  <i class="pe-7s-diskette icon-gradient bg-white">-->
-          <!--                  </i>-->
-          <!--                </div>-->
-          <!--            </div>-->
-          <div class="d-inline-block ">
-            <div class="  ml-3 ">
-              <div class="widget-subheading">
-                Etat de la commande
-              </div>
-              <div class="widget-heading">
-                <span class="text-success font-weight-bolder">{{getStatuts(statut)}}</span>
-              </div>
+      </div>
+    </ng-container>
+    <ng-container class="bg-white py-1 px-1" *ngSwitchCase="DataState.LOADED_STATE">
+      <div class="app-page-title">
+        <div class="page-title-wrapper">
+          <div class="page-title-heading">
+            <div class="page-title-icon">
+              <i class="pe-7s-news-paper icon-gradient bg-danger">
+              </i>
+            </div>
+            <div>Edition de Commande
+              <div class="page-title-subheading">compléter la commande</div>
             </div>
           </div>
+          <div class="page-title-actions">
+            <!--              <div class="d-inline-block">-->
+            <!--                <div class="page-title-icon bg-primary btn btn-success" disabled="" (click)="acceptOrder()">-->
+            <!--                  <i class="pe-7s-diskette icon-gradient bg-white">-->
+            <!--                  </i>-->
+            <!--                </div>-->
+            <!--            </div>-->
+            <div class="d-inline-block ">
+              <div class="  ml-3 ">
+                <div class="widget-subheading">
+                  Etat de la commande
+                </div>
+                <div class="widget-heading">
+                  <span class="text-success font-weight-bolder">{{getStatuts(statut)}}</span>
+                </div>
+              </div>
+            </div>
 
+          </div>
         </div>
       </div>
-    </div>
-    <div class="tab-content" style="">
-      <div class="tab-pane tabs-animation fade show active" id="tab-content-0" role="tabpanel">
-        <div class="main-card mb-3 card">
-          <div class="card-body">
-            <div class="card-title">
-              Commande N°: <span class="text-alternate">#{{order.internalReference}}</span>
+      <div class="tab-content" style="">
+        <div class="tab-pane tabs-animation fade show active" id="tab-content-0" role="tabpanel">
+          <div class="main-card mb-3 card">
+            <div class="card-body">
+              <div class="card-title">
+                Commande N°: <span class="text-alternate">#{{order.internalReference}}</span>
 
 
-              <div class="float-right">
-                <form [formGroup]="selectPdfForm">
-                  <select (change)="generatePDF($event)" name="" id="" formControlName="pdf"
-                          class="form-control form-control-sm">
-                    <option value="" selected disabled hidden>Générer pdf</option>
-                    <option *ngIf="statut == 'PAID' || statut == 'IN_PROCESS_OF_DELIVERY' || statut == 'CLOSED' "
-                            value="bordereau">Bordereau de livraison
-                    </option>
-                    <!--                <option *ngIf="statut == 'PAID' " value="bonLivraison">Bon de livraison</option>-->
-                    <!--                <option  value="facture">Facture</option>-->
-                    <option value="préfacture">Préfacture/Proforma</option>
-                    <!--                <option  value="proforma"  ></option>-->
-                    <option *ngIf="statut == 'CLOSED' " value="bonCommand">Preuve de Bon de Livraison</option>
-                    <option *ngIf="statut != 'CREATED'" value="preuve">Preuve de paiement</option>
-                    <option *ngIf="statut != 'CREATED'" value="reçu">Reçu de paiement</option>
+                <div class="float-right">
+                  <form [formGroup]="selectPdfForm">
+                    <select (change)="generatePDF($event)" name="" id="" formControlName="pdf"
+                            class="form-control form-control-sm">
+                      <option value="" selected disabled hidden>Générer pdf</option>
+                      <option
+                        *ngIf="statut == 'PAID' || statut == 'IN_PROCESS_OF_DELIVERY' || statut == 'CLOSED' && (roleUser=='MANAGER_STORE' || roleUser=='MANAGER_COUPON' || roleUser=='STORE_KEEPER'
+                        || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))"
+                        value="bordereau">Bordereau de livraison
+                      </option>
 
-                  </select>
+                      <option *ngIf="roleUser === 'MANAGER_ORDER'"  value="préfacture">
+                        Préfacture/Proforma
+                      </option>
+                      <option *ngIf="statut == 'CLOSED' " value="bonCommand">Preuve de Bon de Livraison</option>
+                      <option
+                        *ngIf="statut != 'CREATED' && (roleUser == 'MANAGER_COUPON' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))"
+                        value="preuve">Preuve de paiement
+                      </option>
+                      <option
+                        *ngIf="statut != 'CREATED' && (roleUser == 'TREASURY' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))"
+                        value="reçu">Reçu de paiement
+                      </option>
+
+                    </select>
+                  </form>
+                </div>
+                <div class="float-right">
+                  <button class="btn btn-outline-danger btn-lg mr-3"
+                          *ngIf="statut != 'ORDER_CANCEL' && statut != 'CLOSED' && (roleUser == 'MANAGER_ORDER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))"
+                          (click)="deny(order)">Annuler
+                  </button>
+                  <button class="btn btn-outline-primary btn-lg mr-3"
+                          *ngIf="statut == 'CREATED' && (roleUser == 'TREASURY' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))"
+                          (click)="acceptOrder()"
+                          [disabled]="(editForm.controls['file'].invalid || editForm.controls['peimentRef'].invalid
+                    || editForm.controls['method'].invalid)  || (isLoading$ | async)"
+                  >
+                    <i *ngIf="isLoading$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
+                    <span *ngIf="isLoading$ | async">Enregistrement ...</span>
+                    <span *ngIf="!(isLoading$ | async)">Accepter paiement</span>
+                  </button>
+                  <button class="btn btn-outline-primary btn-lg mr-3" *ngIf="statut == 'ACCEPTED' && (roleUser == 'MANAGER_COUPON' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')) " (click)="payOrder()"
+                          [disabled]="(isLoading$ | async)"
+                  >
+                    <i *ngIf="isLoading$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
+                    <span *ngIf="isLoading$ | async">Confirmation ...</span>
+                    <span *ngIf="!(isLoading$ | async)">Confirmer paiement</span>
+                  </button>
+                  <button class="btn btn-outline-primary btn-lg mr-3" *ngIf="statut == 'PAID' && (roleUser == 'MANAGER_STORE' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))"
+                          (click)="generateBoredereau()"
+                          [disabled]="(isLoading$ | async)">
+                    <i *ngIf="isLoading$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
+                    <span *ngIf="isLoading$ | async">Déclenchement ...</span>
+                    <span *ngIf="!(isLoading$ | async)">Déclencher la livraison</span>
+                  </button>
+                  <button class="btn btn-outline-primary btn-lg mr-3" *ngIf="statut == 'IN_PROCESS_OF_DELIVERY' && (roleUser == 'MANAGER_COUPON' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))"
+                          [disabled]="(editForm.controls['fileBordereau'].invalid)  || (isLoading$ | async)"
+                          (click)="endOrder()">
+                    <i *ngIf="isLoading$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
+                    <span *ngIf="isLoading$ | async">Validation ...</span>
+                    <span *ngIf="!(isLoading$ | async)">Valider BL</span>
+
+                  </button>
+                </div>
+              </div>
+              <div class="card-body">
+                <form [formGroup]="editForm">
+                  <div class="row">
+                    <div class="col-md-4">
+                      <div class="position-relative form-group">
+                        <label for="exampleEmail" class="">Ref. commande</label>
+                        <input name="email" id="exampleEmail" placeholder="with a placeholder" type="email"
+                               value="{{order.internalReference}}" disabled
+                               class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="position-relative form-group">
+                        <label for="exampleEmail" class="">Ref. client</label>
+                        <input name="email" id="exampleEmail" placeholder="with a placeholder" type="text"
+                               value="{{order.clientReference}}" disabled
+                               class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="position-relative form-group">
+                        <label for="exampleEmail" class="">Nom client</label>
+                        <input name="email" id="exampleEmail" placeholder="with a placeholder" type="text"
+                               value="{{client.completeName}}" disabled
+                               class="form-control">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-4">
+                      <div class="position-relative form-group">
+                        <label for="exampleEmail" class="">Magasin</label>
+                        <input name="email" id="exampleEmail" placeholder="with a placeholder" type="text"
+                               value="{{store.localization}}" disabled
+                               class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="position-relative form-group">
+                        <label for="exampleEmail" class="">Delai de livraison</label>
+                        <input name="email" id="exampleEmail" value="{{order.deliveryTime}}" placeholder="2 jours"
+                               type="text" disabled
+                               class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="position-relative form-group">
+                        <label for="exampleEmail" class="">Canal</label>
+                        <input name="email" id="exampleEmail" placeholder="appel" type="text" class="form-control"
+                               value="{{order.channel}}" disabled>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-4" *ngIf="statut == 'CREATED' && (roleUser == 'TREASURY' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))">
+                      <div class="position-relative form-group">
+                        <label for="exampleEmail" class="">Mode de paiement</label>
+                        <select name="select" id="exampleSelect" ngModel="{{order.idPaymentMethod}}"
+                                class="form-control"
+                                formControlName="method"
+                                [disabled]="statut !== 'CREATED'">
+                          <option value="" selected hidden disabled>Sélectionner un mode de paiement</option>
+                          <option *ngFor="let payment of paymentMethods"
+                                  value="{{payment.internalReference}}">{{payment.designation}}</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-md-4" *ngIf="statut == 'CREATED' && (roleUser == 'TREASURY' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))">
+                      <div class="position-relative form-group">
+                        <label for="exampleEmail" class="">Ref. paeiment</label>
+                        <input name="email" id="exampleEmail" placeholder="entrer la référence" type="text"
+                               ngModel="{{order.paymentReference}}"
+                               [disabled]="statut != 'CREATED'"
+                               class="form-control" formControlName="peimentRef">
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="position-relative form-group">
+                        <label for="exampleEmail" class="">Montant</label>
+                        <input name="email" id="exampleEmail" placeholder="with a placeholder" type="text"
+                               value="{{order.ttcaggregateAmount}}" disabled
+                               class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-4" *ngIf="statut == 'CREATED' && (roleUser == 'TREASURY' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))">
+                      <div class="position-relative form-group">
+                        <label for="pj" class="">Importer pièce justificative</label>
+                        <input name="file" id="pj" type="file" class="form-control-file" formControlName="file" accept="application/pdf"
+                               (change)="selectFile($event)">
+                      </div>
+                    </div>
+                    <div class="col-md-4" *ngIf="statut == 'IN_PROCESS_OF_DELIVERY' && (roleUser == 'MANAGER_COUPON' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))">
+                      <div class="position-relative form-group">
+                        <label for="exampleFile" class="">Importer Bordereau de Livraison</label>
+                        <input name="file" id="exampleFile" type="file" class="form-control-file" accept="application/pdf"
+                               formControlName="fileBordereau"
+                               (change)="selectFile($event)">
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="divider"></div>
+
+                  <div class="row">
+                    <div class="col-md-12">
+                      <div class="position-relative form-group">
+                        <label for="exampleEmail" class="">Description</label>
+                        <textarea name="text" id="exampleText" class="form-control" value="{{order.description}}" disabled
+                                  placeholder="description de la commande"></textarea>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="divider"></div>
+                  <div class="row">
+                    <div class="col-md-12">
+                      <div class="position-relative form-group">
+                        <label for="exampleEmail" class="">Raison d'annulation</label>
+                        <textarea name="text" rows="1" id="exampleText" class="form-control" formControlName="reason"
+                                  placeholder="raison d'annulation de la commande" [value]="order.reasonForCancellation"
+                                  [disabled]="statut == 'ORDER_CANCEL'"></textarea>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="divider"></div>
+                  <!--            <div class="d-block text-right">-->
+                  <!--              <button class="btn btn-success btn-lg" *ngIf="statut == 'ACCEPTED'" (click)="payOrder()">Payer</button>-->
+                  <!--              <button class="btn btn-success btn-lg" *ngIf="statut == 'PAID'" (click)="generateBoredereau()">Bordereau</button>-->
+                  <!--            </div>-->
+                  <!--              <button class="mt-1 btn btn-primary float-right">Enregistrer</button>-->
                 </form>
               </div>
-              <div class="float-right">
-                <button class="btn btn-outline-danger btn-lg mr-3"
-                        *ngIf="statut != 'ORDER_CANCEL' && statut != 'CLOSED' "
-                        (click)="deny(order)">Annuler
-                </button>
-                <button class="btn btn-outline-primary btn-lg mr-3" *ngIf="statut == 'CREATED' " (click)="acceptOrder()"
-                        [disabled]="(editForm.controls['file'].invalid || editForm.controls['peimentRef'].invalid
-                    || editForm.controls['method'].invalid)  || (isLoading$ | async)"
-                >
-                  <i *ngIf="isLoading$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
-                  <span *ngIf="isLoading$ | async">Enregistrement ...</span>
-                  <span *ngIf="!(isLoading$ | async)">Accepter paiement</span>
-                </button>
-                <button class="btn btn-outline-primary btn-lg mr-3" *ngIf="statut == 'ACCEPTED' " (click)="payOrder()"
-                        [disabled]="(isLoading$ | async)"
-                >
-                  <i *ngIf="isLoading$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
-                  <span *ngIf="isLoading$ | async">Confirmation ...</span>
-                  <span *ngIf="!(isLoading$ | async)">Confirmer paiement</span>
-                </button>
-                <button class="btn btn-outline-primary btn-lg mr-3" *ngIf="statut == 'PAID'"
-                        (click)="generateBoredereau()"
-                        [disabled]="(isLoading$ | async)">
-                  <i *ngIf="isLoading$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
-                  <span *ngIf="isLoading$ | async">Déclenchement ...</span>
-                  <span *ngIf="!(isLoading$ | async)">Déclencher la livraison</span>
-                </button>
-                <button class="btn btn-outline-primary btn-lg mr-3" *ngIf="statut == 'IN_PROCESS_OF_DELIVERY'"
-                        [disabled]="(editForm.controls['fileBordereau'].invalid)  || (isLoading$ | async)"
-                        (click)="endOrder()">
-                  <i *ngIf="isLoading$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
-                  <span *ngIf="isLoading$ | async">Validation ...</span>
-                  <span *ngIf="!(isLoading$ | async)">Valider BL</span>
-
-                </button>
-              </div>
-            </div>
-            <div class="card-body">
-              <form [formGroup]="editForm">
-                <div class="row">
-                  <div class="col-md-4">
-                    <div class="position-relative form-group">
-                      <label for="exampleEmail" class="">Ref. commande</label>
-                      <input name="email" id="exampleEmail" placeholder="with a placeholder" type="email"
-                             value="{{order.internalReference}}"
-                             class="form-control">
-                    </div>
-                  </div>
-                  <div class="col-md-4">
-                    <div class="position-relative form-group">
-                      <label for="exampleEmail" class="">Ref. client</label>
-                      <input name="email" id="exampleEmail" placeholder="with a placeholder" type="text"
-                             value="{{order.clientReference}}"
-                             class="form-control">
-                    </div>
-                  </div>
-                  <div class="col-md-4">
-                    <div class="position-relative form-group">
-                      <label for="exampleEmail" class="">Nom client</label>
-                      <input name="email" id="exampleEmail" placeholder="with a placeholder" type="text"
-                             value="{{client.completeName}}"
-                             class="form-control">
-                    </div>
-                  </div>
+              <div class="divider"></div>
+              <ul class="nav nav-tabs">
+                <li class="nav-item"><a data-toggle="tab" href="#tab-eg10-0" class="active nav-link">Détails de la
+                  commande</a></li>
+                <!--          <li class="nav-item"><a data-toggle="tab" href="#tab-eg10-2" class="nav-link">Etats de la commande</a></li>-->
+                <li class="nav-item"><a data-toggle="tab" href="#tab-eg10-3" class="nav-link"
+                                        *ngIf="statut == 'IN_PROCESS_OF_DELIVERY' && (roleUser == 'STORE_KEEPER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))">Attribution coupon</a></li>
+                <!--          <li class="nav-item"><a data-toggle="tab" href="#tab-eg10-3" class="nav-link">Caisse/Trésorerie</a></li>-->
+              </ul>
+              <div class="tab-content">
+                <div class="tab-pane active" id="tab-eg10-0" role="tabpanel">
+                  <p>Liste des produits de la commande </p>
+                  <table class="mb-0 table table-sm">
+                    <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Type de coupon</th>
+                      <th>Quantité de carnets</th>
+                      <th>Quantité de coupons</th>
+                      <th>Montant HTC</th>
+                      <th>TVA</th>
+                      <th>Montant TTC</th>
+                      <th>Date création</th>
+                      <!--                    <th>Date modification</th>-->
+                      <!--                    <th>Actions</th>-->
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr *ngFor="let prod of products; let i = index">
+                      <th scope="row">{{i + 1}}</th>
+                      <td>{{formatNumber(prod.amount)}}</td>
+                      <td>{{prod.quantityNotebook}}</td>
+                      <td>{{prod.quantityNotebook * 10}}</td>
+                      <td>{{formatNumber(prod.amount * prod.quantityNotebook * 10)}}</td>
+                      <td>{{global.tax * 100}} %</td>
+                      <td>{{formatNumber((prod.amount * prod.quantityNotebook * 10) + (prod.amount * prod.quantityNotebook * 10) * global.tax)}}</td>
+                      <!--                <td></td>-->
+                      <td>{{prod.createdAt | date: 'dd/MM/yyyy à hh:mm'}}</td>
+                      <!--                    <td>{{prod.updateAt | date: 'dd/MM/yyyy à hh:mm'}}</td>-->
+                      <!--                    <td>-->
+                      <!--                      <a style="cursor: pointer" class="delete text-danger">-->
+                      <!--                        <i class="pe-7s-trash" title="supprimer"></i>-->
+                      <!--                      </a>&nbsp;-->
+                      <!--                      <a style="cursor: pointer" class="text-primary">-->
+                      <!--                        <i class="pe-7s-eyedropper" title="modifier"></i>-->
+                      <!--                      </a>-->
+                      <!--                    </td>-->
+                    </tr>
+                    </tbody>
+                    <tfoot>
+                    <!--            <div class="float-right">Total: {{totalOrder}} Fcfa</div>-->
+                    </tfoot>
+                  </table>
                 </div>
-                <div class="row">
-                  <div class="col-md-4">
-                    <div class="position-relative form-group">
-                      <label for="exampleEmail" class="">Magasin</label>
-                      <input name="email" id="exampleEmail" placeholder="with a placeholder" type="text"
-                             value="{{store.localization}}"
-                             class="form-control">
-                    </div>
-                  </div>
-                  <div class="col-md-4">
-                    <div class="position-relative form-group">
-                      <label for="exampleEmail" class="">Delai de livraison</label>
-                      <input name="email" id="exampleEmail" value="{{order.deliveryTime}}" placeholder="2 jours"
-                             type="text"
-                             class="form-control">
-                    </div>
-                  </div>
-                  <div class="col-md-4">
-                    <div class="position-relative form-group">
-                      <label for="exampleEmail" class="">Canal</label>
-                      <input name="email" id="exampleEmail" placeholder="appel" type="text" class="form-control"
-                             value="{{order.channel}}">
-                    </div>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-md-4">
-                    <div class="position-relative form-group">
-                      <label for="exampleEmail" class="">Mode de paiement</label>
-                      <select name="select" id="exampleSelect" ngModel="{{order.idPaymentMethod}}" class="form-control"
-                              formControlName="method"
-                              [disabled]="statut != 'CREATED'">
-                        <option value="" selected hidden disabled>Sélectionner un mode de paiement</option>
-                        <option *ngFor="let payment of paymentMethods"
-                                value="{{payment.internalReference}}">{{payment.designation}}</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div class="col-md-4">
-                    <div class="position-relative form-group">
-                      <label for="exampleEmail" class="">Ref. paeiment</label>
-                      <input name="email" id="exampleEmail" placeholder="entrer la référence" type="text"
-                             ngModel="{{order.paymentReference}}"
-                             [disabled]="statut != 'CREATED'"
-                             class="form-control" formControlName="peimentRef">
-                    </div>
-                  </div>
-                  <div class="col-md-4">
-                    <div class="position-relative form-group">
-                      <label for="exampleEmail" class="">Montant</label>
-                      <input name="email" id="exampleEmail" placeholder="with a placeholder" type="text"
-                             value="{{order.ttcaggregateAmount}}"
-                             class="form-control">
-                    </div>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-md-4" *ngIf="statut == 'CREATED' ">
-                    <div class="position-relative form-group">
-                      <label for="exampleEmail" class="">Importer pièce justificative</label>
-                      <input name="file" id="exampleFile" type="file" class="form-control-file" formControlName="file"
-                             (change)="selectFile($event)">
-                    </div>
-                  </div>
-                  <div class="col-md-4" *ngIf="statut == 'IN_PROCESS_OF_DELIVERY' ">
-                    <div class="position-relative form-group">
-                      <label for="exampleEmail" class="">Importer Bordereau de Livraison</label>
-                      <input name="file" id="exampleFile" type="file" class="form-control-file"
-                             formControlName="fileBordereau"
-                             (change)="selectFile($event)">
-                    </div>
-                  </div>
-
-                </div>
-
-
-                <div class="divider"></div>
-
-                <div class="row">
-                  <div class="col-md-12">
-                    <div class="position-relative form-group">
-                      <label for="exampleEmail" class="">Description</label>
-                      <textarea name="text" id="exampleText" class="form-control" value="{{order.description}}"
-                                placeholder="description de la commande"></textarea>
-                    </div>
-                  </div>
-                </div>
-                <div class="divider"></div>
-                <div class="row">
-                  <div class="col-md-12">
-                    <div class="position-relative form-group">
-                      <label for="exampleEmail" class="">Raison d'annulation</label>
-                      <textarea name="text" rows="1" id="exampleText" class="form-control" formControlName="reason"
-                                placeholder="raison d'annulation de la commande" [value]="order.reasonForCancellation"
-                                [disabled]="statut == 'ORDER_CANCEL'"></textarea>
-                    </div>
-                  </div>
-                </div>
-                <div class="divider"></div>
-                <!--            <div class="d-block text-right">-->
-                <!--              <button class="btn btn-success btn-lg" *ngIf="statut == 'ACCEPTED'" (click)="payOrder()">Payer</button>-->
-                <!--              <button class="btn btn-success btn-lg" *ngIf="statut == 'PAID'" (click)="generateBoredereau()">Bordereau</button>-->
-                <!--            </div>-->
-                <!--              <button class="mt-1 btn btn-primary float-right">Enregistrer</button>-->
-              </form>
-            </div>
-            <div class="divider"></div>
-            <ul class="nav nav-tabs">
-              <li class="nav-item"><a data-toggle="tab" href="#tab-eg10-0" class="active nav-link">Détails de la
-                commande</a></li>
-              <!--          <li class="nav-item"><a data-toggle="tab" href="#tab-eg10-2" class="nav-link">Etats de la commande</a></li>-->
-              <li class="nav-item"><a data-toggle="tab" href="#tab-eg10-3" class="nav-link"
-                                      *ngIf="statut == 'IN_PROCESS_OF_DELIVERY'">Attribution coupon</a></li>
-              <!--          <li class="nav-item"><a data-toggle="tab" href="#tab-eg10-3" class="nav-link">Caisse/Trésorerie</a></li>-->
-            </ul>
-            <div class="tab-content">
-              <div class="tab-pane active" id="tab-eg10-0" role="tabpanel">
-                <p>Liste des produits de la commande </p>
-                <table class="mb-0 table table-sm">
-                  <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Type de coupon</th>
-                    <th>Quantité de carnets</th>
-                    <th>Quantité de coupons</th>
-                    <th>Montant HTC</th>
-                    <th>TVA</th>
-                    <th>Montant TTC</th>
-                    <th>Date création</th>
-<!--                    <th>Date modification</th>-->
-<!--                    <th>Actions</th>-->
-                  </tr>
-                  </thead>
-                  <tbody>
-                  <tr *ngFor="let prod of products; let i = index">
-                    <th scope="row">{{i + 1}}</th>
-                    <td>{{formatNumber(prod.amount)}}</td>
-                    <td>{{prod.quantityNotebook}}</td>
-                    <td>{{prod.quantityNotebook * 10}}</td>
-                    <td>{{formatNumber(prod.amount * prod.quantityNotebook * 10)}}</td>
-                    <td>{{global.tax * 100}} %</td>
-                    <td>{{formatNumber((prod.amount * prod.quantityNotebook * 10)+(prod.amount * prod.quantityNotebook * 10) * global.tax)}}</td>
-                    <!--                <td></td>-->
-                    <td>{{prod.createdAt | date: 'dd/MM/yyyy à hh:mm'}}</td>
-<!--                    <td>{{prod.updateAt | date: 'dd/MM/yyyy à hh:mm'}}</td>-->
-<!--                    <td>-->
-<!--                      <a style="cursor: pointer" class="delete text-danger">-->
-<!--                        <i class="pe-7s-trash" title="supprimer"></i>-->
-<!--                      </a>&nbsp;-->
-<!--                      <a style="cursor: pointer" class="text-primary">-->
-<!--                        <i class="pe-7s-eyedropper" title="modifier"></i>-->
-<!--                      </a>-->
-<!--                    </td>-->
-                  </tr>
-                  </tbody>
-                  <tfoot>
-                  <!--            <div class="float-right">Total: {{totalOrder}} Fcfa</div>-->
-                  </tfoot>
-                </table>
-              </div>
-              <div class="tab-pane" id="tab-eg10-3" role="tabpanel" *ngIf="statut == 'IN_PROCESS_OF_DELIVERY'">
-                <p>Pour rajouter un carnet, veuillez rajouter un de ses coupons, le système sélectionnera
-                  automatiquement tous les coupons du dit carnet</p>
-                <div class="modal-body">
-                  <div class="">
+                <div class="tab-pane" id="tab-eg10-3" role="tabpanel" *ngIf="statut == 'IN_PROCESS_OF_DELIVERY' && (roleUser == 'STORE_KEEPER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))">
+                  <p>Pour rajouter un carnet, veuillez rajouter un de ses coupons, le système sélectionnera
+                    automatiquement tous les coupons du dit carnet</p>
+                  <div class="modal-body">
                     <div class="">
-                      <form [formGroup]="addCouponClientForm">
-                        <div class="row">
-                          <div class="row col-md-12">
-                            <div class="col-md-10">
-                              <div class="position-relative form-group">
-                                <label for="qte" class="">Coupon</label>
-                                <input name="email" id="qte" placeholder="Numéro de série du coupon" type="text"
-                                       class="form-control"
-                                       formControlName="coupon">
-                                <div
-                                  *ngIf="addCouponClientForm.controls['coupon'].invalid && (addCouponClientForm.controls['coupon'].dirty || addCouponClientForm.controls['coupon'].touched)"
-                                  class="mb-2" style="color: #f65656; font-style: italic;">
+                      <div class="">
+                        <form [formGroup]="addCouponClientForm">
+                          <div class="row">
+                            <div class="row col-md-12">
+                              <div class="col-md-10">
+                                <div class="position-relative form-group">
+                                  <label for="qte" class="">Coupon</label>
+                                  <input name="email" id="qte" placeholder="Numéro de série du coupon" type="text"
+                                         class="form-control"
+                                         formControlName="coupon">
+                                  <div
+                                    *ngIf="addCouponClientForm.controls['coupon'].invalid && (addCouponClientForm.controls['coupon'].dirty || addCouponClientForm.controls['coupon'].touched)"
+                                    class="mb-2" style="color: #f65656; font-style: italic;">
 
-                                  <div *ngIf="addCouponClientForm.controls['coupon'].errors?.['required']" class="ml-3">
-                                    le coupon est obligatoire.
+                                    <div *ngIf="addCouponClientForm.controls['coupon'].errors?.['required']"
+                                         class="ml-3">
+                                      le coupon est obligatoire.
+                                    </div>
+                                    <!--                                  <div *ngIf="addCouponClientForm.controls['coupon'].errors?.['pattern']" class="ml-3">-->
+                                    <!--                                    le numéro de série doit avoir 7 chiffres (Ex: 0000001)-->
+                                    <!--                                  </div>-->
                                   </div>
-<!--                                  <div *ngIf="addCouponClientForm.controls['coupon'].errors?.['pattern']" class="ml-3">-->
-<!--                                    le numéro de série doit avoir 7 chiffres (Ex: 0000001)-->
-<!--                                  </div>-->
+                                </div>
+                              </div>
+                              <div class="col-md-2">
+                                <div class="position-relative form-group">
+                                  <label for="add" class="text-white">ajouter</label>
+                                  <button id="add" class=" btn btn-primary float-right"
+                                          [disabled]="addCouponClientForm.controls['coupon'].invalid"
+                                          (click)="addCoupon()">Ajouter
+                                  </button>
                                 </div>
                               </div>
                             </div>
-                            <div class="col-md-2">
-                              <div class="position-relative form-group">
-                                <label for="add" class="text-white">ajouter</label>
-                                <button id="add" class=" btn btn-primary float-right"
-                                        [disabled]="addCouponClientForm.controls['coupon'].invalid"
-                                        (click)="addCoupon()">Ajouter
-                                </button>
+                            <div class="col-md-12 position-relative form-group">
+                              <h5 class="card-title">Liste des coupons à affecter</h5>
+                              <table class="mb-0 table table-sm">
+                                <thead>
+                                <tr>
+                                  <th>#</th>
+                                  <th>Numéro du Coupon</th>
+                                  <th>Action</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr *ngFor="let coupon of listVouchers; let i = index">
+                                  <th scope="row">{{i + 1}}</th>
+                                  <td>{{formatNumber(coupon)}}</td>
+                                  <td><i class="pe-7s-trash text-danger" (click)="removeCoupon(coupon)"></i></td>
+                                </tr>
+                                </tbody>
+                              </table>
+                              <div class="text-center">
+                                <p *ngIf="listVouchers.length === 0" style="color: grey; font-size: 0.9rem;"
+                                   class="mx-auto">Ajouter
+                                  des
+                                  coupons </p>
                               </div>
+                              <div class="card-subtitle float-right">Total: {{listVouchers.length}} coupon(s)</div>
                             </div>
                           </div>
-                          <div class="col-md-12 position-relative form-group">
-                            <h5 class="card-title">Liste des coupons à affecter</h5>
-                            <table class="mb-0 table table-sm">
-                              <thead>
-                              <tr>
-                                <th>#</th>
-                                <th>Numéro du Coupon</th>
-                                <th>Action</th>
-                              </tr>
-                              </thead>
-                              <tbody>
-                              <tr *ngFor="let coupon of listVouchers; let i = index">
-                                <th scope="row">{{i + 1}}</th>
-                                <td>{{formatNumber(coupon)}}</td>
-                                <td><i class="pe-7s-trash text-danger" (click)="removeCoupon(coupon)"></i></td>
-                              </tr>
-                              </tbody>
-                            </table>
-                            <div class="text-center">
-                              <p *ngIf="listVouchers.length === 0" style="color: grey; font-size: 0.9rem;"
-                                 class="mx-auto">Ajouter
-                                des
-                                coupons </p>
-                            </div>
-                            <div class="card-subtitle float-right">Total: {{listVouchers.length}} coupon(s)</div>
-                          </div>
-                        </div>
 
 
-                        <button class="mt-1 btn btn-primary float-right"
-                                [disabled]="(listVouchers.length == 0 ) || (isLoading$ | async)"
-                                (click)="affectCouponClient()">
-                          <i *ngIf="isLoading$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
-                          <span *ngIf="isLoading$ | async">Affectation ...</span>
-                          <span
-                            *ngIf="!(isLoading$ | async)">Affecter coupon</span>
-                        </button>
-                      </form>
+                          <button class="mt-1 btn btn-primary float-right"
+                                  [disabled]="(listVouchers.length == 0 ) || (isLoading$ | async)"
+                                  (click)="affectCouponClient()">
+                            <i *ngIf="isLoading$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
+                            <span *ngIf="isLoading$ | async">Affectation ...</span>
+                            <span
+                              *ngIf="!(isLoading$ | async)">Affecter coupon</span>
+                          </button>
+                        </form>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -377,11 +387,11 @@
           </div>
         </div>
       </div>
-    </div>
+    </ng-container>
+    <ng-container class="bg-white" *ngSwitchCase="DataState.ERROR_STATE">
+      <div class="col-md-12 text-center">
+        <div class="text-primary">{{appState.error}}</div>
+      </div>
+    </ng-container>
   </ng-container>
-  <ng-container class="bg-white" *ngSwitchCase="DataState.ERROR_STATE">
-    <div class="col-md-12 text-center">
-      <div class="text-primary">{{appState.error}}</div>
-    </div>
-  </ng-container>
-</ng-container>
+</div>

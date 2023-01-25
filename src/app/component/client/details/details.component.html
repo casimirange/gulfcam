@@ -116,7 +116,7 @@
               </tr>
               </thead>
               <tbody>
-              <tr style="cursor: pointer" routerLink="/commandes/edit/{{order.internalReference}}" *ngFor="let order of clientOrder.appData.content | orderRefFilter: internalRef | orderDateFilter: date
+              <tr style="cursor: pointer" routerLink="/commandes/complete-order/{{order.internalReference}}" *ngFor="let order of clientOrder.appData.content | orderRefFilter: internalRef | orderDateFilter: date
                     | paginate: { id: 'clientorder', itemsPerPage: size, currentPage: page, totalItems: clientOrder.appData.totalElements}">
                 <td class="text-left">{{order.internalReference}}</td>
                 <td class="text-left">{{order.createdAt | date: 'dd/MM/yyyy'}}</td>

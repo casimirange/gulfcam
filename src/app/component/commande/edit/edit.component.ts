@@ -26,7 +26,7 @@ import {LoaderComponent} from "../../../preloader/loader/loader.component";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {ConfigOptions} from "../../../configOptions/config-options";
 
-export class Product{
+export class Product {
   coupon: number;
 }
 
@@ -51,12 +51,13 @@ export class EditComponent implements OnInit {
   selectPdfForm: FormGroup;
   selectedFiles: FileList;
   currentFileUpload: File;
-  addCouponClientForm: FormGroup ;
+  addCouponClientForm: FormGroup;
   orF: any;
   canaux = ['Appel', 'Courier papier', 'Email', 'Sur site']
   stores: Store[] = [];
   typeVoucher = [3000, 5000, 10000]
   roleUser = localStorage.getItem('userAccount').toString();
+  role: string[] = [];
   private isLoading = new BehaviorSubject<boolean>(false);
   isLoading$ = this.isLoading.asObservable();
   private loadingFile = new BehaviorSubject<boolean>(false);
@@ -65,7 +66,8 @@ export class EditComponent implements OnInit {
   orderState$: Observable<AppState<Order>>;
   readonly DataState = DataState;
   private dataSubjects = new BehaviorSubject<Order>(null);
-  constructor(private orderService: OrderService,  private notifsService: NotifsService, private route: ActivatedRoute,
+
+  constructor(private orderService: OrderService, private notifsService: NotifsService, private route: ActivatedRoute,
               private clientService: ClientService, private storeService: StoreService, private productService: ProductService,
               private voucherService: VoucherService, private paymentService: PaiementService, private fb: FormBuilder,
               private statusService: StatusOrderService, private couponService: CouponService, private router: Router,
@@ -77,6 +79,9 @@ export class EditComponent implements OnInit {
       pdf: ['']
     });
     this.IdParam = this.route.snapshot.paramMap.get('id');
+    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
+      this.role.push(authority);
+    });
   }
 
   ngOnInit(): void {
@@ -86,7 +91,7 @@ export class EditComponent implements OnInit {
     this.getPaymentMethods()
   }
 
-  formOrder(){
+  formOrder() {
     this.editForm = this.fb.group({
       method: ['', [Validators.required]],
       peimentRef: ['', [Validators.required, Validators.minLength(3)]],
@@ -96,13 +101,13 @@ export class EditComponent implements OnInit {
     });
   }
 
-  formAddCarnet(){
+  formAddCarnet() {
     this.addCouponClientForm = this.fb.group({
       coupon: ['', [Validators.required,]]
     });
   }
 
-  getOrder(){
+  getOrder() {
 
     this.orderState$ = this.orderService.showOrder$(parseInt(this.IdParam))
       .pipe(
@@ -141,7 +146,7 @@ export class EditComponent implements OnInit {
     //   )
   }
 
-  getProductsByOrder(){
+  getProductsByOrder() {
     this.productService.getProducts(parseInt(this.IdParam)).subscribe(
       resp => {
         this.products = resp.content
@@ -149,7 +154,7 @@ export class EditComponent implements OnInit {
     )
   }
 
-  getClientByOrder(internalRefClient: number){
+  getClientByOrder(internalRefClient: number) {
     this.clientService.findClient(internalRefClient).subscribe(
       resp => {
         this.client = resp;
@@ -157,7 +162,7 @@ export class EditComponent implements OnInit {
     )
   }
 
-  getStoreByOrder(internalRefClient: number){
+  getStoreByOrder(internalRefClient: number) {
     this.storeService.getStoreByInternalref(internalRefClient).subscribe(
       resp => {
         this.store = resp;
@@ -165,7 +170,7 @@ export class EditComponent implements OnInit {
     )
   }
 
-  getPaymentMethods(){
+  getPaymentMethods() {
     this.paymentService.getPaymentMethods().subscribe(
       resp => {
         this.paymentMethods = resp.content
@@ -173,48 +178,53 @@ export class EditComponent implements OnInit {
     )
   }
 
-  acceptOrder(){
-    this.isLoading.next(true);
-    this.order.idFund = parseInt(localStorage.getItem('uid'))
-    this.order.idPaymentMethod = this.editForm.controls['method'].value
-    this.order.paymentReference = this.editForm.controls['peimentRef'].value
-    const docType = 'pdf'
-    const file : File = this.editForm.controls['file'].value
-    this.currentFileUpload = this.selectedFiles.item(0);
-
-    this.orderService.acceptOrder(this.order.internalReference, this.order.idFund, this.order.idPaymentMethod, this.order.paymentReference,
-      docType, this.currentFileUpload).subscribe(
-      resp => {
-        this.isLoading.next(false);
-        this.notifsService.onSuccess('Commande Acceptée')
-        this.generateReçu()
-        this.refreshOrder()
-        this.editForm.reset()
-        this.formOrder()
-      }
-    )
+  acceptOrder() {
+    if (this.selectedFiles.item(0).type == 'application/pdf') {
+      this.isLoading.next(true);
+      this.order.idFund = parseInt(localStorage.getItem('uid'))
+      this.order.idPaymentMethod = this.editForm.controls['method'].value
+      this.order.paymentReference = this.editForm.controls['peimentRef'].value
+      const docType = 'pdf'
+      this.currentFileUpload = this.selectedFiles.item(0);
+      this.orderService.acceptOrder(this.order.internalReference, this.order.idFund, this.order.idPaymentMethod, this.order.paymentReference,
+        docType, this.currentFileUpload).subscribe(
+        resp => {
+          this.isLoading.next(false);
+          this.notifsService.onSuccess('Commande Acceptée')
+          this.generateReçu()
+          this.refreshOrder()
+          this.editForm.reset()
+          this.formOrder()
+        }, error => {
+          this.isLoading.next(false)
+        }
+      )
+    } else {
+      this.notifsService.onWarning('vous devez importer un fichier PDF')
+    }
   }
 
-  endOrder(){
-    this.isLoading.next(true);
-    this.order.idManagerCoupon = parseInt(localStorage.getItem('uid'))
-    const docType = 'pdf'
-    const file : File = this.editForm.controls['fileBordereau'].value
-    this.currentFileUpload = this.selectedFiles.item(0);
-
-    this.orderService.validOrder(this.order.internalReference, this.order.idManagerCoupon, this.currentFileUpload).subscribe(
-      resp => {
-        this.isLoading.next(false);
-        this.notifsService.onSuccess('Commande Terminée')
-        this.refreshOrder()
-        this.editForm.controls['fileBordereau'].reset()
-      }, error => {
-        this.isLoading.next(false)
-      }
-    )
+  endOrder() {
+    if (this.selectedFiles.item(0).type == 'application/pdf') {
+      this.isLoading.next(true);
+      this.order.idManagerCoupon = parseInt(localStorage.getItem('uid'))
+      this.currentFileUpload = this.selectedFiles.item(0);
+      this.orderService.validOrder(this.order.internalReference, this.order.idManagerCoupon, this.currentFileUpload).subscribe(
+        resp => {
+          this.isLoading.next(false);
+          this.notifsService.onSuccess('Commande Terminée')
+          this.refreshOrder()
+          this.editForm.controls['fileBordereau'].reset()
+        }, error => {
+          this.isLoading.next(false)
+        }
+      )
+    } else {
+      this.notifsService.onWarning('vous devez importer un fichier PDF')
+    }
   }
 
-  payOrder(){
+  payOrder() {
     this.order.idManagerCoupon = parseInt(localStorage.getItem('uid'))
     this.isLoading.next(true);
     this.orderService.payOrder(this.order.internalReference, this.order.idManagerCoupon).subscribe(
@@ -227,13 +237,13 @@ export class EditComponent implements OnInit {
 
   }
 
-  generateBoredereau(){
-    if (this.statut == "PAID"){
+  generateBoredereau() {
+    if (this.statut == "PAID") {
       this.isLoading.next(true);
       this.orderService.deliveryOrder(this.order.internalReference, this.order.idManagerCoupon).subscribe(
         respProd => {
           // console.log('delivery', respProd)
-          const file = new Blob([respProd], { type: 'application/pdf' });
+          const file = new Blob([respProd], {type: 'application/pdf'});
           const fileURL = URL.createObjectURL(file);
           window.open(fileURL);
           this.isLoading.next(false);
@@ -248,11 +258,11 @@ export class EditComponent implements OnInit {
     }
   }
 
-  getBoredereau(){
+  getBoredereau() {
     const type = 'DELIVERY'
     this.orderService.getReçu(this.order.internalReference, type).subscribe(
       respProd => {
-        const file = new Blob([respProd], { type: 'application/pdf' });
+        const file = new Blob([respProd], {type: 'application/pdf'});
         const fileURL = URL.createObjectURL(file);
         window.open(fileURL);
         // this.isLoading.next(false);
@@ -260,7 +270,7 @@ export class EditComponent implements OnInit {
     )
   }
 
-  refreshOrder(){
+  refreshOrder() {
     // this.orderState$ = this.orderService.showOrder$(parseInt(this.IdParam))
     //   .pipe(
     //     map((response) => {
@@ -295,38 +305,37 @@ export class EditComponent implements OnInit {
     this.selectedFiles = event.target.files;
   }
 
-  getProforma(){
+  getProforma() {
     this.openLoader()
     this.orderService.getProforma(this.order.internalReference).subscribe(
       respProd => {
         this.closeLoader()
-        const file = new Blob([respProd], { type: 'application/pdf' });
+        const file = new Blob([respProd], {type: 'application/pdf'});
         const fileURL = URL.createObjectURL(file);
         window.open(fileURL);
-      },error => {
+      }, error => {
         this.closeLoader()
       }
     )
   }
 
-  generatePreuve(){
+  generatePreuve() {
     const docType = 'pdf'
     const type = 'INVOICE'
     this.openLoader()
     this.orderService.getFile(this.order.internalReference, type, docType).subscribe(
       respProd => {
         this.closeLoader()
-        const file = new Blob([respProd], { type: 'application/pdf' });
+        const file = new Blob([respProd], {type: 'application/pdf'});
         const fileURL = URL.createObjectURL(file);
         window.open(fileURL);
-      },error => {
+      }, error => {
         this.closeLoader()
       }
-
     )
   }
 
-  generateReçu(){
+  generateReçu() {
     this.loadingFile.next(true)
     this.openLoader()
     const type = 'INVOICE'
@@ -334,38 +343,38 @@ export class EditComponent implements OnInit {
       respProd => {
         this.loadingFile.next(false)
         this.closeLoader()
-        const file = new Blob([respProd], { type: 'application/pdf' });
+        const file = new Blob([respProd], {type: 'application/pdf'});
         const fileURL = URL.createObjectURL(file);
         window.open(fileURL);
-      },error => {
+      }, error => {
         this.loadingFile.next(false)
         this.closeLoader()
       }
     )
   }
 
-  generateBonLivraison(){
+  generateBonLivraison() {
     const type = 'DELIVERY'
     this.openLoader()
     this.orderService.getReçu(this.order.internalReference, type).subscribe(
       respProd => {
         this.closeLoader()
-        const file = new Blob([respProd], { type: 'application/pdf' });
+        const file = new Blob([respProd], {type: 'application/pdf'});
         const fileURL = URL.createObjectURL(file);
         window.open(fileURL);
-      },error => {
+      }, error => {
         this.closeLoader()
       }
     )
   }
 
-  generateBonCommande(){
+  generateBonCommande() {
     const docType = 'pdf'
     const type = 'DELIVERY'
     this.orderService.getFile(this.order.internalReference, type, docType).subscribe(
       respProd => {
 
-        const file = new Blob([respProd], { type: 'application/pdf' });
+        const file = new Blob([respProd], {type: 'application/pdf'});
         const fileURL = URL.createObjectURL(file);
         window.open(fileURL);
         // this.isLoading.next(false);
@@ -377,7 +386,7 @@ export class EditComponent implements OnInit {
 
     Swal.fire({
       title: 'Annuler commande',
-      html: "Voulez-vous vraiment annuler la commande N° "+ order.internalReference.toString().bold() + " ?",
+      html: "Voulez-vous vraiment annuler la commande N° " + order.internalReference.toString().bold() + " ?",
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#00ace6',
@@ -399,9 +408,9 @@ export class EditComponent implements OnInit {
   }
 
   denyOrder() {
-    if (this.editForm.controls['reason'].value .toString() == ''){
+    if (this.editForm.controls['reason'].value.toString() == '') {
       this.notifsService.onError('veuillez préciser la raison d\'annulation de la commande', '')
-    }else {
+    } else {
       this.order.idManagerCoupon = parseInt(localStorage.getItem('uid'))
       this.order.reasonForCancellation = this.editForm.controls['reason'].value
       this.orderService.denyOrder(this.order.internalReference, this.order.idManagerCoupon, this.order.reasonForCancellation).subscribe();
@@ -410,7 +419,7 @@ export class EditComponent implements OnInit {
     }
   }
 
-  affectCouponClient(){
+  affectCouponClient() {
     this.isLoading.next(true)
     this.listVouchers.forEach(coupon => {
       let cp = coupon.toString()
@@ -424,7 +433,7 @@ export class EditComponent implements OnInit {
 
   }
 
-  generatePDF($event){
+  generatePDF($event) {
     const select = $event.target.value
     // if (select == 'facture'){
     //   this.getProforma();
@@ -433,17 +442,23 @@ export class EditComponent implements OnInit {
     //   this.getProforma();
     // }
     switch (select) {
-      case 'bordereau': this.generateBonLivraison();
+      case 'bordereau':
+        this.generateBonLivraison();
         break;
-      case 'preuve': this.generatePreuve();
+      case 'preuve':
+        this.generatePreuve();
         break;
-      case 'préfacture': this.getProforma();
+      case 'préfacture':
+        this.getProforma();
         break;
-      case 'bonCommand': this.generateBonCommande();
+      case 'bonCommand':
+        this.generateBonCommande();
         break;
-      case 'reçu': this.generateReçu();
+      case 'reçu':
+        this.generateReçu();
         break;
-      case 'bonLivraison': this.generateBonLivraison();
+      case 'bonLivraison':
+        this.generateBonLivraison();
         break;
     }
     // if (select == 'bordereau'){
@@ -466,15 +481,15 @@ export class EditComponent implements OnInit {
   }
 
   addCoupon() {
-    let str= parseInt(this.addCouponClientForm.controls['coupon'].value).toString();
+    let str = parseInt(this.addCouponClientForm.controls['coupon'].value).toString();
     this.couponService.getCouponsBySerialNumber(str).subscribe(
       res => {
-        if (res.status.name !== 'AVAILABLE' ){
-            this.notifsService.onWarning('Ce coupon n\'une plus dans notre espace de stockage')
-          }else {
-            this.listVouchers.push(this.addCouponClientForm.controls['coupon'].value)
-            this.addCouponClientForm.controls['coupon'].reset()
-          }
+        if (res.status.name !== 'AVAILABLE') {
+          this.notifsService.onWarning('Ce coupon n\'une plus dans notre espace de stockage')
+        } else {
+          this.listVouchers.push(this.addCouponClientForm.controls['coupon'].value)
+          this.addCouponClientForm.controls['coupon'].reset()
+        }
       }, error => {
         this.notifsService.onError("Ce coupon n'existe pas", '')
       }
@@ -486,15 +501,15 @@ export class EditComponent implements OnInit {
     this.listVouchers.splice(prodIndex, 1)
   }
 
-  openLoader(){
-    this.modalService.open(LoaderComponent, {backdrop: false });
+  openLoader() {
+    this.modalService.open(LoaderComponent, {backdrop: false});
   }
 
-  closeLoader(){
+  closeLoader() {
     this.modalService.dismissAll()
   }
 
-  formatNumber(amount: any): string{
-    return parseInt(amount).toFixed(0).replace(/(\d)(?=(\d{3})+\b)/g,'$1 ');
+  formatNumber(amount: any): string {
+    return parseInt(amount).toFixed(0).replace(/(\d)(?=(\d{3})+\b)/g, '$1 ');
   }
 }

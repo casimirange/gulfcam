@@ -19,6 +19,7 @@ import {StatusService} from "../../../_services/status/status.service";
 export class IndexEntrepotComponent implements OnInit {
 
   storeHouses: StoreHouse[] = [];
+  storeHousesByStore: StoreHouse[] = [];
   storeHouse: StoreHouse = new StoreHouse();
   @ViewChild('mymodal', { static: false }) viewMe?: ElementRef<HTMLElement>;
   storeHouseForm: FormGroup ;
@@ -30,6 +31,7 @@ export class IndexEntrepotComponent implements OnInit {
   modalTitle = 'Enregistrer un nouvel entrepot'
   magasin: string
   roleUser = localStorage.getItem('userAccount').toString()
+  role: string[] = []
   page: number = 1;
   totalPages: number;
   totalElements: number;
@@ -38,6 +40,9 @@ export class IndexEntrepotComponent implements OnInit {
               private storeService: StoreService, private notifService: NotifsService, private router: Router,
               private statusService: StatusService) {
     this.formStoreHouse();
+    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
+      this.role.push(authority);
+    });
   }
 
   ngOnInit(): void {
@@ -72,6 +77,8 @@ export class IndexEntrepotComponent implements OnInit {
       resp => {
         console.log(resp)
         this.storeHouses = resp.content
+        this.storeHousesByStore = resp.content.filter(sh => sh.store.internalReference === parseInt(localStorage.getItem('store')))
+        console.log(this.storeHousesByStore)
         this.size = resp.size
         this.totalPages = resp.totalPages
         this.totalElements = resp.totalElements

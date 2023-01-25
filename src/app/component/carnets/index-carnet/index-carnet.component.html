@@ -1,5 +1,5 @@
 
-<div class="app-page-title">
+<div class="app-page-title" *ngIf="roleUser === 'MANAGER_STORE' || roleUser === 'MANAGER_COUPON' || roleUser === 'STORE_KEEPER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
   <div class="page-title-wrapper">
     <div class="page-title-heading">
       <div class="page-title-icon">
@@ -10,20 +10,10 @@
         <div class="page-title-subheading">Managez vos carnets</div>
       </div>
     </div>
-    <div class="page-title-actions">
-      <div class="d-inline-block ">
-<!--        <button type="button" data-toggle="tooltip" title="nouveau carton" class="btn-shadow mr-3 btn btn-primary" (click)="open(mymodal)">-->
-<!--                                        <span class="btn-icon-wrapper pr-2 opacity-7">-->
-<!--                                            <i class="fa fa-plus fa-w-20"></i>-->
-<!--                                        </span>-->
-<!--          Carton-->
-<!--        </button>-->
-      </div>
-    </div>
   </div>
 </div>
 
-<div class="row">
+<div class="row" *ngIf="roleUser === 'MANAGER_STORE' || roleUser === 'MANAGER_COUPON' || roleUser === 'STORE_KEEPER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
   <div class="col-md-12">
     <div class="main-card mb-3 card " id="htmlData" #htmlData>
       <div class="card-header">

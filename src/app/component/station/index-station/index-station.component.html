@@ -1,5 +1,4 @@
-
-<div class="app-page-title">
+<div class="app-page-title" *ngIf="roleUser === 'MANAGER_STATION' || role.includes('ROLE_SUPERADMIN')">
   <div class="page-title-wrapper">
     <div class="page-title-heading">
       <div class="page-title-icon">
@@ -10,7 +9,7 @@
         <div class="page-title-subheading">Managez vos stations</div>
       </div>
     </div>
-    <div class="page-title-actions">
+    <div class="page-title-actions" *ngIf="role.includes('ROLE_SUPERADMIN')">
       <div class="d-inline-block ">
         <button type="button" data-toggle="tooltip" title="nouvelle station" class="btn-shadow mr-3 btn btn-primary" (click)="open(mymodal)">
                                         <span class="btn-icon-wrapper pr-2 opacity-7">
@@ -23,7 +22,7 @@
   </div>
 </div>
 
-<div class="row">
+<div class="row" *ngIf="roleUser === 'MANAGER_STATION' || role.includes('ROLE_SUPERADMIN')">
   <div class="col-md-12">
     <div class="main-card mb-3 card " id="htmlData" #htmlData>
       <div class="card-header">
@@ -85,7 +84,7 @@
                 <th>Actions</th>
               </tr>
               </thead>
-              <tbody *ngFor="let station of stations | paginate: { id: 'station', itemsPerPage: size, currentPage: page, totalItems: totalElements }; let i = index">
+              <tbody *ngFor="let station of role.includes('ROLE_SUPERADMIN') ? stations : userStations | paginate: { id: 'station', itemsPerPage: size, currentPage: page, totalItems: totalElements }; let i = index">
 
               <tr>
                 <td>{{i + 1}}</td>
@@ -106,14 +105,14 @@
                   <button class="btn btn-sm btn-secondary mr-2" (click)="showDetails(station)">
                     <i class="pe-7s-look" title="consulter"></i>
                   </button>
-                  <button class="btn btn-sm btn-primary" (click)="updateStationModal(mymodal, station)">
+                  <button class="btn btn-sm btn-primary" (click)="updateStationModal(mymodal, station)" *ngIf="role.includes('ROLE_SUPERADMIN')">
                     <i class="pe-7s-eyedropper" title="modifier"></i>
                   </button>
                 </td>
               </tr>
             </table>
             <div class="text-center">
-              <p *ngIf="stations.length === 0" style="color: grey; font-size: 1.8rem;" class="mx-auto" >Aucune station trouvée !</p>
+              <p *ngIf="role.includes('ROLE_SUPERADMIN') ? stations.length === 0 : userStations.length === 0 " style="color: grey; font-size: 1.8rem;" class="mx-auto" >Aucune station trouvée !</p>
             </div>
             <div class="card-footer">
               <div class="btn-actions-pane-left">

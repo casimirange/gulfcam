@@ -21,7 +21,8 @@ export class DetailsRequestOppositionComponent implements OnInit {
   request: RequestOpposition = new RequestOpposition();
   tickets: Ticket[] = [];
   coupons: Coupon[] = [];
-  roleUser = localStorage.getItem('userAccount').toString()
+  roleUser = localStorage.getItem('userAccount').toString();
+  role: string[] = [];
   private isLoading = new BehaviorSubject<boolean>(false);
   isLoading$ = this.isLoading.asObservable();
   page: number = 1;
@@ -34,6 +35,9 @@ export class DetailsRequestOppositionComponent implements OnInit {
   constructor(private requestService: OppositionService, private activatedRoute: ActivatedRoute, private router: Router,
               private ticketService: TicketService, private notifService: NotifsService, private statusService: StatusService,
               private _location: Location, private couponService: CouponService) {
+    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
+      this.role.push(authority);
+    });
   }
 
   ngOnInit(): void {

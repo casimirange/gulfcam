@@ -41,15 +41,14 @@ export class IndexCouponComponent implements OnInit {
   coupons: Coupon[];
   coupon: Coupon = new Coupon();
   vouchers: TypeVoucher[] = [];
-  couponForm: FormGroup ;
+
   stores: Store[] = [];
   store: Store = new Store();
   appState$: Observable<AppState<CustomResponse<Coupon>>>;
   readonly DataState = DataState;
   private dataSubjects = new BehaviorSubject<CustomResponse<Coupon>>(null);
-  private isLoading = new BehaviorSubject<boolean>(false);
-  isLoading$ = this.isLoading.asObservable();
   roleUser = localStorage.getItem('userAccount').toString()
+  role: string[] = []
   magasin: string
   entrepot: string;
   typcoupon: any;
@@ -59,25 +58,18 @@ export class IndexCouponComponent implements OnInit {
   totalElements: number;
   size: number = 20;
 
-  stations: Station[] = []
+
   constructor(private fb: FormBuilder, private modalService: NgbModal, private storeHouseService: StoreHouseService,
               private storeService: StoreService, private notifService: NotifsService, private cartonService: CartonService,
               private carnetService: CarnetService, private voucherService: VoucherService, private couponService: CouponService,
               private stationService: StationService, private statusService: StatusService) {
-    this.formCoupon();
+    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
+      this.role.push(authority);
+    });
   }
 
   ngOnInit(): void {
     this.getCoupons();
-    this.getStations();
-  }
-
-  //formulaire de création
-  formCoupon(){
-    this.couponForm = this.fb.group({
-      coupon: ['', [Validators.required]],
-      idStation: ['', [Validators.required]],
-    });
   }
 
   //récupération de la liste des magasins
@@ -88,16 +80,6 @@ export class IndexCouponComponent implements OnInit {
       },
     )
   }
-
-  //récupération de la liste des magasins
-  getStations(){
-    this.stationService.getStations().subscribe(
-      resp => {
-        this.stations = resp.content
-      },
-    )
-  }
-
 
   //récupération de la liste des entrepots
   getCoupons(){
@@ -114,16 +96,6 @@ export class IndexCouponComponent implements OnInit {
           return of({dataState: DataState.ERROR_STATE, error: error})
         })
       )
-  }
-
-  annuler() {
-    this.formCoupon();
-    this.modalService.dismissAll()
-  }
-
-  open(content: any){
-    const modal = true;
-    this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title', size: 'lg'});
   }
 
   pageChange(event: number){
@@ -148,33 +120,6 @@ export class IndexCouponComponent implements OnInit {
 
   padWithZero(num, targetLength) {
     return String(num).padStart(targetLength, '0');
-  }
-
-  accepterCoupon() {
-    let str= parseInt(this.couponForm.controls['coupon'].value).toString();
-    this.store.localization = this.couponForm.value
-    this.coupon.serialNumber = str
-    const body = {
-      "idStation": 0,
-      "modulo": 0,
-      "productionDate": "2022-12-16"
-    }
-    body.idStation = this.couponForm.controls['idStation'].value
-    // body.productionDate = new Date().toLocaleString().toString()
-    // console.log(body.productionDate)
-    this.isLoading.next(true);
-    this.couponService.acceptCoupon(this.coupon.serialNumber, body).subscribe(
-      resp => {
-        console.log(resp)
-        this.getCoupons()
-        this.annuler()
-        this.isLoading.next(false);
-        this.notifService.onSuccess('coupon accepté')
-      },
-      error => {
-        this.isLoading.next(false)
-      }
-    )
   }
 
   formatNumber(amount: any): string{

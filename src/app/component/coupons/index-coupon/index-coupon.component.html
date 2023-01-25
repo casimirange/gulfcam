@@ -1,5 +1,5 @@
-
-<div class="app-page-title">
+<div class="app-page-title"
+     *ngIf="roleUser === 'MANAGER_STORE' || roleUser === 'MANAGER_COUPON' || roleUser === 'STORE_KEEPER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
   <div class="page-title-wrapper">
     <div class="page-title-heading">
       <div class="page-title-icon">
@@ -10,69 +10,45 @@
         <div class="page-title-subheading">Managez vos coupons</div>
       </div>
     </div>
-    <div class="page-title-actions">
-      <div class="d-inline-block ">
-                <button type="button" data-toggle="tooltip" title="nouveau carton" class="btn-shadow mr-3 btn btn-primary" (click)="open(mymodal)">
-                                                <span class="btn-icon-wrapper pr-2 opacity-7">
-                                                    <i class="fa fa-plus fa-w-20"></i>
-                                                </span>
-                  Accepter Coupon
-                </button>
-      </div>
-    </div>
+<!--    <div class="page-title-actions">-->
+<!--      <div class="d-inline-block ">-->
+<!--        <button type="button" data-toggle="tooltip" title="nouveau carton" class="btn-shadow mr-3 btn btn-primary"-->
+<!--                (click)="open(mymodal)">-->
+<!--                                                <span class="btn-icon-wrapper pr-2 opacity-7">-->
+<!--                                                    <i class="fa fa-plus fa-w-20"></i>-->
+<!--                                                </span>-->
+<!--          Accepter Coupon-->
+<!--        </button>-->
+<!--      </div>-->
+<!--    </div>-->
   </div>
 </div>
 
-<div class="row">
+<div class="row"
+     *ngIf="roleUser === 'MANAGER_STORE' || roleUser === 'MANAGER_COUPON' || roleUser === 'STORE_KEEPER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
   <div class="col-md-12">
     <div class="main-card mb-3 card " id="htmlData" #htmlData>
       <div class="card-header">
         Liste des coupons
         <div class="btn-actions-pane-right">
           <div role="group" class="btn-group-sm btn-group">
-            <!--              <form >-->
-            <!--                <input type="text" placeholder="Rechercher..." class="form-control form-control-sm">-->
-            <!--              </form>-->
-          </div>
-        </div>
-
-        <div class="btn-actions-pane-right">
-          <div role="group" class="btn-group-sm btn-group">
-            <div >
-              <!--                <form >-->
-              <!--                  <div class="form-row">-->
-
-              <!--                    <div class="col-md-5">-->
-              <!--                      <input type="date" placeholder="BCP002" class="form-control form-control-sm" formControlName="date1">-->
-              <!--                    </div>-->
-              <!--                    <div class="col-md-5">-->
-              <!--                      <input type="date" placeholder="Electricien" class="form-control form-control-sm" formControlName="date2">-->
-              <!--                    </div>-->
-              <!--                    <div class="col-md-2">-->
-              <!--                      <button class="btn-transition btn btn-sm btn-shadow btn-outline-primary form-control-sm form-control" type="submit"><i class="fa fa-search"></i></button>-->
-
-              <!--                    </div>-->
-
-              <!--                  </div>-->
-              <!--                </form>-->
-            </div>
           </div>
         </div>
       </div>
 
-      <div class="table-responsive" >
+      <div class="table-responsive">
 
         <ng-container class="bg-white" *ngIf="(appState$ | async) as appState" [ngSwitch]="appState.dataState">
           <ng-container class="bg-white" *ngSwitchCase="DataState.LOADING_STATE">
-              <div class="col-md-12 text-center my-3">
-                <!--                <div class="spinner-border text-primary my-3" role="status"></div>-->
-                <div class="ball-clip-rotate">
-                  <div style="background-color: rgb(68, 64, 84);"></div>
-                </div>
+            <div class="col-md-12 text-center my-3">
+              <!--                <div class="spinner-border text-primary my-3" role="status"></div>-->
+              <div class="ball-clip-rotate">
+                <div style="background-color: rgb(68, 64, 84);"></div>
               </div>
-            </ng-container>
+            </div>
+          </ng-container>
           <ng-container class="bg-white py-1 px-1" *ngSwitchCase="DataState.LOADED_STATE">
-            <table class="table table-hover bg-white" >
+            <table class="table table-hover bg-white">
               <thead>
               <tr>
                 <th>#</th>
@@ -87,10 +63,11 @@
                 <th>Note credit</th>
                 <th>Dde Oppo.</th>
                 <th>Date</th>
-<!--                <th>Actions</th>-->
+                <!--                <th>Actions</th>-->
               </tr>
               </thead>
-              <tbody *ngFor="let coupon of appState.appData.content | paginate: { id: 'coupon',itemsPerPage: appState.appData.size, currentPage: page, totalItems: appState.appData.totalElements }; let i = index">
+              <tbody
+                *ngFor="let coupon of appState.appData.content | paginate: { id: 'coupon',itemsPerPage: appState.appData.size, currentPage: page, totalItems: appState.appData.totalElements }; let i = index">
 
               <tr>
                 <td>{{i + 1}}</td>
@@ -108,7 +85,8 @@
               </tr>
             </table>
             <div class="text-center">
-              <p *ngIf="!appState.appData.content.length" style="color: grey; font-size: 1.8rem;" class="mx-auto" >Aucun Coupon trouvé !</p>
+              <p *ngIf="!appState.appData.content.length" style="color: grey; font-size: 1.8rem;" class="mx-auto">Aucun
+                Coupon trouvé !</p>
             </div>
             <div class="card-footer">
               <div class="btn-actions-pane-left">
@@ -128,9 +106,9 @@
               </div>
             </div>
           </ng-container>
-          <ng-container class="bg-white"  *ngSwitchCase="DataState.ERROR_STATE">
+          <ng-container class="bg-white" *ngSwitchCase="DataState.ERROR_STATE">
             <div class="col-md-12 text-center">
-              <div class="text-danger" >{{appState.error}}</div>
+              <div class="text-danger">{{appState.error}}</div>
             </div>
           </ng-container>
         </ng-container>
@@ -139,45 +117,4 @@
   </div>
 </div>
 
-<ng-template #mymodal let-modal>
-  <div class="modal-header">
-    <h6 class="modal-title timeline-title" id="modal-basic-title"><b>Accepter coupon</b></h6>
-    <div class="close vertical-timeline-element-content bounce-in" (click)=" modal.close('save click')">
-      <p><i class="fa fa-times"></i></p>
-    </div>
-  </div>
-  <div class="modal-body">
-    <div class="">
-      <div class="">
-        <form [formGroup]="couponForm">
-          <div class="row">
-            <div class="col-md-12">
-              <div class="position-relative form-group">
-                <label for="localisation" class="">Coupon</label>
-                <input name="amount" id="localisation" placeholder="numéro de série du coupon"
-                       type="text" class="form-control" formControlName="coupon">
-              </div>
-            </div>
-            <div class="col-md-12">
-              <div class="position-relative form-group">
-                <label for="localisation" class="">Station</label>
-                <select class="form-control" formControlName="idStation">
-                  <option *ngFor="let station of stations" value="{{station.internalReference}}">{{station.designation}}</option>
-                </select>
-              </div>
-            </div>
-          </div>
-          <button class="mt-1 btn btn-secondary float-right ml-3" (click)="annuler()"><i class="pe-7s-back"></i>Annuler
-          </button>
-          <button class="mt-1 btn btn-primary float-right" [disabled]="couponForm.invalid || (isLoading$ | async)"
-                  (click)="accepterCoupon()">
-            <i *ngIf="isLoading$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
-            <span *ngIf="isLoading$ | async">Acceptation ...</span>
-            <span
-              *ngIf="!(isLoading$ | async)">Accepter coupon</span>
-          </button>
-        </form>
-      </div>
-    </div>
-  </div>
-</ng-template>
+

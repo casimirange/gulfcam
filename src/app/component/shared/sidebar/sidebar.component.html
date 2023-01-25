@@ -51,13 +51,13 @@
           </a>
         </li>
         <li
-          *ngIf="roleUser === 'MANAGER_STORE' || roleUser === 'MANAGER_ORDER' || roleUser === 'MANAGER_COUPON' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+          *ngIf="roleUser === 'MANAGER_STORE' || roleUser === 'STORE_KEEPER' || roleUser === 'MANAGER_ORDER' || roleUser === 'MANAGER_COUPON' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
           <a routerLink="/commandes" routerLinkActive="mm-active">
             <i class="metismenu-icon pe-7s-news-paper">
             </i>Commandes
           </a>
         </li>
-        <li  *ngIf="roleUser === 'MANAGER_STORE' || roleUser === 'MANAGER_COUPON' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+        <li  *ngIf="roleUser === 'MANAGER_STORE' || roleUser === 'CUSTOMER_SERVICE'|| roleUser === 'MANAGER_COUPON' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
           <a routerLink="/coupons" routerLinkActive="mm-active">
             <i class="metismenu-icon pe-7s-ribbon">
             </i>Coupons

@@ -33,4 +33,8 @@ export class UsersService {
     return this.http.put<any>(environment.users, user);
   }
 
+  changePassword(userId: number, body: any): Observable<any>{
+    return this.http.put<any>(environment.changePassword + `/${userId}/password-update`, body);
+  }
+
 }

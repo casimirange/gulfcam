@@ -20,6 +20,7 @@ import {Router} from "@angular/router";
 export class IndexStationComponent implements OnInit, OnDestroy {
 
   stations: Station[] = [];
+  userStations: Station[] = [];
   users: ISignup[] = [];
   station: Station = new Station();
   @ViewChild('mymodal', { static: false }) viewMe?: ElementRef<HTMLElement>;
@@ -32,6 +33,7 @@ export class IndexStationComponent implements OnInit, OnDestroy {
   totalElements: number;
   size: number = 10;
   roleUser = localStorage.getItem('userAccount').toString()
+  role: string[] = []
   suscription: Subscription;
   constructor(private fb: FormBuilder, private modalService: NgbModal, private stationService: StationService,
               private notifService: NotifsService, private statusService: StatusService, private router: Router,
@@ -42,7 +44,9 @@ export class IndexStationComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.getStations();
     this.getUsers();
-
+    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
+      this.role.push(authority);
+    });
     this.suscription = this.stationService.refresh$.subscribe(() => {
       this.getStations()
     })
@@ -64,6 +68,8 @@ export class IndexStationComponent implements OnInit, OnDestroy {
     this.stationService.getAllStationWithPagination(this.page-1, this.size).subscribe(
       resp => {
         this.stations = resp.content
+        this.userStations = resp.content.filter(station => station.idManagerStation == parseInt(localStorage.getItem('uid')))
+        console.log(this.userStations)
         this.size = resp.size
         this.totalPages = resp.totalPages
         this.totalElements = resp.totalElements
@@ -76,7 +82,6 @@ export class IndexStationComponent implements OnInit, OnDestroy {
   getUsers(){
     this.userService.getAllUsersWithPagination(this.page-1, 100).subscribe(
       resp => {
-        console.log(resp)
         this.users = resp.content
         this.users = this.users.filter(user => user.typeAccount.name === 'MANAGER_STATION')
       },

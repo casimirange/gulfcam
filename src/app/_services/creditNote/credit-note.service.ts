@@ -20,8 +20,8 @@ export class CreditNoteService {
     return this.http.post<any>(environment.creditNote, product)
   }
 
-  getCreditNote(): Observable<any>{
-    return this.http.get<any>(environment.creditNote,)
+  getCreditNote(page: number, size: number): Observable<any>{
+    return this.http.get<any>(environment.creditNote + `?page=${page}&size=${size}`,)
   }
 
   getCreditNoteByInternqlRef(internalRef: number): Observable<any>{
@@ -33,7 +33,7 @@ export class CreditNoteService {
   }
 
   getCreditNoteByStation(internalRef: number): Observable<any>{
-    return this.http.get<any>(environment.creditNote+`/${internalRef}`)
+    return this.http.get<any>(environment.creditNote+`/station/${internalRef}`)
   }
 
   exportCreditNote(noteInternalReference: number): Observable<any>{

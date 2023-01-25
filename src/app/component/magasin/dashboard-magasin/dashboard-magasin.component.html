@@ -1,4 +1,4 @@
-<div class="app-page-title">
+<div class="app-page-title" *ngIf="(roleUser === 'MANAGER_STORE' || roleUser === 'MANAGER_COUPON' || roleUser === 'STORE_KEEPER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))">
   <div class="page-title-wrapper">
     <div class="page-title-heading">
       <div class="page-title-icon">
@@ -10,7 +10,7 @@
         </div>
       </div>
     </div>
-    <div class="page-title-actions" >
+    <div class="page-title-actions" *ngIf="role.includes('ROLE_SUPERADMIN')">
       <button (click)="open(mymodal)" type="button" data-toggle="tooltip" title="cartons" data-placement="bottom"
               class="btn-shadow mr-3 btn btn-primary">
            <span class="btn-icon-wrapper pr-2 opacity-7">
@@ -43,7 +43,7 @@
 <!--    </li>-->
 <!--  </ul>-->
 
-<div class="col-lg-12 col-xl-12">
+<div class="col-lg-12 col-xl-12" *ngIf="(roleUser === 'MANAGER_STORE' || roleUser === 'MANAGER_COUPON' || roleUser === 'STORE_KEEPER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))">
   <div class="main-card mb-3 card">
     <div class="card-body">
       <h5 class="card-title">Liste des Magasins</h5>
@@ -59,7 +59,7 @@
           <th>Actions</th>
         </tr>
         </thead>
-        <tbody *ngFor="let store of stores | paginate: { id: 'magasin', itemsPerPage: size, currentPage: page, totalItems: totalElements }; let i = index">
+        <tbody *ngFor="let store of role.includes('ROLE_SUPERADMIN') ? stores : storeFilter | paginate: { id: 'magasin', itemsPerPage: size, currentPage: page, totalItems: totalElements }; let i = index">
 
         <tr >
           <td>{{i + 1}}</td>
@@ -83,7 +83,7 @@
             <button class="btn btn-sm btn-secondary mr-2" (click)="showDetails(store)">
               <i class="pe-7s-look" title="consulter"></i>
             </button>
-            <button class="btn btn-sm btn-primary" (click)="updateStoreModal(mymodal, store)">
+            <button class="btn btn-sm btn-primary" (click)="updateStoreModal(mymodal, store)" *ngIf="role.includes('ROLE_SUPERADMIN')">
               <i class="pe-7s-eyedropper" title="modifier"></i>
             </button>
           </td>

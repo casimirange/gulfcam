@@ -28,6 +28,8 @@ const routes: Routes = [
   { path: 'clients', loadChildren: () => import('./component/client/client.module').then(m => m.ClientModule), canActivate: [AuthGuard]},
   // Users
   { path: 'users', loadChildren: () => import('./component/users/users.module').then(m => m.UsersModule), canActivate: [AuthGuard]},
+  // User Profile
+  { path: 'profile', loadChildren: () => import('./component/profile/profile.module').then(m => m.ProfileModule), canActivate: [AuthGuard]},
   // Paiement Method
   { path: 'paiement-method', loadChildren: () => import('./component/paiement-method/paiement-method.module').then(m => m.PaiementMethodModule), canActivate: [AuthGuard]},
   // Entrepot

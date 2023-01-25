@@ -1,4 +1,3 @@
-
 <div class="app-page-title">
   <div class="page-title-wrapper">
     <div class="page-title-heading">
@@ -49,24 +48,28 @@
 <!--    </div>-->
 <!--  </div>-->
 
-<div class="row" >
+<div class="row">
   <div class="col-md-12">
     <div class="main-card mb-3 card " id="htmlData">
       <div class="card-header">
         Liste des commandes
         <div class="btn-actions-pane-right">
           <div role="group" class="btn-group-sm btn-group">
-<!--            <input type="text" placeholder="Rechercher nom client" [(ngModel)]="name"  class="form-control form-control-sm mr-3">-->
-<!--            <input type="text" placeholder="Rechercher ref client" [(ngModel)]="refCli" class="form-control form-control-sm mr-3">-->
-<!--            <input type="date" placeholder="Rechercher date" [(ngModel)]="date" class="form-control form-control-sm mr-3">-->
-<!--            <input type="text" placeholder="Rechercher ref commande" [(ngModel)]="internalRef" class="form-control form-control-sm mr-3">-->
+            <!--            <input type="text" placeholder="Rechercher nom client" [(ngModel)]="name"  class="form-control form-control-sm mr-3">-->
+            <!--            <input type="text" placeholder="Rechercher ref client" [(ngModel)]="refCli" class="form-control form-control-sm mr-3">-->
+            <!--            <input type="date" placeholder="Rechercher date" [(ngModel)]="date" class="form-control form-control-sm mr-3">-->
+            <!--            <input type="text" placeholder="Rechercher ref commande" [(ngModel)]="internalRef" class="form-control form-control-sm mr-3">-->
+            <!--            <input type="text" placeholder="Rechercher ref commande" >-->
+            <!--            <select name="" id="" [(ngModel)]="storeFilter" class="form-control form-control-sm mr-3">-->
+            <!--              <option *ngFor="let store of stores">{{store.localization}}</option>-->
+            <!--            </select>-->
             <!--              <button class="btn btn-sm mr-3 text-primary" (click)="searchByName()"><i class="fa fa-search"></i></button>-->
           </div>
         </div>
       </div>
 
       <ng-container class="bg-white" *ngIf="(orderState$ | async) as orderState" [ngSwitch]="orderState.dataState">
-        <div class="table-responsive" >
+        <div class="table-responsive">
           <ng-container class="bg-white" *ngSwitchCase="DataState.LOADING_STATE">
             <div class="col-md-12 text-center my-3">
               <!--                <div class="spinner-border text-primary my-3" role="status"></div>-->
@@ -90,21 +93,24 @@
               </tr>
               </thead>
               <tbody>
-              <tr style="cursor: pointer" routerLink="/commandes/edit/{{order.internalReference}}" *ngFor="let order of orderState.appData.content | paginate: { id: 'order', itemsPerPage: size, currentPage: page, totalItems: totalElements} ">
+              <tr style="cursor: pointer" routerLink="/commandes/complete-order/{{order.internalReference}}"
+                  *ngFor="let order of orders | paginate: { id: 'order', itemsPerPage: size, currentPage: page, totalItems: totalElements} ">
                 <td>{{order.internalReference}}</td>
                 <td>{{order.createdAt | date: 'dd/MM/yyyy'}}</td>
                 <td>{{order.completeName }}</td>
+<!--                <td>{{order.client.internalReference }}</td>-->
                 <td>{{order.client.internalReference }}</td>
                 <td>{{order.channel }}</td>
                 <td>{{order.localisation}}</td>
-                <td> <span class="font-weight-bold">{{getStatuts(order.status.name)}}</span> </td>
+                <td><span class="font-weight-bold">{{getStatuts(order.status.name)}}</span></td>
               </tr>
 
               </tbody>
 
             </table>
             <div class="text-center">
-              <p *ngIf="!orderState.appData.content.length" style="color: grey; font-size: 1.8rem;" class="mx-auto" >Aucune commande trouvée !</p>
+              <p *ngIf="!orderState.appData.content.length" style="color: grey; font-size: 1.8rem;" class="mx-auto">
+                Aucune commande trouvée !</p>
             </div>
             <div class="card-footer">
               <div class="btn-actions-pane-left">
@@ -123,9 +129,9 @@
               </div>
             </div>
           </ng-container>
-          <ng-container class="bg-white"  *ngSwitchCase="DataState.ERROR_STATE">
+          <ng-container class="bg-white" *ngSwitchCase="DataState.ERROR_STATE">
             <div class="col-md-12 text-center">
-              <div class="text-danger" >{{orderState.error}}</div>
+              <div class="text-danger">{{orderState.error}}</div>
             </div>
           </ng-container>
         </div>

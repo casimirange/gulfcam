@@ -1,0 +1,69 @@
+<div class="app-page-title" *ngIf="user">
+  <div class="page-title-wrapper">
+    <div class="page-title-heading">
+      <div class="page-title-icon">
+        <i class="pe-7s-user icon-gradient bg-danger">
+        </i>
+      </div>
+      <div>{{user.firstName | titlecase}}
+        <div class="page-title-subheading">{{user.email}}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="tab-content">
+  <div class="tab-pane tabs-animation fad active" id="tab-content-1" role="tabpanel">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="main-card mb-3 card">
+          <div class="card-body">
+            <h5 class="card-title">Modifier mot de passe</h5>
+            <form [formGroup]="changePwd" class="align-content-center">
+
+
+              <div class="offset-2 col-md-8 offset-2">
+                <div class="position-relative form-group">
+                  <label>Ancien mot de passe</label>
+                  <input  id="examplePassword" name="pwd" placeholder="ancien mot de passe" type="password" class="form-control" formControlName="oldpassword"></div>
+              </div>
+              <div class="offset-2 col-md-8 offset-2">
+                <div class="position-relative form-group">
+                  <label>Nouveau mot de passe</label>
+                  <input  id="newPassword" [(ngModel)]="pass" placeholder="nouveau mot de passe..." type="password" class="form-control" formControlName="password"></div>
+                <div *ngIf="form['password'].invalid && (form['password'].dirty || form['password'].touched)"
+                     class=""  style="color: #f65656; font-style: italic;">
+
+                  <div *ngIf="form['password'].errors?.['required']" class="ml-3">
+                    le mot de passe est obligatoire.
+                  </div>
+                  <div *ngIf="form['password'].errors?.['pattern']" class="ml-3">
+                    au moins 8 caractères avec 1 minuscule, 1 majuscule et 1 caractère spécial
+                  </div>
+                </div>
+              </div>
+              <div class="offset-2 col-md-8 offset-2">
+                <div class="position-relative form-group">
+                  <label>Confirmer mot de passe</label>
+                  <input  id="confirm" [(ngModel)]="confirm_pass" placeholder="confirmer mot de passe" type="password" class="form-control" formControlName="cpass"></div>
+                <div *ngIf="confirm_pass !== pass && (form['cpass'].dirty || form['cpass'].touched)"
+                     class=""  style="color: #f65656; font-style: italic;">
+                  les mots de passe sont différents
+                </div>
+              </div>
+                <div class="text-center">
+                  <button type="submit" class="btn btn-primary" [disabled]="changePwd.invalid || confirm_pass !== pass || (isLoading$ | async)"
+                          (click)="onSubmit()">
+                    <i *ngIf="isLoading$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
+                    <span *ngIf="isLoading$ | async">Enregistrement...</span>
+                    <span *ngIf="!(isLoading$ | async)">Modifier</span>
+                  </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

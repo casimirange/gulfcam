@@ -63,7 +63,7 @@ export class IndexCommandComponent implements OnInit {
   page: number = 1;
   totalPages: number;
   totalElements: number;
-  size: number = 3;
+  size: number = 20;
   orderState$: Observable<AppState<CustomResponse<Order>>>;
   readonly DataState = DataState;
   private dataSubjects = new BehaviorSubject<CustomResponse<Order>>(null);
@@ -72,6 +72,7 @@ export class IndexCommandComponent implements OnInit {
   private isLoading = new BehaviorSubject<boolean>(false);
   isLoading$ = this.isLoading.asObservable();
   roleUser = localStorage.getItem('userAccount').toString()
+  role: string[] = []
   clientNotFound: boolean = false;
   constructor(private fb: FormBuilder, private modalService: NgbModal, private clientService: ClientService,
               private voucherService: VoucherService, private notifsService: NotifsService, private storeService: StoreService,
@@ -80,6 +81,9 @@ export class IndexCommandComponent implements OnInit {
   ) {
     this.formOrder();
     this.orF = this.orderForm.controls;
+    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
+      this.role.push(authority);
+    });
   }
 
   //initialisation de création du formulaire de commande

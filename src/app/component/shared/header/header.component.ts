@@ -49,7 +49,6 @@ export class HeaderComponent implements OnInit {
   }
 
   showProfile() {
-    this.router.navigate(['/users/profile', localStorage.getItem('id')])
-    // [routerLink]=""
+    this.router.navigate(['/profile/user', localStorage.getItem('id')])
   }
 }

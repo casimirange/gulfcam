@@ -61,12 +61,16 @@ export class DetailsEntrepotComponent implements OnInit {
   private isLoadingCarton = new BehaviorSubject<boolean>(false);
   isLoadingCarton$ = this.isLoadingCarton.asObservable();
   roleUser = localStorage.getItem('userAccount').toString()
+  role: string[] = []
   constructor(private clientService: ClientService, private activatedRoute: ActivatedRoute, private router: Router,
               private orderService: OrderService, private notifService: NotifsService, private storeService: StoreService,
               private storeHouseService: StoreHouseService, private unitService: UnitsService, private _location: Location,
               private itemService: ItemService, private voucherService: VoucherService, private cartonService: CartonService,
               private carnetService: CarnetService, private statusService: StatusService) {
     this.store = new Store()
+    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
+      this.role.push(authority);
+    });
   }
 
   ngOnInit(): void {
@@ -110,7 +114,6 @@ export class DetailsEntrepotComponent implements OnInit {
       this.carnetState$ = this.carnetService.carnetsByStoreHouse$(params['id'],this.page1 - 1, this.size)
         .pipe(
           map(response => {
-            console.log('carnets',response)
             this.datacarnetSubjects.next(response)
             return {dataState: DataState.LOADED_STATE, appData: response}
           }),

@@ -7,6 +7,8 @@ import {Order} from "../../_model/order";
 import {CustomResponse} from "../../_interfaces/custom-response";
 import {Client} from "../../_model/client";
 import {catchError} from "rxjs/operators";
+import {Status} from "../../_model/status";
+import {log} from "util";
 
 export const httpOptions = {
   responseType: 'arraybuffer' as 'json'
@@ -41,6 +43,10 @@ export class OrderService {
 
   getOrderByClient(clientInternalReference: number): Observable<any>{
     return this.http.get<any>(environment.order + `/client/${clientInternalReference}`,)
+  }
+
+  getOrderByStore(storeInternalRef: number): Observable<any>{
+    return this.http.get<any>(environment.order + `/store/${storeInternalRef}`,)
   }
 
   sendOrderByClient(clientInternalReference: number): Observable<any>{
@@ -116,6 +122,17 @@ export class OrderService {
   orders$ = (page: number, size: number) => <Observable<CustomResponse<Order>>>
     this.http.get<CustomResponse<Order>>(environment.order + `?page=${page}&size=${size}`,)
       .pipe(catchError(this.handleError));
+
+  ordersByStore$ = (storeInternalRef: number, page: number, size: number) => <Observable<CustomResponse<Order>>>
+    this.http.get<CustomResponse<Order>>(environment.order + `/store/${storeInternalRef}?page=${page}&size=${size}`,)
+      .pipe(catchError(this.handleError));
+
+  filterByStatus$ = (status: Status, page: number, size: number, response: CustomResponse<Order>) => <Observable<CustomResponse<Order>>>
+    new Observable<CustomResponse<Order>>(
+      subscriber => {
+        console.log(response)
+      }
+    ).pipe(catchError(this.handleError))
 
   addOrder$ = (order: Order) => <Observable<Order>>
     this.http.post<Order>(environment.order, order)

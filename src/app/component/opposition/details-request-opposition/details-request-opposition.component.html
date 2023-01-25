@@ -1,5 +1,5 @@
 
-<div class="app-page-title">
+<div class="app-page-title" *ngIf="roleUser === 'MANAGER_COUPON' || roleUser === 'CUSTOMER_SERVICE' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
   <div class="page-title-wrapper">
     <div class="page-title-heading">
       <div class="page-title-icon">
@@ -22,12 +22,12 @@
   </div>
 </div>
 
-<div class="row">
+<div class="row" *ngIf="roleUser === 'MANAGER_COUPON' || roleUser === 'CUSTOMER_SERVICE' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
   <div class="col-md-12">
     <div class="main-card mb-3 card">
       <div class="card-header">
         Liste de ses tickets
-        <div class="btn-actions-pane-right">
+        <div class="btn-actions-pane-right" *ngIf="roleUser === 'MANAGER_COUPON' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
           <div role="group" class="btn-group-sm btn-group">
             <button *ngIf="statut == 'CREATED'" class="btn btn-success" [disabled]="(isLoading$ | async)"
                     title="valider une requête d'opposition" (click)="validRequest()">

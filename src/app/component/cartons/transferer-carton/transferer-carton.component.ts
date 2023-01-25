@@ -31,10 +31,15 @@ export class TransfererCartonComponent implements OnInit {
   isLoading$ = this.isLoading.asObservable();
   cartons: Carton[] = [];
   storeHouses1: StoreHouse[] = [];
+  roleUser = localStorage.getItem('userAccount').toString()
+  role: string[] = []
   constructor(private notifsService: NotifsService, private storeHouseService: StoreHouseService, private fb: FormBuilder,
               private cartonService: CartonService, private mvtService: MvtStockService) {
     this.formTransfert()
     this.form = this.tranfertForm.controls;
+    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
+      this.role.push(authority);
+    });
   }
 
   formTransfert(){

@@ -37,9 +37,8 @@ export class IndexClientComponent implements OnInit {
   totalElements: number;
   size: number = 10;
   roleUser = localStorage.getItem('userAccount').toString()
-  modalTitle = 'Enregistrer nouveau client'
   role: string[] = []
-
+  modalTitle = 'Enregistrer nouveau client'
   @ViewChild('mymodal', {static: false}) viewMe?: ElementRef<HTMLElement>;
 
   constructor(private fb: FormBuilder, private modalService: NgbModal, private clientService: ClientService, private router: Router,

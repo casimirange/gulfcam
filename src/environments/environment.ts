@@ -9,6 +9,7 @@ export const environment = {
   resetPassword: url + 'auth/reset-password',
   verification: url + 'auth/verify',
   sendOtp: url + 'auth/resetOtpCode',
+  changePassword: url + 'auth/user',
   client: url + 'client',
   typeVoucher: url + 'typevoucher',
   store: url + 'store',

@@ -30,9 +30,13 @@ export class DetailsMagasinComponent implements OnInit {
   store: Store;
   storeHouses: StoreHouse[] = [];
   roleUser = localStorage.getItem('userAccount').toString()
+  role: string[] = []
   constructor(private activatedRoute: ActivatedRoute, private router: Router, private notifService: NotifsService, private storeService: StoreService,
               private storeHouseService: StoreHouseService, private _location: Location, private statusService: StatusService, ) {
     this.store = new Store()
+    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
+      this.role.push(authority);
+    });
   }
 
   ngOnInit(): void {

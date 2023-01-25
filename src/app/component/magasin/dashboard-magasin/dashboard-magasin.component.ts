@@ -26,6 +26,7 @@ export class DashboardMagasinComponent implements OnInit {
 
   storeForm: FormGroup;
   stores: Store[] = [];
+  storeFilter: Store[] = [];
   storeHouses: StoreHouse[] = [];
   store: Store = new Store ();
   unit: Unite = new Unite();
@@ -38,10 +39,14 @@ export class DashboardMagasinComponent implements OnInit {
   totalElements: number;
   size: number = 10;
   roleUser = localStorage.getItem('userAccount').toString()
+  role: string[] = []
   constructor(private modalService: NgbModal, private fb: FormBuilder, private storeService: StoreService, private router: Router,
               private notifService: NotifsService, private unitService: UnitsService, private voucherService: VoucherService,
               private storehouseService: StoreHouseService, private statusService: StatusService) {
     this.formStore();
+    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
+      this.role.push(authority);
+    });
   }
 
   ngOnInit(): void {
@@ -92,6 +97,7 @@ export class DashboardMagasinComponent implements OnInit {
     this.storeService.getAllStoresWithPagination(this.page-1, this.size).subscribe(
       resp => {
         this.stores = resp.content
+        this.storeFilter = resp.content.filter(sh => sh.internalReference === parseInt(localStorage.getItem('store')))
         this.size = resp.size
         this.totalPages = resp.totalPages
         this.totalElements = resp.totalElements

@@ -33,11 +33,15 @@ export class ApprovisionnerCarnetComponent implements OnInit {
   sn: any;
   storeHouses2: StoreHouse[] = [];
   roleUser = localStorage.getItem('userAccount').toString()
+  role: string[] = []
   constructor(private userService: UsersService,  private notifsService: NotifsService, private route: ActivatedRoute,
               private storeService: StoreService, private storeHouseService: StoreHouseService, private fb: FormBuilder,
               private voucherService: VoucherService, private cartonService: CartonService) {
     this.formSupply()
     this.form = this.supplyForm.controls;
+    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
+      this.role.push(authority);
+    });
   }
 
   formSupply(){

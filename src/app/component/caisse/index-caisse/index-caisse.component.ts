@@ -34,7 +34,7 @@ export class IndexCaisseComponent implements OnInit {
   title = 'Enregistrer nouvelle commande';
   clients: Client[] = [];
   client: Client;
-  store: Store;
+  // stores: Store;
   showClientForm = false;
   clientForm: FormGroup ;
   orderForm: FormGroup ;
@@ -60,7 +60,7 @@ export class IndexCaisseComponent implements OnInit {
   page: number = 1;
   totalPages: number;
   totalElements: number;
-  size: number = 10;
+  size: number = 20;
   orderState$: Observable<AppState<CustomResponse<Order>>>;
   readonly DataState = DataState;
   private dataSubjects = new BehaviorSubject<CustomResponse<Order>>(null);
@@ -104,15 +104,26 @@ export class IndexCaisseComponent implements OnInit {
 
   ngOnInit(): void {
     this.getOrders()
+    // this.getStores()
   }
 
+  // getStores(){
+  //   this.storeService.getStore().subscribe(
+  //     res => {
+  //       this.stores = res.content
+  //     }
+  //   )
+  // }
 
   getOrders(){
+    // let store = localStorage.getItem('store');
+
     this.orderState$ = this.orderService.orders$(this.page - 1, this.size)
       .pipe(
         map(response => {
           this.dataSubjects.next(response)
-          this.notifsService.onSuccess('Cahrgement des commandes')
+          this.orders = response.content.filter(order => order.status.name === 'CREATED' || order.status.name === 'ACCEPTED')
+          this.notifsService.onSuccess('Chargement des commandes')
           return {dataState: DataState.LOADED_STATE, appData: response}
         }),
         startWith({dataState: DataState.LOADING_STATE, appData: null}),
@@ -120,23 +131,25 @@ export class IndexCaisseComponent implements OnInit {
           return of({dataState: DataState.ERROR_STATE, error: error})
         })
       )
-    this.orderService.getOrders().subscribe(
-      resp =>{
-        // this.orders =
-        this.orders = resp.content.filter(order => order.status.name === 'CREATED' || order.status.name === 'ACCEPTED')
-      },
-      err => {
-        this.notifsService.onError(err.error.message, 'échec chargement liste des commandes')
-      }
-    )
+    // this.orderService.getOrders().subscribe(
+    //   resp =>{
+    //     // this.orders =
+    //     this.orders = resp.content.filter(order => order.status.name === 'CREATED' || order.status.name === 'ACCEPTED')
+    //   },
+    //   err => {
+    //     this.notifsService.onError(err.error.message, 'échec chargement liste des commandes')
+    //   }
+    // )
   }
 
   pageChange(event: number){
     this.page = event
+    // let store = localStorage.getItem('store');
     this.orderState$ = this.orderService.orders$(this.page - 1, this.size)
       .pipe(
         map(response => {
           this.dataSubjects.next(response)
+          this.orders = response.content.filter(order => order.status.name === 'CREATED' || order.status.name === 'ACCEPTED')
           return {dataState: DataState.LOADED_STATE, appData: response}
         }),
         startWith({dataState: DataState.LOADING_STATE, appData: null}),

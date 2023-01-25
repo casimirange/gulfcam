@@ -38,10 +38,14 @@ export class IndexMvtStockComponent implements OnInit {
   totalElements: number;
   size: number = 20;
   roleUser = localStorage.getItem('userAccount').toString()
+  role: string[] = []
   constructor(private modalService: NgbModal, private fb: FormBuilder, private storeService: StoreService,
               private storeHouseService: StoreHouseService, private notifService: NotifsService, private unitService: UnitsService,
               private voucherService: VoucherService, private mvtStockService: MvtStockService) {
     this.formStore();
+    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
+      this.role.push(authority);
+    });
   }
 
   ngOnInit(): void {

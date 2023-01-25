@@ -9,7 +9,7 @@ const routes: Routes = [
   { path:'', component: CommandLayoutComponent, children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full'},
       { path: 'dashboard', component: IndexCommandComponent},
-      { path: 'edit/:id', component: EditComponent},
+      { path: 'complete-order/:id', component: EditComponent},
     ]
   }
 ];

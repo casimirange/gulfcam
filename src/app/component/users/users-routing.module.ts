@@ -5,7 +5,7 @@ import {DashboardMagasinComponent} from "../magasin/dashboard-magasin/dashboard-
 import {UserLayoutComponent} from "./user-layout/user-layout.component";
 import {IndexUsersComponent} from "./index-users/index-users.component";
 import {DetailsUserComponent} from "./details-user/details-user.component";
-import {ProfileUserComponent} from "./profile-user/profile-user.component";
+import {ProfileUserComponent} from "../profile/profile-user/profile-user.component";
 import {AddUserComponent} from "./add-user/add-user.component";
 
 const routes: Routes = [

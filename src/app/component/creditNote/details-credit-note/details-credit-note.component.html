@@ -1,5 +1,5 @@
-
-<div class="app-page-title">
+<div class="app-page-title"
+     *ngIf="roleUser === 'CUSTOMER_SERVICE' || roleUser === 'MANAGER_STATION' || roleUser === 'TREASURY' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
   <div class="page-title-wrapper">
     <div class="page-title-heading">
       <div class="page-title-icon">
@@ -8,12 +8,13 @@
       </div>
       <div>Note de crédit N° {{creditNote.internalReference}}
         <div class="page-title-subheading">
-<!--          Date :{{creditNote.createdAt | date: 'dd/MM/yyyy'}}&nbsp;-->
+          <!--          Date :{{creditNote.createdAt | date: 'dd/MM/yyyy'}}&nbsp;-->
           <nav class="" aria-label="breadcrumb">
             <ol class="breadcrumb">
               <li class="breadcrumb-item">
                 <a>
-                  <i aria-hidden="true" class="fa fa-calendar"></i> Date: &nbsp; {{creditNote.createdAt | date: 'dd/MM/yyyy'}}
+                  <i aria-hidden="true" class="fa fa-calendar"></i> Date:
+                  &nbsp; {{creditNote.createdAt | date: 'dd/MM/yyyy'}}
                 </a>
               </li>
               <li class="active breadcrumb-item" aria-current="page">
@@ -27,7 +28,8 @@
       </div>
     </div>
     <div class="page-title-actions">
-      <button (click)="back()" type="button" data-toggle="tooltip" title="Retour à la page précédente" data-placement="bottom"
+      <button (click)="back()" type="button" data-toggle="tooltip" title="Retour à la page précédente"
+              data-placement="bottom"
               class="btn-shadow mr-3 btn btn-outline-dark">
            <span class="btn-icon-wrapper pr-2 opacity-7">
                                             <i class="fa fa-backward fa-w-20"></i>
@@ -38,37 +40,41 @@
   </div>
 </div>
 
-<div class="row">
+<div class="row"
+     *ngIf="roleUser === 'CUSTOMER_SERVICE' || roleUser === 'MANAGER_STATION' || roleUser === 'TREASURY' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
   <div class="col-md-12">
     <div class="main-card mb-3 card">
       <div class="card-header">
         Liste de ses coupons
         <div class="btn-actions-pane-right">
           <div role="group" class="btn-group-sm btn-group">
-            <button  *ngIf="statut == 'CREATED'" class="btn btn-outline-primary" [disabled]="(isLoading$ | async)"
-                    title="valider une note de crédit" (click)="validCreditNote()">
+            <button
+              *ngIf="statut == 'CREATED' && (roleUser === 'TREASURY' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))"
+              class="btn btn-outline-primary" [disabled]="(isLoading$ | async)"
+              title="valider une note de crédit" (click)="validCreditNote()">
               <i *ngIf="isLoading$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
               <span *ngIf="isLoading$ | async">Validation ...</span>
               <span
-                *ngIf="!(isLoading$ | async)"><i class="pe-7s-check" ></i> Valider</span>
+                *ngIf="!(isLoading$ | async)"><i class="pe-7s-check"></i> Valider</span>
             </button> &nbsp;
             <button class="btn btn-outline-alternate" [disabled]="(isExtracting$ | async)"
+                    *ngIf="roleUser === 'TREASURY' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')"
                     title="exporter une note de crédit" (click)="exportCreditNote()">
               <i *ngIf="isExtracting$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
               <span *ngIf="isExtracting$ | async">Exportation ...</span>
               <span
-                *ngIf="!(isExtracting$ | async)"><i class="fa fa-file-pdf" ></i> Exporter</span>
+                *ngIf="!(isExtracting$ | async)"><i class="fa fa-file-pdf"></i> Exporter</span>
             </button>
           </div>
         </div>
 
       </div>
 
-      <div class="table-responsive"  >
+      <div class="table-responsive">
 
         <ng-container class="bg-white">
           <ng-container class="bg-white py-1 px-1">
-            <table class="table table-hover bg-white" >
+            <table class="table table-hover bg-white">
               <thead>
               <tr>
                 <th>#</th>

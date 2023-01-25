@@ -1,5 +1,5 @@
 
-<div class="app-page-title">
+<div class="app-page-title"*ngIf="roleUser === 'MANAGER_STATION' || role.includes('ROLE_SUPERADMIN')">
   <div class="page-title-wrapper">
     <div class="page-title-heading">
       <div class="page-title-icon">
@@ -12,6 +12,12 @@
       </div>
     </div>
     <div class="page-title-actions">
+      <div class="d-inline-block ">
+        <button type="button" data-toggle="tooltip" title="nouveau carton" class="btn-shadow mr-3 btn btn-primary"
+                (click)="open(mymodal)">
+          Accepter Coupon
+        </button>
+      </div>
       <button (click)="back()" type="button" data-toggle="tooltip" title="cartons" data-placement="bottom"
               class="btn-shadow mr-3 btn btn-outline-dark">
            <span class="btn-icon-wrapper pr-2 opacity-7">
@@ -23,7 +29,7 @@
   </div>
 </div>
 
-<ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
+<ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav" *ngIf="roleUser === 'MANAGER_STATION' || role.includes('ROLE_SUPERADMIN')">
   <li class="nav-item">
     <a role="tab" class="nav-link active" id="tab-0" data-toggle="tab" href="#tab-content-0">
       <span>Notes de crédit</span>
@@ -36,7 +42,7 @@
   </li>
 </ul>
 
-<div class="tab-content">
+<div class="tab-content" *ngIf="roleUser === 'MANAGER_STATION' || role.includes('ROLE_SUPERADMIN')">
   <div class="tab-pane tabs-animation fade show active" id="tab-content-0" role="tabpanel">
     <div class="row">
       <div class="col-md-12">
@@ -56,6 +62,7 @@
                     <th>Ref. interne</th>
                     <th>Statut</th>
                     <th>Date</th>
+                    <th>Action</th>
                   </tr>
                   </thead>
                   <tbody *ngFor="let credit of creditNotes ; let i = index">
@@ -63,8 +70,13 @@
                   <tr>
                     <td>{{i + 1}}</td>
                     <td>{{credit.internalReference}}</td>
-                    <td>{{credit.status.name}}</td>
+                    <td>{{getStatuts(credit.status.name)}}</td>
                     <td> {{credit.createdAt | date: 'dd/MM/yyyy'}}</td>
+                    <td>
+                      <button class="btn btn-sm btn-secondary mr-2" (click)="creditNoteDetails(credit)">
+                        <i class="pe-7s-look" title="consulter"></i>
+                      </button>
+                    </td>
                   </tr>
                   </tbody>
                 </table>
@@ -134,7 +146,7 @@
                     <td>{{coupon.idTicket}}</td>
                     <td>{{coupon.idNotebook}}</td>
                     <td>{{coupon.idStation}}</td>
-                    <td>{{getStatuts(coupon.status.name)}}</td>
+                    <td>{{getStatutsCoupon(coupon.status.name)}}</td>
                     <td>{{coupon.createdAt}}</td>
                     <td>{{coupon.updateAt}}</td>
                   </tr>
@@ -167,3 +179,47 @@
     </div>
   </div>
 </div>
+
+<ng-template #mymodal let-modal>
+  <div class="modal-header">
+    <h6 class="modal-title timeline-title" id="modal-basic-title"><b>Accepter coupon</b></h6>
+    <div class="close vertical-timeline-element-content bounce-in" (click)=" modal.close('save click')">
+      <p><i class="fa fa-times"></i></p>
+    </div>
+  </div>
+  <div class="modal-body">
+    <div class="">
+      <div class="">
+        <form [formGroup]="couponForm">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="position-relative form-group">
+                <label for="localisation" class="">Coupon</label>
+                <input name="amount" id="localisation" placeholder="numéro de série du coupon"
+                       type="text" class="form-control" formControlName="coupon">
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="position-relative form-group">
+                <label for="localisation" class="">Station</label>
+                <select class="form-control" formControlName="idStation">
+                  <option *ngFor="let station of stations"
+                          value="{{station.internalReference}}">{{station.designation}}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <button class="mt-1 btn btn-secondary float-right ml-3" (click)="annuler()"><i class="pe-7s-back"></i>Annuler
+          </button>
+          <button class="mt-1 btn btn-primary float-right" [disabled]="couponForm.invalid || (isLoading$ | async)"
+                  (click)="accepterCoupon()">
+            <i *ngIf="isLoading$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
+            <span *ngIf="isLoading$ | async">Acceptation ...</span>
+            <span
+              *ngIf="!(isLoading$ | async)">Accepter coupon</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</ng-template>

@@ -6,7 +6,7 @@ import {RequestOpposition} from "../../../_model/requestOpposition";
 import {Unite} from "../../../_model/unite";
 import {TypeVoucher} from "../../../_model/typeVoucher";
 import {Client} from "../../../_model/client";
-import {BehaviorSubject} from "rxjs";
+import {BehaviorSubject, of} from "rxjs";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {StoreService} from "../../../_services/store/store.service";
 import {Router} from "@angular/router";
@@ -23,6 +23,7 @@ import {CreditNote} from "../../../_model/creditNote";
 import {CreditNoteService} from "../../../_services/creditNote/credit-note.service";
 import {StatusService} from "../../../_services/status/status.service";
 import {CouponService} from "../../../_services/coupons/coupon.service";
+import {catchError, map, startWith} from "rxjs/operators";
 
 @Component({
   selector: 'app-index-credit-note',
@@ -46,11 +47,18 @@ export class IndexCreditNoteComponent implements OnInit {
   isLoading$ = this.isLoading.asObservable();
   modalTitle: string = 'Enregistrer nouvelle note de credit';
   roleUser = localStorage.getItem('userAccount').toString()
+  role: string[] = []
+  page = 1;
+  size = 20;
+  totalElements: number = 0;
   constructor(private modalService: NgbModal, private fb: FormBuilder, private storeService: StoreService, private router: Router,
               private notifService: NotifsService, private unitService: UnitsService, private voucherService: VoucherService,
               private clientService: ClientService, private userService: UsersService, private creditNoteService: CreditNoteService,
               private stationService: StationService, private statusService: StatusService, private couponService: CouponService) {
     this.formStore();
+    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
+      this.role.push(authority);
+    });
   }
 
   ngOnInit(): void {
@@ -94,9 +102,18 @@ export class IndexCreditNoteComponent implements OnInit {
   }
 
   getCreditNote(){
-    this.creditNoteService.getCreditNote().subscribe(
+    this.creditNoteService.getCreditNote(this.page - 1, this.size).subscribe(
       resp => {
-        console.log('note',resp.content)
+        this.creditNotes = resp.content
+        this.totalElements = resp.totalElements
+      },
+    )
+  }
+
+  pageChange(event: number) {
+    this.page = event
+    this.creditNoteService.getCreditNote(this.page - 1, this.size).subscribe(
+      resp => {
         this.creditNotes = resp.content
       },
     )
@@ -200,22 +217,6 @@ export class IndexCreditNoteComponent implements OnInit {
     // )
   }
 
-  // showDetails(store: Store) {
-  //   this.router.navigate(['/entrepots/details', store.internalReference])
-  //   // [routerLink]=""
-  // }
-
-  findClients(event: any): void{
-    console.log(event)
-    this.clientService.searchClient(event) .subscribe(
-      resp => {
-        this.clients = resp;
-        console.log(resp)
-      }, error => {
-        this.clients = []
-      }
-    )
-  }
 
   addCoupon() {
     let str= parseInt(this.creditForm.controls['serialNumber'].value).toString();

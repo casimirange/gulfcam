@@ -43,6 +43,7 @@ export class IndexRequestOppositionComponent implements OnInit {
   isLoading$ = this.isLoading.asObservable();
   modalTitle: string = 'Enregistrer nouvelle requête';
   roleUser = localStorage.getItem('userAccount').toString()
+  role: string[] = []
   page: number = 1;
   totalPages: number;
   totalElements: number;
@@ -53,6 +54,9 @@ export class IndexRequestOppositionComponent implements OnInit {
               private clientService: ClientService, private userService: UsersService, private requestService: OppositionService,
               private statusService: StatusService, private couponService: CouponService) {
     this.formRequest();
+    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
+      this.role.push(authority);
+    });
   }
 
   ngOnInit(): void {

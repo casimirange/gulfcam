@@ -21,6 +21,7 @@ export class DetailsCreditNoteComponent implements OnInit {
 
   creditNote: CreditNote = new CreditNote();
   roleUser = localStorage.getItem('userAccount').toString()
+  role: string[] = []
   private isLoading = new BehaviorSubject<boolean>(false);
   isLoading$ = this.isLoading.asObservable();
   private isExporting = new BehaviorSubject<boolean>(false);
@@ -30,6 +31,9 @@ export class DetailsCreditNoteComponent implements OnInit {
 
   constructor(private noteService: CreditNoteService, private activatedRoute: ActivatedRoute, private router: Router,
               private statusService: StatusService, private _location: Location, private notifService: NotifsService) {
+    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
+      this.role.push(authority);
+    });
   }
 
   ngOnInit(): void {

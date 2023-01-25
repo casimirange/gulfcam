@@ -1,4 +1,5 @@
-<div class="app-page-title">
+<div class="app-page-title"
+     *ngIf="roleUser === 'MANAGER_STORE' || roleUser === 'MANAGER_COUPON' || roleUser === 'STORE_KEEPER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
   <div class="page-title-wrapper">
     <div class="page-title-heading">
       <div class="page-title-icon">
@@ -9,21 +10,23 @@
         <div class="page-title-subheading">Managez vos cartons</div>
       </div>
     </div>
-    <div class="page-title-actions">
+    <div class="page-title-actions"
+         *ngIf="roleUser === 'STORE_KEEPER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
       <div class="d-inline-block ">
         <button type="button" data-toggle="tooltip" title="nouveau carton" class="btn-shadow mr-3 btn btn-primary"
                 (click)="open(mymodal)" [disabled]="(isLoading$ | async)">
-                                        <span class="btn-icon-wrapper pr-2 opacity-7">
-                                            <i class="fa fa-plus fa-w-20"></i>
-                                        </span>
-          Carton
+          <!--                                        <span class="btn-icon-wrapper pr-2 opacity-7">-->
+          <!--                                            <i class="fa fa-plus fa-w-20"></i>-->
+          <!--                                        </span>-->
+          Ordre de stockage
         </button>
       </div>
     </div>
   </div>
 </div>
 
-<div class="row">
+<div class="row"
+     *ngIf="roleUser === 'MANAGER_STORE' || roleUser === 'MANAGER_COUPON' || roleUser === 'STORE_KEEPER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
   <div class="col-md-12">
     <div class="main-card mb-3 card " id="htmlData" #htmlData>
       <div class="card-header">
@@ -84,7 +87,8 @@
                 <td>{{carton.updateAt}}</td>
             </table>
             <div class="text-center">
-              <p *ngIf="!appState.appData.content.length" style="color: grey; font-size: 1.8rem;" class="mx-auto">Aucun carton
+              <p *ngIf="!appState.appData.content.length" style="color: grey; font-size: 1.8rem;" class="mx-auto">Aucun
+                carton
                 trouvé !</p>
             </div>
             <div class="card-footer">
@@ -105,9 +109,9 @@
               </div>
             </div>
           </ng-container>
-          <ng-container class="bg-white"  *ngSwitchCase="DataState.ERROR_STATE">
+          <ng-container class="bg-white" *ngSwitchCase="DataState.ERROR_STATE">
             <div class="col-md-12 text-center">
-              <div class="text-danger" >{{appState.error}}</div>
+              <div class="text-danger">{{appState.error}}</div>
             </div>
           </ng-container>
         </ng-container>
@@ -129,37 +133,36 @@
         <form [formGroup]="cartonForm">
 
           <!--            <div class="col-md-12">-->
+<!--          <div class="position-relative form-group">-->
+<!--            <label for="store" class="">Magasins</label>-->
+<!--            <input type="text" (ngModelChange)="getStoreHouses($event)" ngModel="{{magasin}}" autocomplete="off"-->
+<!--                   id="store" class="form-control"-->
+<!--                   formControlName="idStore" placeholder="choisir un magasin" list="storeListOption">-->
+<!--            <datalist id="storeListOption">-->
+<!--              <option *ngFor="let store of stores" [value]="store.localization"></option>-->
+<!--            </datalist>-->
+
+<!--          </div>-->
+<!--          <div-->
+<!--            *ngIf="cartonForm.controls['idStore'].invalid && (cartonForm.controls['idStore'].dirty || cartonForm.controls['idStore'].touched)"-->
+<!--            class="mb-2" style="color: #f65656; font-style: italic;">-->
+
+<!--            <div *ngIf="cartonForm.controls['idStore'].errors?.['required']" class="ml-3">-->
+<!--              le magasin est obligatoire.-->
+<!--            </div>-->
+<!--          </div>-->
+
           <div class="position-relative form-group">
-            <label for="store" class="">Magasins</label>
-            <input type="text" (ngModelChange)="getStoreHouses($event)" ngModel="{{magasin}}" autocomplete="off"
-                   id="store" class="form-control"
-                   formControlName="idStore" placeholder="choisir un magasin" list="storeListOption">
-            <datalist id="storeListOption">
-              <option *ngFor="let store of stores" [value]="store.localization"></option>
-            </datalist>
-
-          </div>
-          <div
-            *ngIf="cartonForm.controls['idStore'].invalid && (cartonForm.controls['idStore'].dirty || cartonForm.controls['idStore'].touched)"
-            class="mb-2" style="color: #f65656; font-style: italic;">
-
-            <div *ngIf="cartonForm.controls['idStore'].errors?.['required']" class="ml-3">
-              le magasin est obligatoire.
-            </div>
-          </div>
-
-          <div *ngIf="(isLoading$ | async)">
-            <i class="fa fa-spinner fa-spin"></i>&nbsp;chargement des espaces de stockage...
-          </div>
-
-          <div class="position-relative form-group" *ngIf="storeHouses.length != 0">
             <label for="storeHouse" class="">Espace de stockage</label>
-            <input type="text" autocomplete="off" ngModel="{{entrepot}}" id="storeHouse" class="form-control"
-                   formControlName="idStoreHouse" placeholder="choisir un espace de stockage" list="storeHouseListOption">
-            <datalist id="storeHouseListOption">
-              <option *ngFor="let storeHouse of storeHouses" [value]="storeHouse.name"></option>
-            </datalist>
-
+<!--            <input type="text" autocomplete="off" ngModel="{{entrepot}}"  class="form-control"-->
+<!--                   formControlName="idStoreHouse" placeholder="choisir un espace de stockage">-->
+<!--            <datalist id="storeHouseListOption">-->
+<!--              <option *ngFor="let storeHouse of storeHouses" [value]="storeHouse.name"></option>-->
+<!--            </datalist>-->
+            <select name="select" id="storeHouse" class="form-control" formControlName="idStoreHouse">
+              <option value="" selected disabled hidden>Sélectionner un espace de stockage</option>
+              <option *ngFor="let storeHouse of storeHouses" [value]="storeHouse.internalReference">{{storeHouse.name}}</option>
+            </select>
           </div>
           <div
             *ngIf="cartonForm.controls['idStoreHouse'].invalid && (cartonForm.controls['idStoreHouse'].dirty || cartonForm.controls['idStoreHouse'].touched)"
@@ -191,21 +194,21 @@
             <input type="text" id="serialnumber" [(ngModel)]="nc" formControlName="number" class="form-control">
           </div>
           <div
-          *ngIf="cartonForm.controls['number'].invalid && (cartonForm.controls['number'].dirty || cartonForm.controls['number'].touched)"
-          class="mb-2" style="color: #f65656; font-style: italic;">
-          <div *ngIf="cartonForm.controls['number'].errors?.['required']" class="ml-3">
-            le numéro du carton est requis.
+            *ngIf="cartonForm.controls['number'].invalid && (cartonForm.controls['number'].dirty || cartonForm.controls['number'].touched)"
+            class="mb-2" style="color: #f65656; font-style: italic;">
+            <div *ngIf="cartonForm.controls['number'].errors?.['required']" class="ml-3">
+              le numéro du carton est requis.
+            </div>
+            <div *ngIf="cartonForm.controls['number'].errors?.['pattern']" class="ml-3">
+              entrez un numéro valide
+            </div>
+            <div *ngIf="cartonForm.controls['number'].errors?.['min']" class="ml-3">
+              doit être différent de 0
+            </div>
           </div>
-          <div *ngIf="cartonForm.controls['number'].errors?.['pattern']" class="ml-3">
-            entrez un numéro valide
-          </div>
-          <div *ngIf="cartonForm.controls['number'].errors?.['min']" class="ml-3">
-            doit être différent de 0
-          </div>
-        </div>
-<!--          <div *ngIf="nc == 0" style="color: #f65656; font-style: italic;" class="ml-3">-->
-<!--             ou négatif-->
-<!--          </div>-->
+          <!--          <div *ngIf="nc == 0" style="color: #f65656; font-style: italic;" class="ml-3">-->
+          <!--             ou négatif-->
+          <!--          </div>-->
           <div class="form-row">
             <div class="col-md-6">
               <div class="position-relative form-group">
@@ -246,9 +249,9 @@
                     doit être différent de 0
                   </div>
                 </div>
-<!--                <div *ngIf="sctf < sctd" class="ml-3">-->
-<!--                  doit être suppérieur à la série de depart-->
-<!--                </div>-->
+                <!--                <div *ngIf="sctf < sctd" class="ml-3">-->
+                <!--                  doit être suppérieur à la série de depart-->
+                <!--                </div>-->
                 <div *ngIf=" (sctd > 0 && sctf > 0) && (sctf - sctd <= 0)"
                      style="color: #f65656; font-style: italic;">
                   doit être suppérieur à la série de depart
