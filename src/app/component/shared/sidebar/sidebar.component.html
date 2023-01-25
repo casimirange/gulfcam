@@ -57,19 +57,19 @@
             </i>Commandes
           </a>
         </li>
-        <li  *ngIf="roleUser === 'MANAGER_STORE' || roleUser === 'CUSTOMER_SERVICE'|| roleUser === 'MANAGER_COUPON' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+        <li  *ngIf="roleUser === 'MANAGER_STORE' || roleUser === 'CUSTOMER_SERVICE'|| roleUser==='STORE_KEEPER' || roleUser === 'MANAGER_COUPON' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
           <a routerLink="/coupons" routerLinkActive="mm-active">
             <i class="metismenu-icon pe-7s-ribbon">
             </i>Coupons
           </a>
         </li>
-        <li *ngIf="roleUser === 'MANAGER_STORE' || roleUser === 'MANAGER_COUPON' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+        <li *ngIf="roleUser === 'MANAGER_STORE' || roleUser === 'MANAGER_COUPON' || roleUser==='STORE_KEEPER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
           <a routerLink="/carnets" routerLinkActive="mm-active">
             <i class="metismenu-icon pe-7s-note2">
             </i>Carnets
           </a>
         </li>
-        <li *ngIf="roleUser === 'MANAGER_STORE' || roleUser === 'MANAGER_COUPON' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+        <li *ngIf="roleUser === 'MANAGER_STORE' || roleUser === 'MANAGER_COUPON' || roleUser==='STORE_KEEPER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
           <a routerLink="/cartons" routerLinkActive="mm-active">
             <i class="metismenu-icon pe-7s-box1">
             </i>Cartons
