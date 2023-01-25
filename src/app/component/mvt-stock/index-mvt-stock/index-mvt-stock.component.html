@@ -34,12 +34,12 @@
       <span>Stock</span>
     </a>
   </li>
-  <li class="nav-item" *ngIf="roleUser === 'MANAGER_COUPON' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">>
+  <li class="nav-item" *ngIf="roleUser === 'MANAGER_COUPON' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
     <a role="tab" class="nav-link" routerLink="/stock/supply" routerLinkActive="active">
       <span>Ordre d'approvisionnement</span>
     </a>
   </li>
-  <li class="nav-item" *ngIf="roleUser === 'MANAGER_COUPON' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">>
+  <li class="nav-item" *ngIf="roleUser === 'MANAGER_COUPON' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
     <a role="tab" class="nav-link" routerLink="/stock/forward" routerLinkActive="active">
       <span>Ordre de transfert</span>
     </a>
