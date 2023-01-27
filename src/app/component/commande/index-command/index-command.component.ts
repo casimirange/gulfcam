@@ -277,7 +277,7 @@ export class IndexCommandComponent implements OnInit {
           // )
           this.isLoading.next(false)
           this.saveProductsOrder(response)
-          this.getProforma(response);
+          // this.getProforma(response);
           this.annuler()
           this.getOrders()
           return {dataState: DataState.LOADED_STATE, appData: this.dataSubjects.value}
