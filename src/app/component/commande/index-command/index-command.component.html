@@ -70,7 +70,8 @@
               </tr>
               </thead>
               <tbody>
-              <tr style="cursor: pointer" routerLink="/commandes/complete-order/{{order.internalReference}}" *ngFor="let order of orderState.appData.content
+              <tr style="cursor: pointer" routerLink="/commandes/complete-order/{{order.internalReference}}"
+                  *ngFor="let order of role.includes('ROLE_SUPERADMIN') ? orders : filtredOrders
             | clientNameFilter: name | clientRefFilter: refCli | orderRefFilter: internalRef
                  | orderDateFilter: date | paginate: { id: 'orders', itemsPerPage: orderState.appData.size, currentPage: page, totalItems: orderState.appData.totalElements} ">
                 <td>{{order.internalReference}}</td>
@@ -86,14 +87,17 @@
 
             </table>
             <div class="text-center">
-              <p *ngIf="(orderState.appData.content | clientNameFilter: name | clientRefFilter: refCli | orderRefFilter: internalRef
+              <p *ngIf="(role.includes('ROLE_SUPERADMIN') && orders.length === 0 | clientNameFilter: name | clientRefFilter: refCli | orderRefFilter: internalRef
+                 | orderDateFilter: date).length == 0" style="color: grey; font-size: 1.8rem;" class="mx-auto">Aucune
+                commande trouvée !</p>
+              <p *ngIf="(!role.includes('ROLE_SUPERADMIN') && filtredOrders.length === 0 | clientNameFilter: name | clientRefFilter: refCli | orderRefFilter: internalRef
                  | orderDateFilter: date).length == 0" style="color: grey; font-size: 1.8rem;" class="mx-auto">Aucune
                 commande trouvée !</p>
             </div>
             <div class="card-footer">
               <div class="btn-actions-pane-left">
                 <div role="group" class="btn-group-sm btn-group">
-                  Total : &nbsp;<b>{{ orderState.appData.totalElements }} </b>
+<!--                  Total : &nbsp;<b>{{ orderState.appData.totalElements }} </b>-->
                 </div>
               </div>
               <div class="btn-actions-pane-right">
@@ -224,7 +228,7 @@
                 <div class="col-md-12">
                   <div class="position-relative form-group">
                     <label for="delais" class="">Délais de livraison</label>
-                    <input placeholder="délais" type="text" id="delais" autocomplete="off" class="form-control"
+                    <input placeholder="délais" type="date" id="delais" autocomplete="off" class="form-control"
                            formControlName="delais">
                   </div>
                   <div

@@ -54,6 +54,7 @@ export class IndexCommandComponent implements OnInit {
   vouchers: TypeVoucher[] = [];
   voucher: TypeVoucher = new TypeVoucher()
   orders: Order[] = [];
+  filtredOrders: Order[] = [];
   order: Order = new Order();
   @ViewChild('orderModal', { static: false }) commandModal?: ElementRef<HTMLElement>;
   name = ''
@@ -219,7 +220,11 @@ export class IndexCommandComponent implements OnInit {
       .pipe(
         map(response => {
           this.dataSubjects.next(response)
+          this.orders = response.content
+          this.filtredOrders = response.content.filter(order => order.store.internalReference == parseInt(localStorage.getItem('store')))
           this.notifsService.onSuccess('Chargement des commandes')
+          console.log(this.orders)
+          console.log(this.filtredOrders)
           return {dataState: DataState.LOADED_STATE, appData: response}
         }),
         startWith({dataState: DataState.LOADING_STATE, appData: null}),
@@ -256,7 +261,7 @@ export class IndexCommandComponent implements OnInit {
     this.order.idClient = this.client.internalReference
     this.order.channel = this.orF['chanel'].value
     this.order.description = this.orF['description'].value
-    this.order.deliveryTime = this.orF['delais'].value
+    this.order.deliveryTime = this.orF['delais'].value.toString()
     this.order.clientReference = this.orF['refCli'].value
     this.order.idManagerOrder = parseInt(localStorage.getItem('uid'))
     this.order.tax = this.global.tax;
@@ -342,6 +347,8 @@ export class IndexCommandComponent implements OnInit {
       .pipe(
         map(response => {
           this.dataSubjects.next(response)
+          this.orders = response.content
+          this.filtredOrders = response.content.filter(order => order.idStore == parseInt(localStorage.getItem('store')))
           return {dataState: DataState.LOADED_STATE, appData: response}
         }),
         startWith({dataState: DataState.LOADING_STATE, appData: null}),

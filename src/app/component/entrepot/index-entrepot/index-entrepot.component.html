@@ -105,12 +105,13 @@
               </tr>
             </table>
             <div class="text-center">
-            <p *ngIf="storeHouses.length === 0" style="color: grey; font-size: 1.8rem;" class="mx-auto" >Aucun espace de stockage trouvé !</p>
+            <p *ngIf="role.includes('ROLE_SUPERADMIN') && storeHouses.length === 0" style="color: grey; font-size: 1.8rem;" class="mx-auto" >Aucun espace de stockage trouvé !</p>
+            <p *ngIf="!role.includes('ROLE_SUPERADMIN') && storeHousesByStore.length === 0" style="color: grey; font-size: 1.8rem;" class="mx-auto" >Aucun espace de stockage trouvé !</p>
           </div>
             <div class="card-footer">
               <div class="btn-actions-pane-left">
                 <div role="group" class="btn-group-sm btn-group">
-                  Total Entrepots: <b>{{ totalElements }} </b>
+                  Total Entrepots: <b>{{ role.includes('ROLE_SUPERADMIN') ? totalElements : storeHousesByStore.length }} </b>
                 </div>
               </div>
 

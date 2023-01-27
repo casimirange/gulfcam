@@ -80,7 +80,10 @@
                 <div class="float-right">
                   <button class="btn btn-outline-danger btn-lg mr-3"
                           *ngIf="statut != 'ORDER_CANCEL' && statut != 'CLOSED' && (roleUser == 'MANAGER_ORDER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))"
-                          (click)="deny(order)">Annuler
+                          (click)="deny(order)" [disabled]="isCanceling$ | async">
+                    <i *ngIf="isCanceling$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
+                    <span *ngIf="isCanceling$ | async">Annulation ...</span>
+                    <span *ngIf="!(isCanceling$ | async)">Annuler</span>
                   </button>
                   <button class="btn btn-outline-primary btn-lg mr-3"
                           *ngIf="statut == 'CREATED' && (roleUser == 'TREASURY' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))"
@@ -170,10 +173,11 @@
                     </div>
                   </div>
                   <div class="row">
-                    <div class="col-md-4" *ngIf="statut == 'CREATED' && (roleUser == 'TREASURY' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))">
+                    <div class="col-md-4" >
                       <div class="position-relative form-group">
                         <label for="exampleEmail" class="">Mode de paiement</label>
                         <select name="select" id="exampleSelect" ngModel="{{order.idPaymentMethod}}"
+                                *ngIf="statut == 'CREATED' && (roleUser == 'TREASURY' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))"
                                 class="form-control"
                                 formControlName="method"
                                 [disabled]="statut !== 'CREATED'">
@@ -181,22 +185,33 @@
                           <option *ngFor="let payment of paymentMethods"
                                   value="{{payment.internalReference}}">{{payment.designation}}</option>
                         </select>
+                        <select
+                                *ngIf="roleUser != 'TREASURY' && !role.includes('ROLE_ADMIN') && !role.includes('ROLE_SUPERADMIN')"
+                                class="form-control"
+                                disabled>
+                          <option value="" selected hidden disabled>Sélectionner un mode de paiement</option>
+                          <option *ngFor="let payment of paymentMethods" [value]="order.idPaymentMethod"
+                                  value="{{payment.internalReference}}">{{payment.designation}}</option>
+                        </select>
                       </div>
                     </div>
-                    <div class="col-md-4" *ngIf="statut == 'CREATED' && (roleUser == 'TREASURY' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))">
+                    <div class="col-md-4" >
                       <div class="position-relative form-group">
                         <label for="exampleEmail" class="">Ref. paeiment</label>
                         <input name="email" id="exampleEmail" placeholder="entrer la référence" type="text"
+                               *ngIf="statut == 'CREATED' && (roleUser == 'TREASURY' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))"
                                ngModel="{{order.paymentReference}}"
                                [disabled]="statut != 'CREATED'"
                                class="form-control" formControlName="peimentRef">
+                        <input type="text" [value]="order.paymentReference" disabled class="form-control"
+                               *ngIf="roleUser != 'TREASURY' && !role.includes('ROLE_ADMIN') && !role.includes('ROLE_SUPERADMIN')">
                       </div>
                     </div>
                     <div class="col-md-4">
                       <div class="position-relative form-group">
                         <label for="exampleEmail" class="">Montant</label>
                         <input name="email" id="exampleEmail" placeholder="with a placeholder" type="text"
-                               value="{{order.ttcaggregateAmount}}" disabled
+                               value="{{formatNumber(order.ttcaggregateAmount)}} Fcfa" disabled
                                class="form-control">
                       </div>
                     </div>
@@ -228,23 +243,21 @@
                       </div>
                     </div>
                   </div>
-                  <div class="divider"></div>
-                  <div class="row">
+                  <div class="divider" ></div>
+                  <div class="row" >
                     <div class="col-md-12">
                       <div class="position-relative form-group">
                         <label for="exampleEmail" class="">Raison d'annulation</label>
-                        <textarea name="text" rows="1" id="exampleText" class="form-control" formControlName="reason"
-                                  placeholder="raison d'annulation de la commande" [value]="order.reasonForCancellation"
-                                  [disabled]="statut == 'ORDER_CANCEL'"></textarea>
+                        <textarea *ngIf="statut != 'ORDER_CANCEL' && statut != 'CLOSED' && (roleUser != 'MANAGER_ORDER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))"
+                                  name="text" rows="1" id="exampleText" class="form-control" formControlName="reason"
+                                  placeholder="raison d'annulation de la commande" ngModel="{{order.reasonForCancellation}}"
+                                  [disabled]="statut == 'ORDER_CANCEL' || statut != 'CLOSED'"></textarea>
+                        <textarea *ngIf="roleUser != 'MANAGER_ORDER' && !role.includes('ROLE_ADMIN') && !role.includes('ROLE_SUPERADMIN')" rows="1" class="form-control"
+                                  [value]="order.reasonForCancellation"
+                                  disabled></textarea>
                       </div>
                     </div>
                   </div>
-                  <div class="divider"></div>
-                  <!--            <div class="d-block text-right">-->
-                  <!--              <button class="btn btn-success btn-lg" *ngIf="statut == 'ACCEPTED'" (click)="payOrder()">Payer</button>-->
-                  <!--              <button class="btn btn-success btn-lg" *ngIf="statut == 'PAID'" (click)="generateBoredereau()">Bordereau</button>-->
-                  <!--            </div>-->
-                  <!--              <button class="mt-1 btn btn-primary float-right">Enregistrer</button>-->
                 </form>
               </div>
               <div class="divider"></div>

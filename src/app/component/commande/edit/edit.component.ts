@@ -60,6 +60,8 @@ export class EditComponent implements OnInit {
   role: string[] = [];
   private isLoading = new BehaviorSubject<boolean>(false);
   isLoading$ = this.isLoading.asObservable();
+  private isCanceling = new BehaviorSubject<boolean>(false);
+  isCanceling$ = this.isCanceling.asObservable();
   private loadingFile = new BehaviorSubject<boolean>(false);
   loadingFile$ = this.loadingFile.asObservable();
   private IdParam: string;
@@ -411,11 +413,20 @@ export class EditComponent implements OnInit {
     if (this.editForm.controls['reason'].value.toString() == '') {
       this.notifsService.onError('veuillez préciser la raison d\'annulation de la commande', '')
     } else {
+      this.isCanceling.next(true)
       this.order.idManagerCoupon = parseInt(localStorage.getItem('uid'))
       this.order.reasonForCancellation = this.editForm.controls['reason'].value
-      this.orderService.denyOrder(this.order.internalReference, this.order.idManagerCoupon, this.order.reasonForCancellation).subscribe();
-      this.notifsService.onSuccess('commande annulée avec succès')
-      this.refreshOrder()
+      this.orderService.denyOrder(this.order.internalReference, this.order.idManagerCoupon, this.order.reasonForCancellation).subscribe(
+        res => {
+          this.isCanceling.next(false)
+          this.notifsService.onSuccess('commande annulée avec succès')
+          this.refreshOrder()
+        },error => {
+          this.isCanceling.next(false)
+        }
+
+      );
+
     }
   }
 

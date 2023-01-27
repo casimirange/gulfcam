@@ -22,7 +22,7 @@ export class IndexUsersComponent implements OnInit {
   page: number = 1;
   totalPages: number;
   totalElements: number;
-  size: number = 10;
+  size: number = 2;
   role: string[] = []
   constructor(private modalService: NgbModal, private userService: UsersService, private notifsService: NotifsService,
               private storeService: StoreService, private statusAccountService: StatusAccountService,
