@@ -22,6 +22,7 @@ import { CreditNoteLayoutComponent } from './component/creditNote/credit-note-la
 import {ReactiveFormsModule} from "@angular/forms";
 import { LoaderComponent } from './preloader/loader/loader.component';
 import {ConnectionServiceModule} from "ng-connection-service";
+import {TokenService} from "./_services/token/token.service";
 // import {OnlineStatusModule} from "ngx-online-status";
 // import {Ng2SearchPipeModule} from "ng2-search-filter";
 // import {Ng2OrderModule} from "ng2-order-pipe";
@@ -57,7 +58,8 @@ import {ConnectionServiceModule} from "ng-connection-service";
   ],
   providers: [
     TokenInterceptorProvider,
-    BnNgIdleService
+    BnNgIdleService,
+    TokenService
     // ClientService
   ],
   bootstrap: [AppComponent],

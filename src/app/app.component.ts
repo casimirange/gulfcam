@@ -11,6 +11,7 @@ import {NavigationStart, Router} from "@angular/router";
 import {TokenService} from "./_services/token/token.service";
 import {Location} from "@angular/common";
 import {ConnectionService} from "ng-connection-service";
+import IdleTimer from "src/app/_helpers/idleTimer.js"
 const Toast = Swal.mixin({
   toast: true,
   position: 'bottom-end',
@@ -33,8 +34,9 @@ export class AppComponent implements OnInit, OnDestroy{
   isConnected = true;
   noInternetConnection: boolean;
   source = interval(3000)
-  url: string;
-  timer: number = 0;
+  url: string = '';
+  // timer: number = 0;
+  timer: any;
   online$: Observable<boolean>;
   networkStatus: boolean = false;
   networkStatus$: Subscription = Subscription.EMPTY;
@@ -58,9 +60,24 @@ export class AppComponent implements OnInit, OnDestroy{
     // );
     //
     // console.log('op',this.online$)
+
   }
 
   ngOnInit(): void {
+    this.router.events.subscribe((val) => {
+      console.log(this._location.path())
+      this.url = this._location.path()
+    });
+    if (!this.url.includes('/auth')) {
+      this.timer = new IdleTimer({
+        timeout: 600, //expired after 10 minutes
+        onTimeout: () => {
+          if (!this.url.startsWith('/auth')) {
+            this.notifsService.inactivityUser()
+          }
+        }
+      });
+    }
 
     // this.router.events.subscribe((val) => {
     //   // console.log(this._location.path())
@@ -80,7 +97,7 @@ export class AppComponent implements OnInit, OnDestroy{
   }
 
   ngOnDestroy(): void {
-
+    this.timer.clear();
     // this.networkStatus$.unsubscribe();
   }
 

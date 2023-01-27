@@ -93,4 +93,26 @@ export class NotifsService {
       }
     })
   }
+
+  inactivityUser(){
+    localStorage.setItem('url', this.router.url)
+    this.tokenService.clearTokenExpired();
+    Swal.fire({
+      title: 'Inactivité',
+      html: 'Nous avons constaté que vous n\'êtes plus actif sur la plateforme',
+      icon: 'info',
+      footer: '<a >Veuillez vous reconnecter de nouveau</a>',
+      showCancelButton: false,
+      confirmButtonText: 'OK',
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      focusConfirm: false,
+      backdrop: `rgba(0, 0, 0, 0.4)`
+    }).then((result) => {
+      if (result.value) {
+        // this.tokenService.clearTokenExpired();
+
+      }
+    })
+  }
 }

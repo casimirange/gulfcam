@@ -4,13 +4,18 @@ import {Router} from "@angular/router";
 import {IUser} from "../../_model/user";
 import {ISignup} from "../../_model/signup";
 import {BnNgIdleService} from "bn-ng-idle";
+import {timeout} from "rxjs/operators";
+import IdleTimer from "../../_helpers/idleTimer.js";
+import {NotifsService} from "../notifications/notifs.service";
+import Swal from "sweetalert2";
 
 @Injectable({
   providedIn: 'root'
 })
 export class TokenService {
   private roles: string[] = [];
-  constructor(private router: Router, private bnIdle: BnNgIdleService,) { }
+
+  constructor(private router: Router, private bnIdle: BnNgIdleService) { }
 
   saveToken(token: IToken){
     localStorage.setItem('bearerToken', <string>token.access_token);
@@ -54,6 +59,28 @@ export class TokenService {
   saveRefreshToken(token: string){
     // localStorage.removeItem('bearerToken');
     localStorage.setItem('bearerToken', <string>token);
+    new IdleTimer({
+      timeout: 600, //expired after 600 secs
+      onTimeout: () => {
+        localStorage.setItem('url', this.router.url)
+        this.clearTokenExpired();
+        Swal.fire({
+          title: 'Inactivité',
+          html: 'Nous avons constaté que vous n\'êtes plus actif sur la plateforme',
+          icon: 'info',
+          footer: '<a >Veuillez vous reconnecter de nouveau</a>',
+          showCancelButton: false,
+          confirmButtonText: 'OK',
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          focusConfirm: false,
+          backdrop: `rgba(0, 0, 0, 0.4)`
+        }).then((result) => {
+          if (result.value) {
+          }
+        })
+      }
+    }).startInterval();
     if (this.isRedirect()){
       this.router.navigate([localStorage.getItem('url').toString()])
       localStorage.removeItem('url')
@@ -102,6 +129,7 @@ export class TokenService {
     localStorage.removeItem('id')
     localStorage.removeItem('Roles')
     localStorage.removeItem('exp')
+    localStorage.removeItem('_expiredTime')
     this.router.navigate(['auth']);
   }
 
