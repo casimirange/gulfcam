@@ -61,7 +61,7 @@
                         value="bordereau">Bordereau de livraison
                       </option>
 
-                      <option *ngIf="roleUser === 'MANAGER_ORDER'"  value="préfacture">
+                      <option *ngIf="roleUser === 'MANAGER_ORDER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')"  value="préfacture">
                         Préfacture/Proforma
                       </option>
                       <option *ngIf="statut == 'CLOSED' " value="bonCommand">Preuve de Bon de Livraison</option>
