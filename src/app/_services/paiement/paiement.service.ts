@@ -22,6 +22,10 @@ export class PaiementService {
     return this.http.get<any>(environment.paymentMethod)
   }
 
+  getPaiementMethodByInternalRef(internalRef: number): Observable<any>{
+    return this.http.get<any>(environment.paymentMethod+`/${internalRef}`);
+  }
+
   updatePaiementMethod(payment: any, internalRef: number): Observable<any>{
     return this.http.put<any>(environment.paymentMethod+`/${internalRef}`, payment);
   }

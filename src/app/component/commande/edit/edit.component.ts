@@ -46,6 +46,7 @@ export class EditComponent implements OnInit {
   store: Store = new Store();
   products: Products[] = []
   paymentMethods: PaiementMethod[] = []
+  paymentMethod: PaiementMethod = new PaiementMethod()
   statut: string;
   editForm: FormGroup;
   selectPdfForm: FormGroup;
@@ -120,6 +121,7 @@ export class EditComponent implements OnInit {
           this.statut = response.status.name
           this.getClientByOrder(response.idClient)
           this.getStoreByOrder(response.idStore)
+          this.getPaymentMethodByOrder(response.idPaymentMethod)
           return {dataState: DataState.LOADED_STATE, appData: response}
         }),
         startWith({dataState: DataState.LOADING_STATE, appData: null}),
@@ -168,6 +170,14 @@ export class EditComponent implements OnInit {
     this.storeService.getStoreByInternalref(internalRefClient).subscribe(
       resp => {
         this.store = resp;
+      }
+    )
+  }
+
+  getPaymentMethodByOrder(internalRefClient: number) {
+    this.paymentService.getPaiementMethodByInternalRef(internalRefClient).subscribe(
+      resp => {
+        this.paymentMethod = resp;
       }
     )
   }

@@ -185,14 +185,10 @@
                           <option *ngFor="let payment of paymentMethods"
                                   value="{{payment.internalReference}}">{{payment.designation}}</option>
                         </select>
-                        <select
-                                *ngIf="roleUser != 'TREASURY' && !role.includes('ROLE_ADMIN') && !role.includes('ROLE_SUPERADMIN')"
-                                class="form-control"
-                                disabled>
-                          <option value="" selected hidden disabled>Sélectionner un mode de paiement</option>
-                          <option *ngFor="let payment of paymentMethods" [value]="order.idPaymentMethod"
-                                  value="{{payment.internalReference}}">{{payment.designation}}</option>
-                        </select>
+                        <input *ngIf="roleUser != 'TREASURY' && statut != 'CREATED'"
+                               placeholder="Sélecyionner un mode de paiement" type="text"
+                               value="{{paymentMethod.designation}}" disabled
+                               class="form-control">
                       </div>
                     </div>
                     <div class="col-md-4" >
@@ -204,14 +200,14 @@
                                [disabled]="statut != 'CREATED'"
                                class="form-control" formControlName="peimentRef">
                         <input type="text" [value]="order.paymentReference" disabled class="form-control"
-                               *ngIf="roleUser != 'TREASURY' && !role.includes('ROLE_ADMIN') && !role.includes('ROLE_SUPERADMIN')">
+                               *ngIf="roleUser != 'TREASURY' && statut != 'CREATED'">
                       </div>
                     </div>
                     <div class="col-md-4">
                       <div class="position-relative form-group">
                         <label for="exampleEmail" class="">Montant</label>
                         <input name="email" id="exampleEmail" placeholder="with a placeholder" type="text"
-                               value="{{formatNumber(order.ttcaggregateAmount)}} Fcfa" disabled
+                               value="{{formatNumber(order.netAggregateAmount)}} Fcfa" disabled
                                class="form-control">
                       </div>
                     </div>
@@ -279,12 +275,8 @@
                       <th>Type de coupon</th>
                       <th>Quantité de carnets</th>
                       <th>Quantité de coupons</th>
-                      <th>Montant HTC</th>
-                      <th>TVA</th>
-                      <th>Montant TTC</th>
+                      <th>Montant Total</th>
                       <th>Date création</th>
-                      <!--                    <th>Date modification</th>-->
-                      <!--                    <th>Actions</th>-->
                     </tr>
                     </thead>
                     <tbody>
@@ -294,19 +286,7 @@
                       <td>{{prod.quantityNotebook}}</td>
                       <td>{{prod.quantityNotebook * 10}}</td>
                       <td>{{formatNumber(prod.amount * prod.quantityNotebook * 10)}}</td>
-                      <td>{{global.tax * 100}} %</td>
-                      <td>{{formatNumber((prod.amount * prod.quantityNotebook * 10) + (prod.amount * prod.quantityNotebook * 10) * global.tax)}}</td>
-                      <!--                <td></td>-->
                       <td>{{prod.createdAt | date: 'dd/MM/yyyy à hh:mm'}}</td>
-                      <!--                    <td>{{prod.updateAt | date: 'dd/MM/yyyy à hh:mm'}}</td>-->
-                      <!--                    <td>-->
-                      <!--                      <a style="cursor: pointer" class="delete text-danger">-->
-                      <!--                        <i class="pe-7s-trash" title="supprimer"></i>-->
-                      <!--                      </a>&nbsp;-->
-                      <!--                      <a style="cursor: pointer" class="text-primary">-->
-                      <!--                        <i class="pe-7s-eyedropper" title="modifier"></i>-->
-                      <!--                      </a>-->
-                      <!--                    </td>-->
                     </tr>
                     </tbody>
                     <tfoot>

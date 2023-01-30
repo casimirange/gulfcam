@@ -265,7 +265,7 @@ export class IndexCommandComponent implements OnInit {
     this.order.clientReference = this.orF['refCli'].value
     this.order.idManagerOrder = parseInt(localStorage.getItem('uid'))
     this.order.tax = this.global.tax;
-    this.order.ttcaggregateAmount = this.totalOrder * this.order.tax + this.totalOrder;
+    this.order.ttcaggregateAmount = this.totalOrder;
     this.order.netAggregateAmount = this.totalOrder;
 
 

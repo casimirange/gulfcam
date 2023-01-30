@@ -1,5 +1,4 @@
-
-<div class="app-page-title"*ngIf="roleUser === 'MANAGER_STATION' || role.includes('ROLE_SUPERADMIN')">
+<div class="app-page-title" *ngIf="roleUser === 'MANAGER_STATION' || role.includes('ROLE_SUPERADMIN')">
   <div class="page-title-wrapper">
     <div class="page-title-heading">
       <div class="page-title-icon">
@@ -29,13 +28,14 @@
   </div>
 </div>
 
-<ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav" *ngIf="roleUser === 'MANAGER_STATION' || role.includes('ROLE_SUPERADMIN')">
+<ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav"
+    *ngIf="roleUser === 'MANAGER_STATION' || role.includes('ROLE_SUPERADMIN')">
   <li class="nav-item">
     <a role="tab" class="nav-link active" id="tab-0" data-toggle="tab" href="#tab-content-0">
       <span>Notes de crédit</span>
     </a>
   </li>
-  <li class="nav-item" >
+  <li class="nav-item">
     <a role="tab" class="nav-link" id="tab-1" data-toggle="tab" href="#tab-content-1">
       <span>Coupons</span>
     </a>
@@ -51,11 +51,11 @@
             Liste de ses notes de credit
           </div>
 
-          <div class="table-responsive"  >
+          <div class="table-responsive">
 
             <ng-container class="bg-white">
               <ng-container class="bg-white py-1 px-1">
-                <table class="table table-hover bg-white" >
+                <table class="table table-hover bg-white">
                   <thead>
                   <tr>
                     <th>#</th>
@@ -81,7 +81,8 @@
                   </tbody>
                 </table>
                 <div class="text-center">
-                  <p *ngIf="creditNotes.length === 0" style="color: grey; font-size: 1.8rem;" class="mx-auto" >Aucune note de crédit trouvée pour cette station !</p>
+                  <p *ngIf="creditNotes.length === 0" style="color: grey; font-size: 1.8rem;" class="mx-auto">Aucune
+                    note de crédit trouvée pour cette station !</p>
                 </div>
               </ng-container>
             </ng-container>
@@ -95,11 +96,11 @@
             <div class="btn-actions-pane-right">
               <div role="group" class="btn-group-sm btn-group">
                 <!--              <pagination-controls id="client" (pageChange)="pageChange($event)" ></pagination-controls>-->
-<!--                <pagination-controls-->
-<!--                  id="creditDetail"-->
-<!--                  previousLabel="Précédent"-->
-<!--                  nextLabel="Suivant"-->
-<!--                  (pageChange)="pageChange($event)"></pagination-controls>-->
+                <!--                <pagination-controls-->
+                <!--                  id="creditDetail"-->
+                <!--                  previousLabel="Précédent"-->
+                <!--                  nextLabel="Suivant"-->
+                <!--                  (pageChange)="pageChange($event)"></pagination-controls>-->
               </div>
             </div>
           </div>
@@ -115,11 +116,11 @@
             Liste de ses coupons
           </div>
 
-          <div class="table-responsive"  >
+          <div class="table-responsive">
 
             <ng-container class="bg-white">
               <ng-container class="bg-white py-1 px-1">
-                <table class="table table-hover bg-white" >
+                <table class="table table-hover bg-white">
                   <thead>
                   <tr>
                     <th>#</th>
@@ -135,13 +136,16 @@
                     <th>Date modification</th>
                   </tr>
                   </thead>
-                  <tbody *ngFor="let coupon of coupons | paginate: { id: 'coupon',itemsPerPage: size, currentPage: pageCoupon, totalItems: totalElementsCoupon }; let i = index">
+                  <tbody
+                    *ngFor="let coupon of coupons | paginate: { id: 'coupon',itemsPerPage: size, currentPage: pageCoupon, totalItems: totalElementsCoupon }; let i = index">
 
                   <tr>
                     <td>{{i + 1}}</td>
                     <td>{{coupon.internalReference}}</td>
                     <td>{{ padWithZero(coupon.serialNumber, 7)}}</td>
-                    <td><span *ngFor="let v of vouchers">{{v.internalReference == coupon.idTypeVoucher ? v.amount : ''}}</span></td>
+                    <td><span
+                      *ngFor="let v of vouchers">{{v.internalReference == coupon.idTypeVoucher ? v.amount : ''}}</span>
+                    </td>
                     <td>{{coupon.idClient}}</td>
                     <td>{{coupon.idTicket}}</td>
                     <td>{{coupon.idNotebook}}</td>
@@ -152,7 +156,8 @@
                   </tr>
                 </table>
                 <div class="text-center">
-                  <p *ngIf="creditNotes.length === 0" style="color: grey; font-size: 1.8rem;" class="mx-auto" >Aucun coupon trouvé pour cette station !</p>
+                  <p *ngIf="creditNotes.length === 0" style="color: grey; font-size: 1.8rem;" class="mx-auto">Aucun
+                    coupon trouvé pour cette station !</p>
                 </div>
               </ng-container>
             </ng-container>
@@ -199,13 +204,23 @@
                        type="text" class="form-control" formControlName="coupon">
               </div>
             </div>
+<!--            <div class="col-md-12">-->
+<!--              <div class="position-relative form-group">-->
+<!--                <label for="localisation" class="">Station</label>-->
+<!--                <select class="form-control" formControlName="idStation">-->
+<!--                  <option *ngFor="let station of stations"-->
+<!--                          value="{{station.internalReference}}">{{station.designation}}</option>-->
+<!--                </select>-->
+<!--              </div>-->
+<!--            </div>-->
             <div class="col-md-12">
               <div class="position-relative form-group">
-                <label for="localisation" class="">Station</label>
-                <select class="form-control" formControlName="idStation">
-                  <option *ngFor="let station of stations"
-                          value="{{station.internalReference}}">{{station.designation}}</option>
-                </select>
+                <div>
+                  <div class="custom-checkbox custom-control">
+                    <input type="checkbox" id="exampleCustomCheckbox" class="custom-control-input" formControlName="verif">
+                    <label class="custom-control-label" for="exampleCustomCheckbox">Confirmez-vous avoir le coupon en main?</label>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

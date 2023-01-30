@@ -48,6 +48,7 @@ export class DetailsStationComponent implements OnInit {
   coupon: Coupon = new Coupon();
   private isLoading = new BehaviorSubject<boolean>(false);
   isLoading$ = this.isLoading.asObservable();
+  idParam: number;
   constructor(private stationService: StationService, private activatedRoute: ActivatedRoute, private router: Router,private modalService: NgbModal,
               private _location: Location, private voucherService: VoucherService, private statusService: StatusService,private fb: FormBuilder,
               private creditNoteService: CreditNoteService, private couponService: CouponService, private notifService: NotifsService) {
@@ -55,12 +56,16 @@ export class DetailsStationComponent implements OnInit {
       this.role.push(authority);
     });
     this.formCoupon()
+    this.activatedRoute.params.subscribe(params => {
+      this.idParam = params['id']
+    })
   }
 
   formCoupon(){
     this.couponForm = this.fb.group({
       coupon: ['', [Validators.required]],
-      idStation: ['', [Validators.required]],
+      // idStation: ['', [Validators.required]],
+      verif: ['', [Validators.requiredTrue]]
     });
   }
 
@@ -74,14 +79,13 @@ export class DetailsStationComponent implements OnInit {
   }
 
   getStationInfos(){
-    this.activatedRoute.params.subscribe(params => {
-      this.stationService.getStationByInternalref(params['id']).subscribe(
+    // this.activatedRoute.params.subscribe(params => {
+      this.stationService.getStationByInternalref(this.idParam).subscribe(
         res => {
           this.station = res;
-          console.log(res)
         }
       )
-    })
+    // })
   }
 
   getStations(){
@@ -114,25 +118,26 @@ export class DetailsStationComponent implements OnInit {
   }
 
   getCreditNoteByStation(){
-    this.activatedRoute.params.subscribe(params => {
-      this.creditNoteService.getCreditNoteByStation(parseInt(params['id'])).subscribe(
+    // this.activatedRoute.params.subscribe(params => {
+      this.creditNoteService.getCreditNoteByStation(this.idParam).subscribe(
         resp => {
           this.creditNotes = resp.content
+          console.log(resp)
         },
       )
-    })
+    // })
   }
 
   getCouponByStation(){
-    this.activatedRoute.params.subscribe(params => {
-      this.couponService.getCouponsByStation(parseInt(params['id']), this.pageCoupon -1, this.size).subscribe(
+    // this.activatedRoute.params.subscribe(params => {
+      this.couponService.getCouponsByStation(this.idParam, this.pageCoupon -1, this.size).subscribe(
         resp => {
           this.coupons = resp.content
           this.totalElementsCoupon = resp.totalElements
           this.totalPagesCoupon = resp.totalPages
         },
       )
-    })
+    // })
   }
 
   padWithZero(num, targetLength) {
@@ -155,13 +160,13 @@ export class DetailsStationComponent implements OnInit {
       "modulo": 0,
       "productionDate": "2022-12-16"
     }
-    body.idStation = this.couponForm.controls['idStation'].value
+    body.idStation = this.idParam
+    // body.idStation = this.couponForm.controls['idStation'].value
     // body.productionDate = new Date().toLocaleString().toString()
     // console.log(body.productionDate)
     this.isLoading.next(true);
     this.couponService.acceptCoupon(this.coupon.serialNumber, body).subscribe(
       resp => {
-        console.log(resp)
         this.getCouponByStation()
         this.annuler()
         this.isLoading.next(false);

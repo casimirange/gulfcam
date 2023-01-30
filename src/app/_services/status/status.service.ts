@@ -34,6 +34,8 @@ export class StatusService {
         break;
       case 'USED': this.status = 'UTILISE'
         break;
+      case 'STORE_ENABLE': this.status = 'CREEE'
+        break;
     }
 
     return this.status

@@ -105,6 +105,7 @@ export class IndexCreditNoteComponent implements OnInit {
     this.creditNoteService.getCreditNote(this.page - 1, this.size).subscribe(
       resp => {
         this.creditNotes = resp.content
+        console.log(resp)
         this.totalElements = resp.totalElements
       },
     )
