@@ -1,4 +1,4 @@
-import {Component, OnInit, TemplateRef} from '@angular/core';
+import {Component, OnDestroy, OnInit, TemplateRef} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {Store} from "../../../_model/store";
 import {IUser} from "../../../_model/user";
@@ -24,22 +24,25 @@ import {CreditNoteService} from "../../../_services/creditNote/credit-note.servi
 import {StatusService} from "../../../_services/status/status.service";
 import {CouponService} from "../../../_services/coupons/coupon.service";
 import {catchError, map, startWith} from "rxjs/operators";
+import {Coupon} from "../../../_model/coupon";
 
 @Component({
   selector: 'app-index-credit-note',
   templateUrl: './index-credit-note.component.html',
   styleUrls: ['./index-credit-note.component.css']
 })
-export class IndexCreditNoteComponent implements OnInit {
+export class IndexCreditNoteComponent implements OnInit, OnDestroy {
 
   creditForm: FormGroup;
   stores: Store[] = [];
   users: IUser[] = [];
-  store: Store = new Store ();
+  store: Store = new Store();
   creditNote: CreditNote = new CreditNote();
   creditNotes: CreditNote[] = [];
   unit: Unite = new Unite();
-  typeVouchers: TypeVoucher[]
+  coupons: Coupon[] = [];
+  couponsFiltered: Coupon[] = [];
+  selectedStation: boolean = false
   clients: Client[]
   stations: Station[]
   vouchers: number[] = []
@@ -51,6 +54,7 @@ export class IndexCreditNoteComponent implements OnInit {
   page = 1;
   size = 20;
   totalElements: number = 0;
+
   constructor(private modalService: NgbModal, private fb: FormBuilder, private storeService: StoreService, private router: Router,
               private notifService: NotifsService, private unitService: UnitsService, private voucherService: VoucherService,
               private clientService: ClientService, private userService: UsersService, private creditNoteService: CreditNoteService,
@@ -64,10 +68,19 @@ export class IndexCreditNoteComponent implements OnInit {
   ngOnInit(): void {
     this.getCreditNote();
     this.getStations()
+    // this.getCouponByStation()
+  }
+
+  ngOnDestroy(): void {
+    this.creditNoteService.saveCreditNote(this.creditNote).subscribe().unsubscribe();
+    this.creditNoteService.getCreditNote(this.page - 1, this.size).subscribe().unsubscribe();
+    this.stationService.getStations().subscribe().unsubscribe();
+    this.creditNoteService.validCreditNote(0).subscribe().unsubscribe();
+    this.couponService.getCouponsBySerialNumber("str").subscribe().unsubscribe();
   }
 
   //initialisation du formulaire de création type de bon
-  formStore(){
+  formStore() {
     this.creditForm = this.fb.group({
       idStation: ['', [Validators.required,]],
       serialNumber: ['', [Validators.required, Validators.pattern('^[0-9]*'),]],
@@ -75,20 +88,21 @@ export class IndexCreditNoteComponent implements OnInit {
   }
 
   //ouverture du modal
-  open(content: any){
+  open(content: any) {
     const modal = true;
     this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title', size: 'lg'});
   }
 
-  createCreditNote(){
-    console.log(this.creditForm.value)
-    // this.creditNote.idClient = this.clients.find(client => client.completeName === this.creditForm.controls['idClient'].value).internalReference
+  createCreditNote() {
     this.creditNote.idStation = parseInt(this.creditForm.controls['idStation'].value)
     this.creditNote.serialCoupons = this.vouchers
     this.isLoading.next(true);
     this.creditNoteService.saveCreditNote(this.creditNote).subscribe(
       resp => {
         this.getCreditNote()
+        this.vouchers = []
+        this.couponsFiltered = []
+        // this.getCouponByStation()
         // this.creditNotes.push(resp)
         this.annuler()
         this.isLoading.next(false);
@@ -101,7 +115,7 @@ export class IndexCreditNoteComponent implements OnInit {
     )
   }
 
-  getCreditNote(){
+  getCreditNote() {
     this.creditNoteService.getCreditNote(this.page - 1, this.size).subscribe(
       resp => {
         this.creditNotes = resp.content
@@ -120,7 +134,7 @@ export class IndexCreditNoteComponent implements OnInit {
     )
   }
 
-  getStations(){
+  getStations() {
     this.stationService.getStations().subscribe(
       resp => {
         this.stations = resp.content
@@ -133,9 +147,11 @@ export class IndexCreditNoteComponent implements OnInit {
     this.store = new Store()
     this.modalService.dismissAll()
     this.vouchers = []
+    this.couponsFiltered = []
+    this.selectedStation = false
   }
 
-  delete(store: CreditNote, index:number) {
+  delete(store: CreditNote, index: number) {
     // this.isLoading.next(true);
     // this.storeService.deleteStore(store.internalReference).subscribe(
     //   resp => {
@@ -151,13 +167,13 @@ export class IndexCreditNoteComponent implements OnInit {
     // )
   }
 
-  valid(internalRef: number, index:number) {
+  valid(internalRef: number, index: number) {
     this.isLoading.next(true);
     this.creditNoteService.validCreditNote(internalRef).subscribe(
       resp => {
         console.log(resp)
         const index = this.creditNotes.findIndex(req => req.internalReference === resp.internalReference);
-        this.creditNotes[ index ] = resp;
+        this.creditNotes[index] = resp;
         this.isLoading.next(false);
         this.notifService.onSuccess("note de crédit validée")
       },
@@ -171,7 +187,7 @@ export class IndexCreditNoteComponent implements OnInit {
   deleteStore(store: CreditNote, index: number) {
     Swal.fire({
       title: 'Supprimer Magasin',
-      html: "Voulez-vous vraiment supprimer la note "+ store.internalReference.toString().bold() + " ?",
+      html: "Voulez-vous vraiment supprimer la note " + store.internalReference.toString().bold() + " ?",
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#00ace6',
@@ -195,7 +211,7 @@ export class IndexCreditNoteComponent implements OnInit {
     console.log(store)
     this.modalService.open(mymodal, {ariaLabelledBy: 'modal-basic-title', size: 'lg'});
     this.creditNote = store
-    for (let coupon of store.coupon){
+    for (let coupon of store.coupon) {
       this.vouchers.push(parseInt(coupon.serialNumber))
     }
     this.modalTitle = 'Modifier note'
@@ -220,21 +236,21 @@ export class IndexCreditNoteComponent implements OnInit {
 
 
   addCoupon() {
-    let str= parseInt(this.creditForm.controls['serialNumber'].value).toString();
+    let str = parseInt(this.creditForm.controls['serialNumber'].value).toString();
     this.couponService.getCouponsBySerialNumber(str).subscribe(
       res => {
-        if (res.status.name === 'USED' ){
-          if (res.idCreditNote != null){
+        if (res.status.name === 'USED') {
+          if (res.idCreditNote != null) {
             this.notifService.onWarning('Ce coupon a déjà fait l\'objet d\'une note de crédit')
-          }else {
-            if (res.idStation === parseInt(this.creditForm.controls['idStation'].value)){
+          } else {
+            if (res.idStation === parseInt(this.creditForm.controls['idStation'].value)) {
               this.vouchers.push(parseInt(this.creditForm.controls['serialNumber'].value))
               this.creditForm.controls['serialNumber'].reset()
-            }else {
-             this.notifService.onWarning('Ce coupon n\'a pas été utilisé dans cette station')
+            } else {
+              this.notifService.onWarning('Ce coupon n\'a pas été utilisé dans cette station')
             }
           }
-        }else{
+        } else {
           this.notifService.onWarning("Ce coupon n'a pas encore été utilisé en station")
         }
       }, error => {
@@ -243,9 +259,35 @@ export class IndexCreditNoteComponent implements OnInit {
     )
   }
 
+  addCoupons(str: string) {
+    this.vouchers.push(parseInt(str));
+  }
+
+  getCouponByStation() {
+    const stationId = this.creditForm.controls['idStation'].value
+    this.vouchers = []
+    this.couponsFiltered = []
+    if (stationId != 0) {
+      this.couponService.getCouponsByStation(stationId, 0, 13000000).subscribe(
+        resp => {
+          this.selectedStation = true
+          this.coupons = resp.content
+          this.couponsFiltered = this.coupons.filter(cp => cp.idCreditNote == null);
+        },
+      )
+    }
+  }
+
   removeCoupon(coupon: number) {
     console.log(this.vouchers.indexOf(coupon))
     const prodIndex = this.vouchers.indexOf(coupon)
+    this.vouchers.splice(prodIndex, 1)
+  }
+
+
+  removeCoupons(coupon: string) {
+    console.log(this.vouchers.indexOf(+coupon))
+    const prodIndex = this.vouchers.indexOf(+coupon)
     this.vouchers.splice(prodIndex, 1)
   }
 
@@ -257,7 +299,11 @@ export class IndexCreditNoteComponent implements OnInit {
     this.router.navigate(['/credit-note/details', note.internalReference])
   }
 
-  formatNumber(amount: any): string{
-    return parseInt(amount).toFixed(0).replace(/(\d)(?=(\d{3})+\b)/g,'$1 ');
+  formatNumber(amount: any): string {
+    return parseInt(amount).toFixed(0).replace(/(\d)(?=(\d{3})+\b)/g, '$1 ');
+  }
+
+  padWithZero(num, targetLength) {
+    return String(num).padStart(targetLength, '0');
   }
 }

@@ -101,7 +101,7 @@
 <ng-template #mymodal let-modal>
   <div class="modal-header">
     <h6 class="modal-title timeline-title" id="modal-basic-title"><b>{{modalTitle}}</b></h6>
-    <div class="close vertical-timeline-element-content bounce-in" (click)=" modal.close('save click')">
+    <div class="close vertical-timeline-element-content bounce-in" (click)=" modal.close('save click'); annuler()">
       <p><i class="fa fa-times"></i></p>
     </div>
   </div>
@@ -113,57 +113,106 @@
             <div class="col-md-12">
               <div class="position-relative form-group">
                 <label for="station" class="">Station</label>
-                <select name="select" id="station" class="form-control" formControlName="idStation">
+                <select name="select" id="station" class="form-control" formControlName="idStation" (ngModelChange)="getCouponByStation()" >
                   <option value="" selected disabled hidden>Sélectionner une station</option>
                   <option *ngFor="let station of stations" value="{{station.internalReference}}">{{station.designation}}</option>
                 </select>
               </div>
             </div>
-            <div class="row col-md-12">
-              <div class="col-md-10">
-                <div class="position-relative form-group">
-                  <label for="qte" class="">Coupon</label>
-                  <input name="email" id="qte" placeholder="Numéro de série du coupon" type="text" class="form-control"
-                         formControlName="serialNumber">
-                  <div
-                    *ngIf="creditForm.controls['serialNumber'].invalid && (creditForm.controls['serialNumber'].dirty || creditForm.controls['serialNumber'].touched)"
-                    class="mb-2" style="color: #f65656; font-style: italic;">
+<!--            <div class="row col-md-12">-->
+<!--              <div class="col-md-10">-->
+<!--                <div class="position-relative form-group">-->
+<!--                  <label for="qte" class="">Coupon</label>-->
+<!--                  <input name="email" id="qte" placeholder="Numéro de série du coupon" type="text" class="form-control"-->
+<!--                         formControlName="serialNumber">-->
+<!--                  <div-->
+<!--                    *ngIf="creditForm.controls['serialNumber'].invalid && (creditForm.controls['serialNumber'].dirty || creditForm.controls['serialNumber'].touched)"-->
+<!--                    class="mb-2" style="color: #f65656; font-style: italic;">-->
 
-                    <div *ngIf="creditForm.controls['serialNumber'].errors?.['required']" class="ml-3">
-                      le coupon est obligatoire.
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-2">
-                <div class="position-relative form-group">
-                  <label for="add" class="text-white">ajouter</label>
-                  <button id="add" class=" btn btn-primary float-right"
-                          [disabled]="creditForm.controls['serialNumber'].invalid"
-                          (click)="addCoupon()">Ajouter</button>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-12 position-relative form-group">
+<!--                    <div *ngIf="creditForm.controls['serialNumber'].errors?.['required']" class="ml-3">-->
+<!--                      le coupon est obligatoire.-->
+<!--                    </div>-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--              <div class="col-md-2">-->
+<!--                <div class="position-relative form-group">-->
+<!--                  <label for="add" class="text-white">ajouter</label>-->
+<!--                  <button id="add" class=" btn btn-primary float-right"-->
+<!--                          [disabled]="creditForm.controls['serialNumber'].invalid"-->
+<!--                          (click)="addCoupon()">Ajouter</button>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--            <div class="col-md-12 position-relative form-group">-->
+<!--              <h5 class="card-title">Liste des coupons</h5>-->
+<!--              <table class="mb-0 table table-sm">-->
+<!--                <thead>-->
+<!--                <tr>-->
+<!--                  <th>#</th>-->
+<!--                  <th>Coupon</th>-->
+<!--                  <th>Action</th>-->
+<!--                </tr>-->
+<!--                </thead>-->
+<!--                <tbody>-->
+<!--                <tr *ngFor="let prod of vouchers; let i = index">-->
+<!--                  <th scope="row">{{i + 1}}</th>-->
+<!--                  <td>{{formatNumber(prod)}}</td>-->
+<!--                  <td><i class="pe-7s-trash text-danger" (click)="removeCoupon(prod)"></i></td>-->
+<!--                </tr>-->
+<!--                </tbody>-->
+<!--              </table>-->
+<!--              <div class="text-center">-->
+<!--                <p *ngIf="vouchers.length === 0" style="color: grey; font-size: 0.9rem;" class="mx-auto" >Ajouter des coupons à la note de crédit</p>-->
+<!--              </div>-->
+<!--              <div class="card-subtitle float-right">Total: {{vouchers.length}} coupon(s)</div>-->
+<!--            </div>-->
+            <div class="col-md-12 position-relative form-group" *ngIf="couponsFiltered.length">
               <h5 class="card-title">Liste des coupons</h5>
               <table class="mb-0 table table-sm">
                 <thead>
                 <tr>
                   <th>#</th>
-                  <th>Coupon</th>
-                  <th>Action</th>
+                  <th>#</th>
+                  <th>Ref. interne</th>
+                  <th>Numéro de série</th>
+                  <th>coupon</th>
+                  <th>client</th>
+                  <th>statut</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr *ngFor="let prod of vouchers; let i = index">
+                <tr *ngFor="let prod of couponsFiltered; let i = index">
                   <th scope="row">{{i + 1}}</th>
-                  <td>{{formatNumber(prod)}}</td>
-                  <td><i class="pe-7s-trash text-danger" (click)="removeCoupon(prod)"></i></td>
+                  <th scope="row">
+                    <div class="widget-content-left mr-2">
+                      <div class="custom-checkbox custom-control" >
+                        <input type="checkbox" id="exampleCustomCheckbox{{i}}" class="custom-control-input"
+                               (click)="vouchers.includes(+prod.serialNumber) ? removeCoupons(prod.serialNumber) : addCoupons(prod.serialNumber)">
+                        <label class="custom-control-label" for="exampleCustomCheckbox{{i}}">&nbsp;</label>
+                      </div>
+                    </div>
+                  </th>
+                  <td>{{prod.internalReference}}</td>
+                  <td>{{padWithZero(prod.serialNumber, 7)}}</td>
+                  <td>{{formatNumber(prod.amount)}}</td>
+                  <td>{{prod.nameClient}}</td>
+                  <td>{{getStatuts(prod.status.name)}}</td>
                 </tr>
                 </tbody>
               </table>
               <div class="text-center">
-                <p *ngIf="vouchers.length === 0" style="color: grey; font-size: 0.9rem;" class="mx-auto" >Ajouter des coupons à la note de crédit</p>
+                <p style="color: grey; font-size: 0.9rem;" class="mx-auto" >Sélectionner des coupons à ajouter à la note de crédit</p>
+              </div>
+              <div class="card-subtitle float-right">Total: {{vouchers.length}} coupon(s)</div>
+            </div>
+
+
+            <div class="col-md-12 position-relative form-group" *ngIf="!couponsFiltered.length && selectedStation">
+              <h5 class="card-title">Liste des coupons</h5>
+
+              <div class="text-center">
+                <p style="color: grey; font-size: 1.2rem;" class="mx-auto" >Aucun coupon utilisé dans cette station</p>
               </div>
               <div class="card-subtitle float-right">Total: {{vouchers.length}} coupon(s)</div>
             </div>
