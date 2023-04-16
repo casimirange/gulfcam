@@ -74,7 +74,7 @@ export class TransfererCartonComponent implements OnInit {
   //save carton
   transfertCarton(){
     this.isLoading.next(true);
-    this.stock.idStoreKeeper = parseInt(localStorage.getItem('uid').toString())
+    this.stock.idSpaceManager1 = parseInt(localStorage.getItem('uid').toString())
     this.stock.idStoreHouseStockage = parseInt(this.tranfertForm.controls['idStoreHouseStockage'].value)
     let cartons =[]
     cartons.push(this.tranfertForm.controls['idCarton'].value)

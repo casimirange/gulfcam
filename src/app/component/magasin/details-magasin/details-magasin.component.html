@@ -1,5 +1,5 @@
 
-<div class="app-page-title" *ngIf="(roleUser === 'MANAGER_STORE' || roleUser === 'MANAGER_COUPON' || roleUser === 'STORE_KEEPER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))">
+<div class="app-page-title" *ngIf="(roleUser === 'MANAGER_SPACES_2' || roleUser === 'SALES_MANAGER' || roleUser === 'MANAGER_SPACES_1' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))">
   <div class="page-title-wrapper">
     <div class="page-title-heading">
       <div class="page-title-icon">
@@ -22,9 +22,9 @@
   </div>
 </div>
 
-<app-unites *ngIf="(roleUser === 'MANAGER_STORE' || roleUser === 'MANAGER_COUPON' || roleUser === 'STORE_KEEPER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))"></app-unites>
+<app-unites *ngIf="(roleUser === 'MANAGER_SPACES_2' || roleUser === 'SALES_MANAGER' || roleUser === 'MANAGER_SPACES_1' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))"></app-unites>
 
-<div class="row" *ngIf="(roleUser === 'MANAGER_STORE' || roleUser === 'MANAGER_COUPON' || roleUser === 'STORE_KEEPER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))">
+<div class="row" *ngIf="(roleUser === 'MANAGER_SPACES_2' || roleUser === 'SALES_MANAGER' || roleUser === 'MANAGER_SPACES_1' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))">
   <div class="col-md-12">
     <div class="main-card mb-3 card " id="htmlData">
       <div class="card-header">

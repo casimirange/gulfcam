@@ -10,21 +10,21 @@ export class StatusAccountService {
 
   allStatus(st: string): string{
     switch (st) {
-      case 'STORE_KEEPER': this.status = 'MAGASINIER'
+      case 'MANAGER_SPACES_1': this.status = 'GESTIONNAIRE ESPACE 1'
         break;
-      case 'MANAGER_COUPON': this.status = 'GESTIONNAIRE DE COUPON'
+      case 'MANAGER_SPACES_2': this.status = 'GESTIONNAIRE ESPACE 2'
         break;
-      case 'MANAGER_STORE': this.status = 'GESTIONNAIRE DE MAGASIN'
+      case 'SALES_MANAGER': this.status = 'DIRECTEUR COMMERCIAL'
         break;
       case 'MANAGER_STATION': this.status = 'GESTIONNAIRE DE STATION'
         break;
-      case 'MANAGER_ORDER': this.status = 'GESTIONNAIRE DE COMMANDE'
+      case 'DSI_AUDIT': this.status = 'DSI/AUDIT'
         break;
-      case 'TREASURY': this.status = 'CAISSIER'
+      case 'TREASURY': this.status = 'CAISSIER/TRESORERIE'
         break;
-      case 'CUSTOMER_SERVICE': this.status = 'SERVICE CLIENT'
+      case 'COMMERCIAL_ATTACHE': this.status = 'ATTACHE COMMERCIAL'
         break;
-      case 'POMPIST': this.status = 'POMPISTE'
+      case 'COMPTABLE': this.status = 'COMPTABLE'
         break;
     }
     return this.status

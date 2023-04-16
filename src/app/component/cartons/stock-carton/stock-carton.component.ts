@@ -144,7 +144,7 @@ export class StockCartonComponent implements OnInit {
   saveCarton() {
     this.isLoading.next(true);
     let typ = this.vouchers.find(tv => tv.amount == parseInt(this.cartonForm.controls['typeVoucher'].value))
-    this.carton.idStoreKeeper = parseInt(localStorage.getItem('uid').toString())
+    this.carton.idSpaceManager1 = parseInt(localStorage.getItem('uid').toString())
     this.carton.idStoreHouseStockage = parseInt(this.cartonForm.controls['idStoreHouse'].value)
     this.carton.number = parseInt(this.cartonForm.controls['number'].value)
     this.carton.from = parseInt(this.cartonForm.controls['from'].value)

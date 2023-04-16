@@ -17,6 +17,7 @@ export class Stock {
   storeHouse1?: StoreHouse;
   storeHouse2?: StoreHouse;
   idStoreKeeper?: number;
+  idSpaceManager1?: number;
   quantityCarton?: number;
   typeVoucher?: number;
   type?: string;

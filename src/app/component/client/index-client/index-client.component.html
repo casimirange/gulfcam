@@ -1,4 +1,4 @@
-<ng-container *ngIf="roleUser === 'MANAGER_ORDER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+<ng-container *ngIf="roleUser === 'COMMERCIAL_ATTACHE' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
   <div class="app-page-title">
     <div class="page-title-wrapper">
       <div class="page-title-heading">
@@ -13,7 +13,7 @@
       <div class="page-title-actions">
         <div class="d-inline-block ">
           <button type="button" data-toggle="tooltip" title="nouveau client" class="btn-shadow mr-3 btn btn-primary"
-                  (click)="open(mymodal)">
+                  (click)="open(mymodals)">
                                         <span class="btn-icon-wrapper pr-2 opacity-7">
                                             <i class="fa fa-plus fa-w-20"></i>
                                         </span>
@@ -96,7 +96,7 @@
                     <button class="btn btn-sm btn-secondary mr-2" (click)="detailsClient(client)">
                       <i class="pe-7s-look" title="consulter"></i>
                     </button>
-                    <button class="btn btn-sm btn-primary" (click)="updateClientModal(mymodal, client)">
+                    <button class="btn btn-sm btn-primary" (click)="updateClientModal(mymodals, client)">
                       <i class="pe-7s-eyedropper" title="modifier"></i>
                     </button>
                   </td>
@@ -138,7 +138,7 @@
     </div>
   </div>
 </ng-container>
-<ng-template #mymodal let-modal>
+<ng-template #mymodals let-modal>
   <div class="modal-header">
     <h6 class="modal-title timeline-title" id="modal-basic-title"><b>{{modalTitle}}</b></h6>
     <div class="close vertical-timeline-element-content bounce-in" (click)=" annuler()">
@@ -270,8 +270,8 @@
                 <select name="select" ngModel="{{clientType}}" id="typeClient" class="form-control"
                         formControlName="typeClient">
                   <option value="" selected disabled hidden>Sélectionner un type de client</option>
-                  <option value="ENTREPRISE">Entreprise</option>
                   <option value="ADMINISTRATION">Administration</option>
+                  <option value="ENTREPRISE">Entreprise</option>
                   <option value="PARTICULAR">Particulier</option>
                 </select>
 

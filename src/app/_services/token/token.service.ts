@@ -8,6 +8,7 @@ import {timeout} from "rxjs/operators";
 import IdleTimer from "../../_helpers/idleTimer.js";
 import {NotifsService} from "../notifications/notifs.service";
 import Swal from "sweetalert2";
+import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +16,7 @@ import Swal from "sweetalert2";
 export class TokenService {
   private roles: string[] = [];
 
-  constructor(private router: Router, private bnIdle: BnNgIdleService) { }
+  constructor(private router: Router, private bnIdle: BnNgIdleService, private modalService: NgbModal) { }
 
   saveToken(token: IToken){
     localStorage.setItem('bearerToken', <string>token.access_token);
@@ -82,6 +83,7 @@ export class TokenService {
       }
     }).startInterval();
     if (this.isRedirect()){
+      this.modalService.dismissAll()
       this.router.navigate([localStorage.getItem('url').toString()])
       localStorage.removeItem('url')
       this.userInactivity()

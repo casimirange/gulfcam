@@ -29,26 +29,26 @@
               <!--              <h5 class="card-title">Grid Menu Bigger</h5>-->
               <div class="grid-menu grid-menu-3col">
                 <div class="no-gutters row">
-                  <div class="col-sm-6 col-xl-4" routerLink="/commandes" *ngIf="roleUser === 'MANAGER_STORE' || roleUser === 'STORE_KEEPER' ||
-                   roleUser === 'MANAGER_ORDER' || roleUser === 'MANAGER_COUPON' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+                  <div class="col-sm-6 col-xl-4" routerLink="/commandes" *ngIf="roleUser === 'MANAGER_SPACES_1' || roleUser === 'MANAGER_SPACES_2' ||
+                   roleUser === 'COMMERCIAL_ATTACHE' || roleUser === 'SALES_MANAGER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
                     <button class="btn-icon-vertical btn-square btn-transition btn btn-outline-link">
                       <i class="pe-7s-news-paper btn-icon-wrapper btn-icon-lg mb-3"></i>Commandes
                     </button>
                   </div>
                   <div class="col-sm-6 col-xl-4" routerLink="/cartons"
-                       *ngIf="roleUser === 'MANAGER_STORE' || roleUser === 'MANAGER_COUPON' || roleUser === 'STORE_KEEPER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+                       *ngIf="roleUser === 'SALES_MANAGER' || roleUser === 'MANAGER_SPACES_1' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
                     <button class="btn-icon-vertical btn-square btn-transition btn btn-outline-link">
                       <i class="pe-7s-box1 btn-icon-wrapper btn-icon-lg mb-3"></i>Cartons
                     </button>
                   </div>
                   <div class="col-sm-6 col-xl-4" routerLink="/magasins"
-                       *ngIf="roleUser === 'MANAGER_STORE' || roleUser === 'MANAGER_COUPON' || roleUser === 'STORE_KEEPER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+                       *ngIf="roleUser === 'MANAGER_STORE' || roleUser === 'SALES_MANAGER' || roleUser === 'MANAGER_SPACES_1' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
                     <button class="btn-icon-vertical btn-square btn-transition btn btn-outline-link">
                       <i class="pe-7s-home btn-icon-wrapper btn-icon-lg mb-3"></i>Magasins
                     </button>
                   </div>
                   <div class="col-sm-6 col-xl-4" routerLink="/coupons"
-                       *ngIf="roleUser === 'MANAGER_STORE' || roleUser === 'CUSTOMER_SERVICE' || roleUser === 'MANAGER_COUPON' || roleUser === 'STORE_KEEPER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+                       *ngIf="roleUser === 'COMMERCIAL_ATTACHE' || roleUser === 'SALES_MANAGER' || roleUser === 'MANAGER_SPACES_2' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
                     <button class="btn-icon-vertical btn-square btn-transition btn btn-outline-link">
                       <i class="pe-7s-ribbon btn-icon-wrapper btn-icon-lg mb-3"></i>Coupons
                     </button>
@@ -60,7 +60,7 @@
                     </button>
                   </div>
                   <div class="col-sm-6 col-xl-4" routerLink="/carnets"
-                       *ngIf="roleUser === 'MANAGER_STORE' || roleUser === 'MANAGER_COUPON' || roleUser === 'STORE_KEEPER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+                       *ngIf="roleUser === 'SALES_MANAGER' || roleUser === 'MANAGER_SPACES_2' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
                     <button class="btn-icon-vertical btn-square btn-transition btn btn-outline-link">
                       <i class="pe-7s-note2 btn-icon-wrapper btn-icon-lg mb-3"></i>Carnets
                     </button>
@@ -76,25 +76,25 @@
                     </button>
                   </div>
                   <div class="col-sm-6 col-xl-4" routerLink="/clients"
-                       *ngIf="roleUser === 'MANAGER_ORDER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+                       *ngIf="roleUser === 'COMMERCIAL_ATTACHE' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
                     <button class="btn-icon-vertical btn-square btn-transition btn btn-outline-link">
                       <i class="pe-7s-users btn-icon-wrapper btn-icon-lg mb-3"></i>Clients
                     </button>
                   </div>
                   <div class="col-sm-6 col-xl-4" routerLink="/entrepots"
-                       *ngIf="roleUser === 'MANAGER_STORE' || roleUser === 'MANAGER_COUPON' || roleUser === 'STORE_KEEPER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+                       *ngIf="roleUser === 'MANAGER_STORE' || roleUser === 'SALES_MANAGER' || roleUser === 'MANAGER_SPACES_1' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
                     <button class="btn-icon-vertical btn-square btn-transition btn btn-outline-link">
                       <i class="pe-7s-server btn-icon-wrapper btn-icon-lg mb-3"></i>Espace de stockage
                     </button>
                   </div>
                   <div class="col-sm-6 col-xl-4" routerLink="/request-opposition"
-                       *ngIf="roleUser === 'MANAGER_COUPON' || roleUser === 'CUSTOMER_SERVICE' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+                       *ngIf="roleUser === 'SALES_MANAGER' || roleUser === 'COMMERCIAL_ATTACHE' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
                     <button class="btn-icon-vertical btn-square btn-transition btn btn-outline-link">
                       <i class="pe-7s-close-circle btn-icon-wrapper btn-icon-lg mb-3"></i>Demande d'opposition
                     </button>
                   </div>
                   <div class="col-sm-6 col-xl-4" routerLink="/credit-note"
-                       *ngIf="roleUser === 'CUSTOMER_SERVICE' || roleUser === 'TREASURY' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+                       *ngIf="roleUser === 'COMMERCIAL_ATTACHE' || roleUser === 'COMPTABLE' || roleUser === 'DSI_AUDIT' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
                     <button class="btn-icon-vertical btn-square btn-transition btn btn-outline-link">
                       <i class="pe-7s-cash btn-icon-wrapper btn-icon-lg mb-3"></i>Note de credit
                     </button>
@@ -106,7 +106,7 @@
                     </button>
                   </div>
                   <div class="col-sm-6 col-xl-4" routerLink="/stock"
-                       *ngIf="roleUser === 'MANAGER_COUPON' || roleUser==='MANAGER_STORE' || roleUser==='STORE_KEEPER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+                       *ngIf="roleUser==='MANAGER_SPACES_2' || roleUser==='MANAGER_SPACES_1' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
                     <button class="btn-icon-vertical btn-square btn-transition btn btn-outline-link">
                       <i class="pe-7s-drawer btn-icon-wrapper btn-icon-lg mb-3"></i>Stock
                     </button>

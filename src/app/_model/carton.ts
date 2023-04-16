@@ -7,7 +7,7 @@ export class Carton{
   internalReference?: number;
   idStoreHouseStockage: number;
   idStoreHouseSell?: number;
-  idStoreKeeper: number;
+  idSpaceManager1: number;
   storeKeeper?: IUser;
   nameStoreHouse?: string;
   createdAt?: Date;

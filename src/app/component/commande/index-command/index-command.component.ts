@@ -263,7 +263,7 @@ export class IndexCommandComponent implements OnInit {
     this.order.description = this.orF['description'].value
     this.order.deliveryTime = this.orF['delais'].value.toString()
     this.order.clientReference = this.orF['refCli'].value
-    this.order.idManagerOrder = parseInt(localStorage.getItem('uid'))
+    this.order.idCommercialAttache = parseInt(localStorage.getItem('uid'))
     this.order.tax = this.global.tax;
     this.order.ttcaggregateAmount = this.totalOrder;
     this.order.netAggregateAmount = this.totalOrder;

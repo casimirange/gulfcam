@@ -13,6 +13,10 @@ export class Order{
     idManagerStore?:	number
     idManagerCoupon?:	number
     idManagerOrder?:	number
+    idCommercialAttache?:	number
+    idSalesManager?:	number
+    idSpaceManager2?:	number
+    idSpaceManager1?:	number
     idStorekeeper?:	number
     linkInvoice?: string
     linkDelivery?: string

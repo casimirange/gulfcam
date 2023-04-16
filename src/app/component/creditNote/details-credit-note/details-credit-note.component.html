@@ -1,5 +1,5 @@
 <div class="app-page-title"
-     *ngIf="roleUser === 'CUSTOMER_SERVICE' || roleUser === 'MANAGER_STATION' || roleUser === 'TREASURY' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+     *ngIf="roleUser === 'COMPTABLE' || roleUser === 'DSI_AUDIT'  || roleUser === 'MANAGER_STATION' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
   <div class="page-title-wrapper">
     <div class="page-title-heading">
       <div class="page-title-icon">
@@ -41,7 +41,7 @@
 </div>
 
 <div class="row"
-     *ngIf="roleUser === 'CUSTOMER_SERVICE' || roleUser === 'MANAGER_STATION' || roleUser === 'TREASURY' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+     *ngIf="roleUser === 'COMPTABLE' || roleUser === 'DSI_AUDIT' || roleUser === 'MANAGER_STATION' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
   <div class="col-md-12">
     <div class="main-card mb-3 card">
       <div class="card-header">
@@ -49,7 +49,7 @@
         <div class="btn-actions-pane-right">
           <div role="group" class="btn-group-sm btn-group">
             <button
-              *ngIf="statut == 'CREATED' && (roleUser === 'TREASURY' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))"
+              *ngIf="statut == 'CREATED' && (roleUser === 'DSI_AUDIT' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))"
               class="btn btn-outline-primary" [disabled]="(isLoading$ | async)"
               title="valider une note de crédit" (click)="validCreditNote()">
               <i *ngIf="isLoading$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
@@ -58,7 +58,7 @@
                 *ngIf="!(isLoading$ | async)"><i class="pe-7s-check"></i> Valider</span>
             </button> &nbsp;
             <button class="btn btn-outline-alternate" [disabled]="(isExtracting$ | async)"
-                    *ngIf="roleUser === 'TREASURY' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')"
+                    *ngIf="roleUser === 'DSI_AUDIT' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')"
                     title="exporter une note de crédit" (click)="exportCreditNote()">
               <i *ngIf="isExtracting$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
               <span *ngIf="isExtracting$ | async">Exportation ...</span>

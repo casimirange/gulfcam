@@ -85,9 +85,9 @@ export class IndexRequestOppositionComponent implements OnInit {
   createRequest() {
     this.requestOpposition.reason = this.requestForm.controls['reason'].value
     this.requestOpposition.description = this.requestForm.controls['description'].value
-    this.requestOpposition.idServiceClient = parseInt(localStorage.getItem('uid'))
+    this.requestOpposition.idCommercialAttache = parseInt(localStorage.getItem('uid'))
     this.requestOpposition.idClient = this.clients.find(client => client.completeName === this.requestForm.controls['idClient'].value).internalReference
-    this.requestOpposition.idManagerCoupon = parseInt(this.requestForm.controls['idManagerCoupon'].value)
+    this.requestOpposition.idSalesManager = parseInt(this.requestForm.controls['idManagerCoupon'].value)
 
     this.vouchers.forEach(value => {
       let client = this.clients.find(client => client.completeName === this.requestForm.controls['idClient'].value)

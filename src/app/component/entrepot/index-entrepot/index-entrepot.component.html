@@ -1,5 +1,5 @@
 
-<div class="app-page-title"  *ngIf="(roleUser === 'MANAGER_STORE' || roleUser === 'MANAGER_COUPON' || roleUser === 'STORE_KEEPER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))">
+<div class="app-page-title"  *ngIf="(roleUser === 'MANAGER_SPACES_2' || roleUser === 'SALES_MANAGER' || roleUser === 'MANAGER_SPACES_1' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))">
   <div class="page-title-wrapper">
     <div class="page-title-heading">
       <div class="page-title-icon">
@@ -23,7 +23,7 @@
   </div>
 </div>
 
-<div class="row"  *ngIf="(roleUser === 'MANAGER_STORE' || roleUser === 'MANAGER_COUPON' || roleUser === 'STORE_KEEPER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))">
+<div class="row"  *ngIf="(roleUser === 'MANAGER_SPACES_2' || roleUser === 'SALES_MANAGER' || roleUser === 'MANAGER_SPACES_1' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))">
   <div class="col-md-12">
     <div class="main-card mb-3 card " id="htmlData" #htmlData>
       <div class="card-header">
@@ -95,7 +95,9 @@
                 <td>{{storeHouse.createAt}}</td>
                 <td>{{storeHouse.updateAt}}</td>
                 <td >
-                  <button class="btn btn-sm btn-secondary mr-2" (click)="showDetails(storeHouse)">
+                  <button class="btn btn-sm btn-secondary mr-2" (click)="showDetails(storeHouse)"
+                  *ngIf="role.includes('ROLE_SUPERADMIN') || (storeHouse.type == 'vente' ? roleUser == 'MANAGER_SPACES_2' : roleUser =='MANAGER_SPACES_1') "
+                  >
                     <i class="pe-7s-look" title="consulter"></i>
                   </button>
                   <button class="btn btn-sm btn-primary" (click)="updateStoreHouseModal(mymodal, storeHouse)"  *ngIf="role.includes('ROLE_SUPERADMIN')">

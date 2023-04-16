@@ -192,14 +192,14 @@
 <!--                                                 formControlName="typeAccount">-->
                     <select formControlName="typeAccount" class="form-control form-control-sm">
                       <option value="" selected disabled hidden>Sélectionner un type de compte</option>-->
-                      <option value="STORE_KEEPER">Magasinier </option>
-                      <option value="MANAGER_COUPON">Gestionnaire de coupon </option>
-                      <option value="MANAGER_ORDER">Gestionnaire de commande </option>
-                      <option value="MANAGER_STORE">Gestionnaire de magasin </option>
+                      <option value="MANAGER_SPACES_1">Gestionnaire espace 1 </option>
+                      <option value="MANAGER_SPACES_2">Gestionnaire espace 2 </option>
+                      <option value="SALES_MANAGER">Directeur Commercial </option>
+                      <option value="COMMERCIAL_ATTACHE">Attaché Commercial </option>
                       <option value="TREASURY">Caissier/Trésorier</option>
-                      <option value="CUSTOMER_SERVICE">Service client</option>
+                      <option value="COMPTABLE">Comptable</option>
                       <option value="MANAGER_STATION">Gestionnaire de station</option>
-                      <option value="POMPIST">Pompiste</option>
+                      <option value="DSI_AUDIT">DSI/AUDIT</option>
                     </select>
                   </div>
                   <div *ngIf="form['typeAccount'].invalid && (form['typeAccount'].dirty || form['typeAccount'].touched)"
@@ -223,7 +223,7 @@
                       <option value="ROLE_ADMIN">Admin </option>
                       <option value="ROLE_AGENT">Agent </option>
                       <option value="ROLE_SUPER_ADMIN">Super admin</option>
-                      <option value="ROLE_USER">simple utilisateur</option>
+                      <option value="ROLE_USER">Simple utilisateur</option>
                     </select>
                   </div>
                   <div *ngIf="form['roleName'].invalid && (form['roleName'].dirty || form['roleName'].touched)"

@@ -1,5 +1,5 @@
-<div *ngIf="roleUser === 'MANAGER_STORE' || roleUser === 'STORE_KEEPER' || roleUser === 'TREASURY' ||
-                   roleUser === 'MANAGER_ORDER' || roleUser === 'MANAGER_COUPON' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+<div *ngIf="roleUser === 'MANAGER_SPACES_1' || roleUser === 'MANAGER_SPACES_2' || roleUser === 'TREASURY' ||
+                   roleUser === 'COMMERCIAL_ATTACHE' || roleUser === 'SALES_MANAGER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
   <ng-container class="bg-white" *ngIf="(orderState$ | async) as appState" [ngSwitch]="appState.dataState">
     <ng-container class="bg-white" *ngSwitchCase="DataState.LOADING_STATE">
       <div class="col-md-12 text-center my-3">
@@ -54,19 +54,19 @@
                   <form [formGroup]="selectPdfForm">
                     <select (change)="generatePDF($event)" name="" id="" formControlName="pdf"
                             class="form-control form-control-sm">
-                      <option value="" selected disabled hidden>Générer pdf</option>
+                      <option value="" selected disabled hidden>Consulter les documents pdf</option>
                       <option
-                        *ngIf="statut == 'PAID' || statut == 'IN_PROCESS_OF_DELIVERY' || statut == 'CLOSED' && (roleUser=='MANAGER_STORE' || roleUser=='MANAGER_COUPON' || roleUser=='STORE_KEEPER'
+                        *ngIf="statut == 'PAID' || statut == 'IN_PROCESS_OF_DELIVERY' || statut == 'CLOSED' && (roleUser=='MANAGER_SPACES_2' || roleUser=='SALES_MANAGER' || roleUser=='MANAGER_SPACES_1'
                         || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))"
                         value="bordereau">Bordereau de livraison
                       </option>
 
-                      <option *ngIf="roleUser === 'MANAGER_ORDER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')"  value="préfacture">
+                      <option *ngIf="roleUser === 'COMMERCIAL_ATTACHE' || roleUser === 'SALES_MANAGER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')"  value="préfacture">
                         Préfacture/Proforma
                       </option>
                       <option *ngIf="statut == 'CLOSED' " value="bonCommand">Preuve de Bon de Livraison</option>
                       <option
-                        *ngIf="statut != 'CREATED' && (roleUser == 'MANAGER_COUPON' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))"
+                        *ngIf="statut != 'CREATED' && (roleUser == 'SALES_MANAGER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))"
                         value="preuve">Preuve de paiement
                       </option>
                       <option
@@ -79,7 +79,7 @@
                 </div>
                 <div class="float-right">
                   <button class="btn btn-outline-danger btn-lg mr-3"
-                          *ngIf="statut != 'ORDER_CANCEL' && statut != 'CLOSED' && (roleUser == 'MANAGER_ORDER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))"
+                          *ngIf="statut != 'ORDER_CANCEL' && statut != 'CLOSED' && (roleUser == 'COMMERCIAL_ATTACHE' || roleUser == 'SALES_MANAGER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))"
                           (click)="deny(order)" [disabled]="isCanceling$ | async">
                     <i *ngIf="isCanceling$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
                     <span *ngIf="isCanceling$ | async">Annulation ...</span>
@@ -95,21 +95,21 @@
                     <span *ngIf="isLoading$ | async">Enregistrement ...</span>
                     <span *ngIf="!(isLoading$ | async)">Accepter paiement</span>
                   </button>
-                  <button class="btn btn-outline-primary btn-lg mr-3" *ngIf="statut == 'ACCEPTED' && (roleUser == 'MANAGER_COUPON' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')) " (click)="payOrder()"
+                  <button class="btn btn-outline-primary btn-lg mr-3" *ngIf="statut == 'ACCEPTED' && (roleUser == 'SALES_MANAGER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')) " (click)="payOrder()"
                           [disabled]="(isLoading$ | async)"
                   >
                     <i *ngIf="isLoading$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
                     <span *ngIf="isLoading$ | async">Confirmation ...</span>
                     <span *ngIf="!(isLoading$ | async)">Confirmer paiement</span>
                   </button>
-                  <button class="btn btn-outline-primary btn-lg mr-3" *ngIf="statut == 'PAID' && (roleUser == 'MANAGER_STORE' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))"
+                  <button class="btn btn-outline-primary btn-lg mr-3" *ngIf="statut == 'PAID' && (roleUser == 'SALES_MANAGER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))"
                           (click)="generateBoredereau()"
                           [disabled]="(isLoading$ | async)">
                     <i *ngIf="isLoading$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
                     <span *ngIf="isLoading$ | async">Déclenchement ...</span>
                     <span *ngIf="!(isLoading$ | async)">Déclencher la livraison</span>
                   </button>
-                  <button class="btn btn-outline-primary btn-lg mr-3" *ngIf="statut == 'IN_PROCESS_OF_DELIVERY' && (roleUser == 'MANAGER_COUPON' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))"
+                  <button class="btn btn-outline-primary btn-lg mr-3" *ngIf="statut == 'IN_PROCESS_OF_DELIVERY' && (roleUser == 'SALES_MANAGER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))"
                           [disabled]="(editForm.controls['fileBordereau'].invalid)  || (isLoading$ | async)"
                           (click)="endOrder()">
                     <i *ngIf="isLoading$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
@@ -218,7 +218,7 @@
                                (change)="selectFile($event)">
                       </div>
                     </div>
-                    <div class="col-md-4" *ngIf="statut == 'IN_PROCESS_OF_DELIVERY' && (roleUser == 'MANAGER_COUPON' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))">
+                    <div class="col-md-4" *ngIf="statut == 'IN_PROCESS_OF_DELIVERY' && (roleUser == 'SALES_MANAGER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))">
                       <div class="position-relative form-group">
                         <label for="exampleFile" class="">Importer Bordereau de Livraison</label>
                         <input name="file" id="exampleFile" type="file" class="form-control-file" accept="application/pdf"
@@ -244,11 +244,11 @@
                     <div class="col-md-12">
                       <div class="position-relative form-group">
                         <label for="exampleEmail" class="">Raison d'annulation</label>
-                        <textarea *ngIf="statut != 'ORDER_CANCEL' && statut != 'CLOSED' && (roleUser != 'MANAGER_ORDER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))"
+                        <textarea *ngIf="statut != 'ORDER_CANCEL' && statut != 'CLOSED' && roleUser != 'COMMERCIAL_ATTACHE' || roleUser != 'SALES_MANAGER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')"
                                   name="text" rows="1" id="exampleText" class="form-control" formControlName="reason"
                                   placeholder="raison d'annulation de la commande" ngModel="{{order.reasonForCancellation}}"
                                   [disabled]="statut == 'ORDER_CANCEL' || statut != 'CLOSED'"></textarea>
-                        <textarea *ngIf="roleUser != 'MANAGER_ORDER' && !role.includes('ROLE_ADMIN') && !role.includes('ROLE_SUPERADMIN')" rows="1" class="form-control"
+                        <textarea *ngIf="roleUser != 'COMMERCIAL_ATTACHE' && !role.includes('ROLE_ADMIN') && !role.includes('ROLE_SUPERADMIN')" rows="1" class="form-control"
                                   [value]="order.reasonForCancellation"
                                   disabled></textarea>
                       </div>
@@ -262,7 +262,7 @@
                   commande</a></li>
                 <!--          <li class="nav-item"><a data-toggle="tab" href="#tab-eg10-2" class="nav-link">Etats de la commande</a></li>-->
                 <li class="nav-item"><a data-toggle="tab" href="#tab-eg10-3" class="nav-link"
-                                        *ngIf="statut == 'IN_PROCESS_OF_DELIVERY' && (roleUser == 'STORE_KEEPER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))">Attribution coupon</a></li>
+                                        *ngIf="statut == 'IN_PROCESS_OF_DELIVERY' && (roleUser == 'MANAGER_SPACES_2' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))">Attribution coupon</a></li>
                 <!--          <li class="nav-item"><a data-toggle="tab" href="#tab-eg10-3" class="nav-link">Caisse/Trésorerie</a></li>-->
               </ul>
               <div class="tab-content">
@@ -294,7 +294,7 @@
                     </tfoot>
                   </table>
                 </div>
-                <div class="tab-pane" id="tab-eg10-3" role="tabpanel" *ngIf="statut == 'IN_PROCESS_OF_DELIVERY' && (roleUser == 'STORE_KEEPER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))">
+                <div class="tab-pane" id="tab-eg10-3" role="tabpanel" *ngIf="statut == 'IN_PROCESS_OF_DELIVERY' && (roleUser == 'MANAGER_SPACES_2' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))">
                   <p>Pour rajouter un carnet, veuillez rajouter un de ses coupons, le système sélectionnera
                     automatiquement tous les coupons du dit carnet</p>
                   <div class="modal-body">

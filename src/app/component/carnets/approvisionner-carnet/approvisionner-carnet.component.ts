@@ -97,7 +97,7 @@ export class ApprovisionnerCarnetComponent implements OnInit {
       })
     }  , 1000);
 
-    console.log('supply', this.supply)
+    // console.log('supply', this.supply)
 
     this.cartonService.createCartonSupply(this.supply.idCarton, this.supply.idStoreHouseSell).subscribe(
       resp => {

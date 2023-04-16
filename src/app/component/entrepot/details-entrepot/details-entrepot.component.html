@@ -1,5 +1,5 @@
 
-<div class="app-page-title" *ngIf="roleUser === 'MANAGER_STORE' || roleUser === 'MANAGER_COUPON' || roleUser === 'STORE_KEEPER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+<div class="app-page-title" *ngIf="roleUser === 'MANAGER_SPACES_2' || roleUser === 'SALES_MANAGER' || roleUser === 'MANAGER_SPACES_1' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
   <div class="page-title-wrapper">
     <div class="page-title-heading">
       <div class="page-title-icon">
@@ -22,7 +22,7 @@
   </div>
 </div>
 
-<div class="row" *ngIf="items && (roleUser === 'MANAGER_STORE' || roleUser === 'MANAGER_COUPON' || roleUser === 'STORE_KEEPER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))">
+<div class="row" *ngIf="items && (roleUser === 'MANAGER_SPACES_2' || roleUser === 'SALES_MANAGER' || roleUser === 'MANAGER_SPACES_1' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))">
   <div class="col-md-6 "  style="cursor: pointer;" *ngFor="let cdp of items" [ngClass]="items.length == 3 ? 'col-lg-4' : items.length == 2 ? 'col-lg-6' : 'col-lg-3'">
     <div class="mb-3 widget-chart widget-chart2 text-left card" [ngClass]="cdp.amount == 5000 ? 'card-shadow-danger' :
             (cdp.amount == 3000 ? 'card-shadow-warning' : 'card-shadow-success')">
@@ -153,7 +153,7 @@
 <!--  </div>-->
 <!--</div>-->
 
-<div class="row" *ngIf="storeHouse.type === 'stockage' && (roleUser === 'MANAGER_STORE' || roleUser === 'MANAGER_COUPON' || roleUser === 'STORE_KEEPER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))">
+<div class="row" *ngIf="storeHouse.type === 'stockage' && (roleUser === 'SALES_MANAGER' || roleUser === 'MANAGER_SPACES_1' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))">
   <div class="col-md-12">
     <div class="main-card mb-3 card ">
       <div class="card-header">
@@ -207,7 +207,7 @@
                   {{padWithZero(carton.serialTo, 7)}} A {{removeZeros(carton.typeVoucher.toString())}} -
                   {{padWithZero(carton.serialFrom, 7)}}</td>
 
-                <td>{{carton.idStoreKeeper}}</td>
+                <td>{{carton.idSpaceManager1}}</td>
                 <td>
               <span class="mb-2 mr-2 badge " [ngClass]="carton.status.name == 'AVAILABLE' ? 'badge-success' : 'badge-danger'">
                 {{getStatuts(carton.status.name)}}
@@ -313,7 +313,7 @@
 <!--    </div>-->
 <!--  </div>-->
 <!--</div>-->
-<div class="row"  *ngIf="storeHouse.type === 'vente' && (roleUser === 'MANAGER_STORE' || roleUser === 'MANAGER_COUPON' || roleUser === 'STORE_KEEPER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))">
+<div class="row"  *ngIf="storeHouse.type === 'vente' && (roleUser === 'SALES_MANAGER' || roleUser === 'MANAGER_SPACES_2' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))">
   <div class="col-md-12">
     <div class="main-card mb-3 card " id="htmlData" #htmlData>
       <div class="card-header">

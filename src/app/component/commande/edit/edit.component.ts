@@ -219,7 +219,7 @@ export class EditComponent implements OnInit {
   endOrder() {
     if (this.selectedFiles.item(0).type == 'application/pdf') {
       this.isLoading.next(true);
-      this.order.idManagerCoupon = parseInt(localStorage.getItem('uid'))
+      this.order.idSalesManager = parseInt(localStorage.getItem('uid'))
       this.currentFileUpload = this.selectedFiles.item(0);
       this.orderService.validOrder(this.order.internalReference, this.order.idManagerCoupon, this.currentFileUpload).subscribe(
         resp => {
@@ -237,7 +237,7 @@ export class EditComponent implements OnInit {
   }
 
   payOrder() {
-    this.order.idManagerCoupon = parseInt(localStorage.getItem('uid'))
+    this.order.idSalesManager = parseInt(localStorage.getItem('uid'))
     this.isLoading.next(true);
     this.orderService.payOrder(this.order.internalReference, this.order.idManagerCoupon).subscribe(
       resp => {
@@ -424,7 +424,7 @@ export class EditComponent implements OnInit {
       this.notifsService.onError('veuillez préciser la raison d\'annulation de la commande', '')
     } else {
       this.isCanceling.next(true)
-      this.order.idManagerCoupon = parseInt(localStorage.getItem('uid'))
+      this.order.idCommercialAttache = parseInt(localStorage.getItem('uid'))
       this.order.reasonForCancellation = this.editForm.controls['reason'].value
       this.orderService.denyOrder(this.order.internalReference, this.order.idManagerCoupon, this.order.reasonForCancellation).subscribe(
         res => {

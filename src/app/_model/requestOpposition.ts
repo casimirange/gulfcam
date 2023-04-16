@@ -5,8 +5,8 @@ export class RequestOpposition{
     id?:	number
     internalReference?: number
     idClient:	number
-    idManagerCoupon?:	number
-    idServiceClient?:	number
+    idSalesManager?:	number
+    idCommercialAttache?:	number
     status?:	Status
     reason?:	string
     description?:	string
