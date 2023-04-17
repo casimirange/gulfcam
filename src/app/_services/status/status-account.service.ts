@@ -20,7 +20,7 @@ export class StatusAccountService {
         break;
       case 'DSI_AUDIT': this.status = 'DSI/AUDIT'
         break;
-      case 'TREASURY': this.status = 'CAISSIER/TRESORERIE'
+      case 'TREASURY': this.status = 'CAISSIER/TRESORIER'
         break;
       case 'COMMERCIAL_ATTACHE': this.status = 'ATTACHE COMMERCIAL'
         break;
