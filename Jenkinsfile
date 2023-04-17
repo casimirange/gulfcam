@@ -33,7 +33,7 @@ pipeline {
          }
       }
 
-      stage('Push in registry'){
+      stage('Push in gitlab registry'){
          steps{
             script{
                if ("${REMOTE_BRANCH_NAME}" == 'dev'){
