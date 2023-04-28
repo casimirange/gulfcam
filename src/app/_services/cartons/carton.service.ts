@@ -6,6 +6,7 @@ import {CustomResponse} from "../../_interfaces/custom-response";
 import {Client} from "../../_model/client";
 import {catchError} from "rxjs/operators";
 import {Carton} from "../../_model/carton";
+import {Coupon} from "../../_model/coupon";
 
 @Injectable({
   providedIn: 'root'
@@ -52,6 +53,10 @@ export class CartonService {
 
   cartonsByStoreHouse$ = (idStoreHouse: number, page: number, size: number) => <Observable<CustomResponse<Carton>>>
     this.http.get<CustomResponse<Carton>>(environment.carton + `/storehouse/${idStoreHouse}?page=${page}&size=${size}`,)
+      .pipe(catchError(this.handleError));
+
+  filterCarton$ = (number?: string, statut?: string, type?: string, storehouse?: string, spacemanager1?: string, date?: string, page?: number, size?: number) => <Observable<CustomResponse<Carton>>>
+    this.http.get<CustomResponse<Carton>>(environment.carton + `/filter?page=${page}&size=${size}&number=${number}&status=${statut}&storehouse=${storehouse}&type=${type}&spacemanager1=${spacemanager1}&date=${date}`,)
       .pipe(catchError(this.handleError));
 
   handleError(error: HttpErrorResponse): Observable<never>{

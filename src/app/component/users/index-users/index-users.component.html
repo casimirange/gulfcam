@@ -37,8 +37,17 @@
           </div>
         </div>
       </div>
-
+      <ng-container class="bg-white" *ngIf="(appState$ | async) as appState" [ngSwitch]="appState.dataState">
       <div class="table-responsive" >
+        <ng-container class="bg-white" *ngSwitchCase="DataState.LOADING_STATE">
+          <div class="col-md-12 text-center my-3">
+            <!--                <div class="spinner-border text-primary my-3" role="status"></div>-->
+            <div class="ball-clip-rotate">
+              <div style="background-color: rgb(68, 64, 84);"></div>
+            </div>
+          </div>
+        </ng-container>
+        <ng-container class="bg-white py-1 px-1" *ngSwitchCase="DataState.LOADED_STATE">
         <table class="table table-hover bg-white" id="element-pannes">
           <thead>
           <tr>
@@ -56,7 +65,7 @@
           </tr>
           </thead>
           <tbody>
-          <tr *ngFor="let user of users | paginate: { id: 'users', itemsPerPage: size, currentPage: page, totalItems: totalElements }">
+          <tr *ngFor="let user of appState.appData.content | paginate: { id: 'allusers0', itemsPerPage: appState.appData.size, currentPage: page, totalItems: appState.appData.totalElements }">
             <td class="text-left">{{user.internalReference}}</td>
             <td class="text-left">{{user.lastName}}</td>
             <td class="text-left">{{user.firstName}}</td>
@@ -80,36 +89,39 @@
                 <i class="pe-7s-look" title="consulter"></i>
               </button>
             </td>
-            <!--              <td class="text-left" > type 1 </td>-->
-<!--            <td class="text-left" ><span *ngFor="let store of stores">{{store.internalReference == order.idStore ? store.localization : ''}}</span></td>-->
-<!--            <td class="text-left" > <span class="text-focus">{{order.status.name === 'ORDER_CREATED' ? 'créée' : order.status.name === 'ORDER_COMPLETED'-->
-<!--              ? 'terminée' : ''}}</span> </td>-->
           </tr>
 
           </tbody>
 
         </table>
         <div class="text-center">
-          <p *ngIf="users.length === 0" style="color: grey; font-size: 1.8rem;" class="mx-auto" >Aucun utilisateur trouvé !</p>
+          <p *ngIf="appState.appData.totalElements == 0" style="color: grey; font-size: 1.8rem;" class="mx-auto">Aucun utilisateur trouvé !</p>
         </div>
         <div class="card-footer">
           <div class="btn-actions-pane-left">
             <div role="group" class="btn-group-sm btn-group">
-              Total : <b>{{ totalElements }} </b>
+              Total : <b>{{ appState.appData.totalElements }} </b>
             </div>
           </div>
           <div class="btn-actions-pane-right">
             <div role="group" class="btn-group-sm btn-group">
               <!--              <pagination-controls id="client" (pageChange)="pageChange($event)" ></pagination-controls>-->
               <pagination-controls
-                id="users"
+                id="allusers0"
                 previousLabel="Précédent"
                 nextLabel="Suivant"
-                (pageChange)="pageChange($event)"></pagination-controls>
+                (pageChange)="pageChanges($event)"></pagination-controls>
             </div>
           </div>
         </div>
+        </ng-container>
+        <ng-container class="bg-white"  *ngSwitchCase="DataState.ERROR_STATE">
+          <div class="col-md-12 text-center">
+            <div class="text-danger" >{{appState.error}}</div>
+          </div>
+        </ng-container>
       </div>
+      </ng-container>
     </div>
   </div>
 </div>

@@ -5,6 +5,7 @@ import {environment} from "../../../environments/environment";
 import {CustomResponse} from "../../_interfaces/custom-response";
 import {catchError} from "rxjs/operators";
 import {Coupon} from "../../_model/coupon";
+import {Order} from "../../_model/order";
 
 @Injectable({
   providedIn: 'root'
@@ -45,7 +46,7 @@ export class CouponService {
    *
    */
 
-  coupons$ = (page: number, size: number) => <Observable<CustomResponse<Coupon>>>
+  coupons$ = (page?: number, size?: number) => <Observable<CustomResponse<Coupon>>>
     this.http.get<CustomResponse<Coupon>>(environment.coupon + `?page=${page}&size=${size}`,)
       .pipe(catchError(this.handleError));
 
@@ -68,4 +69,8 @@ export class CouponService {
   handleError(error: HttpErrorResponse): Observable<never>{
     return throwError(`Une erreur est survenue: ${error.error.message.toString().bold()}` )
   }
+
+  filterCoupon$ = (serialNumber?: string, statut?: string, type?: string, clientName?: string, stationName?: string, page?: number, size?: number) => <Observable<CustomResponse<Coupon>>>
+    this.http.get<CustomResponse<Coupon>>(environment.coupon + `/filter?page=${page}&size=${size}&serialnumber=${serialNumber}&status=${statut}&client=${clientName}&type=${type}&station=${stationName}`,)
+      .pipe(catchError(this.handleError));
 }

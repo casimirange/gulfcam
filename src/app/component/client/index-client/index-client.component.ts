@@ -35,11 +35,16 @@ export class IndexClientComponent implements OnInit {
   page: number = 1;
   totalPages: number;
   totalElements: number;
-  size: number = 10;
+  size: number = 20;
   roleUser = localStorage.getItem('userAccount').toString()
   role: string[] = []
   modalTitle = 'Enregistrer nouveau client'
   @ViewChild('mymodals', {static: false}) viewMe?: ElementRef<HTMLElement>;
+  onFilter: boolean = false;
+  dateFilter? = ''
+  typeFilter? = ''
+  clientNameFilter? = ''
+  companyNameFilter? = ''
 
   constructor(private fb: FormBuilder, private modalService: NgbModal, private clientService: ClientService, private router: Router,
               private notifService: NotifsService) {
@@ -70,10 +75,11 @@ export class IndexClientComponent implements OnInit {
 
   pageChange(event: number) {
     this.page = event
-    this.appState$ = this.clientService.clients$(this.page - 1, this.size)
+    this.appState$ = this.clientService.filterClient$(this.companyNameFilter, this.typeFilter, this.clientNameFilter, this.dateFilter, this.page - 1, this.size)
       .pipe(
         map(response => {
           this.dataSubjects.next(response)
+          // this.notifsService.onSuccess('Chargement des commandes')
           return {dataState: DataState.LOADED_STATE, appData: response}
         }),
         startWith({dataState: DataState.LOADING_STATE, appData: null}),
@@ -88,10 +94,11 @@ export class IndexClientComponent implements OnInit {
       completeName: ['', [Validators.required, Validators.minLength(3)]],
       companyName: [''],
       email: ['', [Validators.email]],
-      phone: ['', [Validators.required, ]],
+      phone: ['', [Validators.required,]],
       address: ['', [Validators.required, Validators.minLength(5)]],
       gulfcamAccountNumber: ['', [Validators.required, Validators.pattern('^[0-9 ]*$')]],
       rccm: [''],
+      niu: [''],
       typeClient: ['', [Validators.required]],
     });
   }
@@ -102,9 +109,9 @@ export class IndexClientComponent implements OnInit {
     // this.client.phone = this.clientForm.controls['phone'].value.e164Number
     this.appState$ = this.clientService.addClient$(this.client)
       .pipe(
-        map((response ) => {
+        map((response) => {
           this.dataSubjects.next(
-            {...this.dataSubjects.value , content: [response, ...this.dataSubjects.value.content]}
+            {...this.dataSubjects.value, content: [response, ...this.dataSubjects.value.content]}
           )
           this.annuler()
           this.isLoading.next(false)
@@ -194,7 +201,7 @@ export class IndexClientComponent implements OnInit {
     this.isLoading.next(true)
     this.appState$ = this.clientService.deleteClient$(internalRef)
       .pipe(
-        map((response ) => {
+        map((response) => {
           const index = this.dataSubjects.value.content.findIndex(client => client.internalReference === internalRef)
           this.dataSubjects.value.content.splice(index, 1)
           this.isLoading.next(false)
@@ -209,7 +216,33 @@ export class IndexClientComponent implements OnInit {
       )
   }
 
-  telInputObject($event: any) {
-    console.log($event);
+  showFilter() {
+    this.onFilter = !this.onFilter
+
+    if (!this.onFilter) {
+      this.dateFilter = '';
+      this.companyNameFilter = '';
+      this.typeFilter = '';
+      this.clientNameFilter = '';
+      this.filterClients()
+    }
   }
+
+
+  filterClients() {
+    this.page = 1
+    this.appState$ = this.clientService.filterClient$(this.companyNameFilter, this.typeFilter, this.clientNameFilter, this.dateFilter, this.page - 1, this.size)
+      .pipe(
+        map(response => {
+          this.dataSubjects.next(response)
+          // this.notifsService.onSuccess('Chargement des commandes')
+          return {dataState: DataState.LOADED_STATE, appData: response}
+        }),
+        startWith({dataState: DataState.LOADING_STATE, appData: null}),
+        catchError((error: string) => {
+          return of({dataState: DataState.ERROR_STATE, error: error})
+        })
+      )
+  }
+
 }

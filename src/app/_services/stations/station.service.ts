@@ -1,8 +1,12 @@
 import { Injectable } from '@angular/core';
-import {HttpClient} from "@angular/common/http";
-import {Observable, Subject} from "rxjs";
+import {HttpClient, HttpErrorResponse} from "@angular/common/http";
+import {Observable, Subject, throwError} from "rxjs";
 import {environment} from "../../../environments/environment";
-import {tap} from "rxjs/operators";
+import {catchError, tap} from "rxjs/operators";
+import {CustomResponse} from "../../_interfaces/custom-response";
+import {Coupon} from "../../_model/coupon";
+import {Station} from "../../_model/station";
+import {Client} from "../../_model/client";
 
 @Injectable({
   providedIn: 'root'
@@ -43,4 +47,28 @@ export class StationService {
   getStationByInternalref(internalref: number): Observable<any>{
     return this.http.get<any>(environment.station+`/${internalref}`)
   }
+
+  searchStation(designation: string): Observable<any>{
+    return this.http.get<any>(environment.station+ `/like/${designation}`)
+  }
+
+  filtrerStation(designation?: string, localization?: string, pinCode?: string, idManagerStation?: string, page?: number, size?: number): Observable<any>{
+    return this.http.get<any>(environment.station+ `/filter?page=${page}&size=${size}&designation=${designation}&localization=${localization}&pinCode=${pinCode}&idManagerStation=${idManagerStation}`)
+  }
+
+  handleError(error: HttpErrorResponse): Observable<never>{
+    return throwError(`Une erreur est survenue: ${error.error.message.toString().bold()}` )
+  }
+
+  filterStation$ = (designation?: string, localization?: string, pinCode?: string, idManagerStation?: string, page?: number, size?: number) => <Observable<CustomResponse<Station>>>
+    this.http.get<CustomResponse<Station>>(environment.station + `/filter?page=${page}&size=${size}&designation=${designation}&localization=${localization}&pinCode=${pinCode}&idManagerStation=${idManagerStation}`,)
+      .pipe(catchError(this.handleError));
+
+  addStation$ = (station: Station) => <Observable<Station>>
+    this.http.post<Station>(environment.station, station)
+      .pipe(catchError(this.handleError));
+
+  updateStation$ = (station: Station, internalRef: number) => <Observable<Station>>
+    this.http.post<Station>(environment.station+`/${internalRef}`, station)
+      .pipe(catchError(this.handleError));
 }

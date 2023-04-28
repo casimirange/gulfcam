@@ -32,6 +32,69 @@
         Liste des coupons
         <div class="btn-actions-pane-right">
           <div role="group" class="btn-group-sm btn-group">
+                <button class="btn btn-icon btn-pill border-0 btn-transition" [ngClass]="onFilter? 'btn-outline-light' : 'btn-light'" (click)="showFilter()">
+                  <i class="fa btn-icon-wrapper fa-sliders-h"></i>
+                  {{!onFilter ? "Filtrer" : "Annuler"}}
+                </button>
+          </div>
+        </div>
+      </div>
+      <div class="card-body bg-tempting-azure card-header-tab-animation fadeInLeft"  *ngIf="onFilter">
+
+        <div class="menu-header-subtitle">
+          <div role="group" class="btn-group-sm btn-group">
+            <form class="form-row">
+            <div class="position-relative form-group mr-2">
+            <label for="stats" class="text-dark font-weight-bold">Statut</label>
+            <select name="stat" id="stats" class="form-control form-control-sm mr-3" [(ngModel)]="statusFilter" (ngModelChange)="filterCoupons()">
+              <option value="" selected disabled hidden>Choix statut</option>
+              <!--              <option value="CREATED">CREE</option>-->
+              <option value="ACCEPTED">ACCEPTE</option>
+              <option value="CANCELED">ANNULE</option>
+              <option value="USED">UTILISE</option>
+              <option value="ACTIVATED">ACTIVE</option>
+              <option value="SUSPENDED">SUSPENDU</option>
+              <option value="AVAILABLE">DISPONIBLE</option>
+              <option value="">Tout afficher</option>
+            </select>
+            </div>
+            <div class="position-relative form-group  mr-2 ">
+              <label for="typ" class="text-dark font-weight-bold">Type de coupon</label>
+            <select name="stat" id="typ" class="form-control form-control-sm mr-3" [(ngModel)]="typeFilter" (ngModelChange)="filterCoupons()">
+              <option value="" selected disabled hidden>Type</option>
+              <option value="{{v.internalReference}}" *ngFor="let v of vouchers">{{v.amount}}</option>
+              <option value="">Tout afficher</option>
+            </select>
+            </div>
+              <div class="position-relative form-group  mr-2">
+                <label for="client" class="text-dark font-weight-bold">Recherche par client</label>
+<!--            <input type="text" name="client" id="client" placeholder="Rechercher client" [(ngModel)]="clientName" (ngModelChange)="filterCoupons()"-->
+<!--                   class="form-control form-control-sm mr-3">-->
+                <input type="text" id="client" name="client" [(ngModel)]="clientName" (ngModelChange)="findClients($event); " autocomplete="off"
+                       class="form-control form-control-sm mr-3" list="clientsListOption"
+                       placeholder="cherchez un client">
+                <datalist id="clientsListOption">
+                  <option *ngFor="let client of clients" [value]="client.completeName"></option>
+                </datalist>
+              </div>
+              <div class="position-relative form-group  mr-2">
+                <label for="station" class="text-dark font-weight-bold">Recherche par station</label>
+<!--            <input type="text" name="client" id="client" placeholder="Rechercher client" [(ngModel)]="clientName" (ngModelChange)="filterCoupons()"-->
+<!--                   class="form-control form-control-sm mr-3">-->
+                <input type="text" id="station" name="station" [(ngModel)]="stationName" (ngModelChange)="findStation($event); " autocomplete="off"
+                       class="form-control form-control-sm mr-3" list="stationsListOption"
+                       placeholder="cherchez une station">
+                <datalist id="stationsListOption">
+                  <option *ngFor="let station of stations" [value]="station.designation"></option>
+                </datalist>
+              </div>
+              <div class="position-relative form-group  mr-2">
+                <label for="serial" class="text-dark font-weight-bold">Recherche par N° Série</label>
+            <input type="text" name="serial" id="serial" placeholder="Rechercher numéro" [(ngModel)]="serialNumber" (ngModelChange)="filterCoupons()"
+                   class="form-control form-control-sm mr-3">
+              </div>
+            <!--            <button class="btn btn-sm mr-3 text-primary" (click)="filterOrders()"><i class="fa fa-search"></i></button>-->
+            </form>
           </div>
         </div>
       </div>

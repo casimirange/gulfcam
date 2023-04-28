@@ -3,7 +3,7 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {Store} from "../../../_model/store";
 import {Unite} from "../../../_model/unite";
 import {TypeVoucher} from "../../../_model/typeVoucher";
-import {BehaviorSubject} from "rxjs";
+import {BehaviorSubject, Observable, of} from "rxjs";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {StoreService} from "../../../_services/store/store.service";
 import {Router} from "@angular/router";
@@ -21,6 +21,10 @@ import {StatusOrderService} from "../../../_services/status/status-order.service
 import {StatusService} from "../../../_services/status/status.service";
 import {ISignup} from "../../../_model/signup";
 import {CouponService} from "../../../_services/coupons/coupon.service";
+import {AppState} from "../../../_interfaces/app-state";
+import {CustomResponse} from "../../../_interfaces/custom-response";
+import {DataState} from "../../../_enum/data.state.enum";
+import {catchError, map, startWith} from "rxjs/operators";
 
 @Component({
   selector: 'app-index-request-opposition',
@@ -32,6 +36,7 @@ export class IndexRequestOppositionComponent implements OnInit {
   requestForm: FormGroup;
   stores: Store[] = [];
   users: ISignup[] = [];
+  usersCA: ISignup[] = [];
   store: Store = new Store();
   canaux = ['Appel', 'Courier papier', 'Email', 'Sur site']
   requestOpposition: RequestOpposition = new RequestOpposition();
@@ -39,6 +44,9 @@ export class IndexRequestOppositionComponent implements OnInit {
   unit: Unite = new Unite();
   clients: Client[]
   vouchers: number[] = []
+  appState$: Observable<AppState<CustomResponse<RequestOpposition>>>;
+  readonly DataState = DataState;
+  private dataSubjects = new BehaviorSubject<CustomResponse<RequestOpposition>>(null);
   private isLoading = new BehaviorSubject<boolean>(false);
   isLoading$ = this.isLoading.asObservable();
   modalTitle: string = 'Enregistrer nouvelle requête';
@@ -48,7 +56,13 @@ export class IndexRequestOppositionComponent implements OnInit {
   totalPages: number;
   totalElements: number;
   size: number = 10;
-
+  clientName = '';
+  statusFilter = '';
+  saleManagerFilter = '';
+  attacheComFilter = '';
+  date = '';
+  private clientNotFound: boolean;
+  onFilter = false;
   constructor(private modalService: NgbModal, private fb: FormBuilder, private storeService: StoreService, private router: Router,
               private notifService: NotifsService, private unitService: UnitsService, private voucherService: VoucherService,
               private clientService: ClientService, private userService: UsersService, private requestService: OppositionService,
@@ -60,8 +74,9 @@ export class IndexRequestOppositionComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.getClients();
+    // this.getClients();
     this.getUsers();
+    this.getUsersCA();
     this.getRequests();
   }
 
@@ -71,7 +86,7 @@ export class IndexRequestOppositionComponent implements OnInit {
       idClient: ['', [Validators.required]],
       reason: ['', [Validators.required, Validators.minLength(3)]],
       description: ['', [Validators.required, Validators.minLength(3)]],
-      idManagerCoupon: ['', [Validators.required,]],
+      // idManagerCoupon: ['', ],
       serialNumber: ['', [Validators.required, Validators.pattern('^[0-9]*'),]],
     });
   }
@@ -87,23 +102,24 @@ export class IndexRequestOppositionComponent implements OnInit {
     this.requestOpposition.description = this.requestForm.controls['description'].value
     this.requestOpposition.idCommercialAttache = parseInt(localStorage.getItem('uid'))
     this.requestOpposition.idClient = this.clients.find(client => client.completeName === this.requestForm.controls['idClient'].value).internalReference
-    this.requestOpposition.idSalesManager = parseInt(this.requestForm.controls['idManagerCoupon'].value)
-
-    this.vouchers.forEach(value => {
-      let client = this.clients.find(client => client.completeName === this.requestForm.controls['idClient'].value)
-      this.couponService.getCouponsBySerialNumber(value.toString()).subscribe(
-        res => {
-          if (res.idClient != client.internalReference) {
-            this.notifService.onWarning(`le coupon ${value} n'appartient pas à ce client`)
-          }else {
-            this.requestOpposition.serialCoupons.push(value)
-          }
-        },
-      )
-    })
+    // this.requestOpposition.idSalesManager = parseInt(this.requestForm.controls['idManagerCoupon'].value)
+    // console.log("vouchers", this.vouchers)
+    this.requestOpposition.serialCoupons = this.vouchers
+    // this.vouchers.forEach(value => {
+    //   let client = this.clients.find(client => client.completeName === this.requestForm.controls['idClient'].value)
+    //   this.couponService.getCouponsBySerialNumber(value.toString()).subscribe(
+    //     res => {
+    //       if (res.idClient != client.internalReference) {
+    //         this.notifService.onWarning(`le coupon ${value} n'appartient pas à ce client`)
+    //       }else {
+    //         this.requestOpposition.serialCoupons.push(value)
+    //       }
+    //     },
+    //   )
+    // })
     // this.requestOpposition.serialCoupons = this.vouchers
     this.isLoading.next(true);
-    console.log('demande d\'opposition', this.requestOpposition)
+    // console.log('demande d\'opposition', this.requestOpposition)
     this.requestService.saveOppositionRequest(this.requestOpposition).subscribe(
       resp => {
         // this.requestOppositions.push(resp)
@@ -120,13 +136,35 @@ export class IndexRequestOppositionComponent implements OnInit {
   }
 
   getRequests() {
-    this.requestService.getOppositionRequest(this.page - 1, this.size).subscribe(
+    this.appState$ = this.requestService.requests$(this.page - 1, this.size, this.clientName, this.date, this.statusFilter, this.attacheComFilter, this.saleManagerFilter)
+      .pipe(
+        map(response => {
+          this.dataSubjects.next(response)
+          return {dataState: DataState.LOADED_STATE, appData: response}
+        }),
+        startWith({dataState: DataState.LOADING_STATE, appData: null}),
+        catchError((error: string) => {
+          return of({dataState: DataState.ERROR_STATE, error: error})
+        })
+      )
+    // this.requestService.getOppositionRequest(this.page - 1, this.size).subscribe(
+    //   resp => {
+    //     this.requestOppositions = resp.content
+    //     // this.size = resp.size
+    //     this.totalPages = resp.totalPages
+    //     this.totalElements = resp.totalElements
+    //     this.notifService.onSuccess('Liste des demandes d\'opposition')
+    //   },
+    // )
+  }
+
+  filterRequests() {
+    this.requestService.filterOppositionRequest(this.page - 1, this.size, this.clientName, this.date, this.statusFilter).subscribe(
       resp => {
         this.requestOppositions = resp.content
         // this.size = resp.size
         this.totalPages = resp.totalPages
         this.totalElements = resp.totalElements
-        this.notifService.onSuccess('Liste des demandes d\'opposition')
       },
     )
   }
@@ -139,12 +177,39 @@ export class IndexRequestOppositionComponent implements OnInit {
     )
   }
 
+  findClients(event: string): Client[]{
+    if (event != '' && event.length >= 3){
+      this.clientService.searchClient(event) .subscribe(
+        resp => {
+          this.clients = resp;
+          if (!resp.length){
+            this.notifService.onError('Ce client n\'existe pas', '')
+            this.clientNotFound = true
+          }else {
+            this.clientNotFound = false
+          }
+        }
+      )
+    }else {
+      this.clients = []
+    }
+    return this.clients
+  }
+
   getUsers() {
-    console.log(this.requestForm.value)
-    this.userService.getUsers().subscribe(
+    const type = 'SALES_MANAGER'
+    this.userService.getUsersByTypeAccount(type).subscribe(
       resp => {
-        this.users = resp.content
-        this.users = this.users.filter(user => user.typeAccount.name === 'MANAGER_COUPON')
+        this.users = resp
+      },
+    )
+  }
+
+  getUsersCA() {
+    const type = 'COMMERCIAL_ATTACHE'
+    this.userService.getUsersByTypeAccount(type).subscribe(
+      resp => {
+        this.usersCA = resp
       },
     )
   }
@@ -164,7 +229,6 @@ export class IndexRequestOppositionComponent implements OnInit {
 
   updateRequest() {
     this.isLoading.next(true);
-    console.log(this.requestForm.controls['localization'].value)
     // this.storeService.updateStore(this.requestForm.value, this.store.internalReference).subscribe(
     //   resp => {
     //     this.isLoading.next(false);
@@ -183,17 +247,15 @@ export class IndexRequestOppositionComponent implements OnInit {
   //   this.router.navigate(['/entrepots/details', store.internalReference])
   // }
 
-  findClients(event: any): void {
-    console.log(event)
-    this.clientService.searchClient(event).subscribe(
-      resp => {
-        this.clients = resp;
-        console.log(resp)
-      }, error => {
-        this.clients = []
-      }
-    )
-  }
+  // findClients(event: any): void {
+  //   this.clientService.searchClient(event).subscribe(
+  //     resp => {
+  //       this.clients = resp;
+  //     }, error => {
+  //       this.clients = []
+  //     }
+  //   )
+  // }
 
   addCoupon() {
     // let str= this.requestForm.controls['serialNumber'].value.toString();
@@ -223,11 +285,8 @@ export class IndexRequestOppositionComponent implements OnInit {
   }
 
   removeCoupon(coupon: number) {
-    console.log(this.vouchers.indexOf(coupon))
     const prodIndex = this.vouchers.indexOf(coupon)
     this.vouchers.splice(prodIndex, 1)
-    console.log('prod', coupon)
-    console.log('produit', this.vouchers)
   }
 
   requestDetails(request: RequestOpposition) {
@@ -241,5 +300,41 @@ export class IndexRequestOppositionComponent implements OnInit {
   pageChange(event: number) {
     this.page = event
     this.getRequests()
+  }
+
+  showFilter() {
+    this.onFilter = !this.onFilter
+
+    if (!this.onFilter) {
+      this.date = '';
+      this.clientName = '';
+      this.statusFilter = '';
+      this.attacheComFilter = '';
+      this.saleManagerFilter = '';
+      this.getRequests()
+    }
+  }
+
+  findClientsForFilter(event: string): Client[]{
+    if (event != '' && event.length >= 3){
+      this.clientService.searchClient(event) .subscribe(
+        resp => {
+          this.clients = resp;
+          if (this.clients.length <= 1){
+            this.getRequests()
+          }
+
+          if (!resp.length){
+            this.notifService.onError('Ce client n\'existe pas', '')
+          }
+        }
+      )
+    }else {
+      if (this.clientName == ''){
+        this.getRequests()
+      }
+      this.clients = []
+    }
+    return this.clients
   }
 }

@@ -6,7 +6,7 @@ import { StockCartonComponent } from './stock-carton/stock-carton.component';
 import { TransfererCartonComponent } from './transferer-carton/transferer-carton.component';
 import { CartonLayoutComponent } from './carton-layout/carton-layout.component';
 import {SharedModule} from "../shared/shared.module";
-import {ReactiveFormsModule} from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {NgxPaginationModule} from "ngx-pagination";
 
 
@@ -21,7 +21,8 @@ import {NgxPaginationModule} from "ngx-pagination";
         CartonsRoutingModule,
         SharedModule,
         ReactiveFormsModule,
-        NgxPaginationModule
+        NgxPaginationModule,
+        FormsModule
     ]
 })
 export class CartonsModule { }

@@ -19,7 +19,7 @@ import { CouponLayoutComponent } from './component/coupons/coupon-layout/coupon-
 import { IndexCouponComponent } from './component/coupons/index-coupon/index-coupon.component';
 import {BnNgIdleService} from "bn-ng-idle";
 import { CreditNoteLayoutComponent } from './component/creditNote/credit-note-layout/credit-note-layout.component';
-import {ReactiveFormsModule} from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import { LoaderComponent } from './preloader/loader/loader.component';
 import {ConnectionServiceModule} from "ng-connection-service";
 import {TokenService} from "./_services/token/token.service";
@@ -40,22 +40,23 @@ import {TokenService} from "./_services/token/token.service";
 
 
   ],
-  imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    AppRoutingModule,
-    SharedModule,
-    HttpClientModule,
-    NgbModule,
-    NgOtpInputModule,
-    NgxPaginationModule,
-    ReactiveFormsModule,
-    ConnectionServiceModule
-    // SweetAlert2Module.forRoot(),
-    // Ng2SearchPipeModule,
-    // Ng2OrderModule
-    // OnlineStatusModule
-  ],
+    imports: [
+        BrowserModule,
+        BrowserAnimationsModule,
+        AppRoutingModule,
+        SharedModule,
+        HttpClientModule,
+        NgbModule,
+        NgOtpInputModule,
+        NgxPaginationModule,
+        ReactiveFormsModule,
+        ConnectionServiceModule,
+        FormsModule,
+        // SweetAlert2Module.forRoot(),
+        // Ng2SearchPipeModule,
+        // Ng2OrderModule
+        // OnlineStatusModule
+    ],
   providers: [
     TokenInterceptorProvider,
     BnNgIdleService,

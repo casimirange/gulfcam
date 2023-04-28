@@ -109,9 +109,4 @@ export class LoginComponent implements OnInit {
     );
   }
 
-  connect(){
-
-  }
-
-
 }

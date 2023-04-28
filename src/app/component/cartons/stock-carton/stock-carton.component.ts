@@ -24,6 +24,8 @@ import {AppState} from "../../../_interfaces/app-state";
 import {CustomResponse} from "../../../_interfaces/custom-response";
 import {Client} from "../../../_model/client";
 import {DataState} from "../../../_enum/data.state.enum";
+import {UsersService} from "../../../_services/users/users.service";
+import {ISignup} from "../../../_model/signup";
 
 @Component({
   selector: 'app-stock-carton',
@@ -40,6 +42,7 @@ export class StockCartonComponent implements OnInit {
   coupon: Coupon = new Coupon();
   mvtStock: Stock = new Stock();
   vouchers: TypeVoucher[] = [];
+  users: ISignup[] = [];
   @ViewChild('mymodal', {static: false}) viewMe?: ElementRef<HTMLElement>;
   cartonForm: FormGroup;
   storeHouseType = ['stockage', 'vente']
@@ -72,11 +75,17 @@ export class StockCartonComponent implements OnInit {
   size: number = 20;
   roleUser = localStorage.getItem('userAccount').toString()
   role: string[] = []
-
+  onFilter = false;
+  number = '';
+  statusFilter = '';
+  typeFilter = '';
+  spaceManager = '';
+  dateFilter = '';
+  idStoreHouse = '';
   constructor(private fb: FormBuilder, private modalService: NgbModal, private storeHouseService: StoreHouseService,
               private storeService: StoreService, private notifService: NotifsService, private cartonService: CartonService,
               private carnetService: CarnetService, private voucherService: VoucherService, private couponService: CouponService,
-              private mvtStockService: MvtStockService, private statusService: StatusService) {
+              private mvtStockService: MvtStockService, private statusService: StatusService, private userService: UsersService) {
     this.formCarton();
     JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
       this.role.push(authority);
@@ -85,6 +94,7 @@ export class StockCartonComponent implements OnInit {
 
   ngOnInit(): void {
     this.getTypeVoucher();
+    this.getUsers();
     this.getStoreHouses();
     this.getCartons();
   }
@@ -113,7 +123,7 @@ export class StockCartonComponent implements OnInit {
 
   //récupération de la liste des entrepots
   getCartons() {
-    this.appState$ = this.cartonService.cartons$(this.page - 1, this.size)
+    this.appState$ = this.cartonService.filterCarton$(this.number, this.statusFilter, this.typeFilter, this.idStoreHouse, this.spaceManager, this.dateFilter, this.page - 1, this.size)
       .pipe(
         map(response => {
           this.dataSubjects.next(response)
@@ -174,6 +184,16 @@ export class StockCartonComponent implements OnInit {
     )
   }
 
+  getUsers(): void {
+    const type = 'MANAGER_SPACES_1'
+    this.userService.getUsersByTypeAccount(type.toString()).subscribe(
+      resp => {
+        console.log(resp)
+        this.users = resp
+      }
+    )
+  }
+
   annuler() {
     this.formCarton();
     this.cartonForm.reset()
@@ -188,8 +208,6 @@ export class StockCartonComponent implements OnInit {
   }
 
   //open modal
-
-
   open(content: any) {
     const modal = true;
     this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title', size: 'lg'});
@@ -201,7 +219,7 @@ export class StockCartonComponent implements OnInit {
 
   pageChange(event: number) {
     this.page = event
-    this.appState$ = this.cartonService.cartons$(this.page - 1, this.size)
+    this.appState$ = this.cartonService.filterCarton$(this.number, this.statusFilter, this.typeFilter, this.idStoreHouse, this.spaceManager, this.dateFilter, this.page - 1, this.size)
       .pipe(
         map(response => {
           this.dataSubjects.next(response)
@@ -216,5 +234,35 @@ export class StockCartonComponent implements OnInit {
 
   removeZeros(coupon: string): string {
     return coupon.replace(/[0]/g, '')
+  }
+
+  showFilter() {
+    this.onFilter = !this.onFilter
+
+    if (!this.onFilter){
+      this.number = '';
+      this.statusFilter = '';
+      this.typeFilter = '';
+      this.spaceManager = '';
+      this.dateFilter = '';
+      this.idStoreHouse = '';
+      this.filterCartons()
+    }
+  }
+
+  filterCartons() {
+    this.page=1
+    this.appState$ = this.cartonService.filterCarton$(this.number, this.statusFilter, this.typeFilter, this.idStoreHouse, this.spaceManager, this.dateFilter, this.page - 1, this.size)
+      .pipe(
+        map(response => {
+          this.dataSubjects.next(response)
+          // this.notifsService.onSuccess('Chargement des commandes')
+          return {dataState: DataState.LOADED_STATE, appData: response}
+        }),
+        startWith({dataState: DataState.LOADING_STATE, appData: null}),
+        catchError((error: string) => {
+          return of({dataState: DataState.ERROR_STATE, error: error})
+        })
+      )
   }
 }

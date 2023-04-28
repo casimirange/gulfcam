@@ -57,9 +57,11 @@ export class IndexCommandComponent implements OnInit {
   filtredOrders: Order[] = [];
   order: Order = new Order();
   @ViewChild('orderModal', { static: false }) commandModal?: ElementRef<HTMLElement>;
-  name = ''
+  clientName = ''
+  storeFilter = localStorage.getItem('store')
+  statusFilter = ''
   refCli = ''
-  date = ''
+  date = '';
   internalRef = ''
   page: number = 1;
   totalPages: number;
@@ -75,6 +77,7 @@ export class IndexCommandComponent implements OnInit {
   roleUser = localStorage.getItem('userAccount').toString()
   role: string[] = []
   clientNotFound: boolean = false;
+  onFilter: boolean = false;
   constructor(private fb: FormBuilder, private modalService: NgbModal, private clientService: ClientService,
               private voucherService: VoucherService, private notifsService: NotifsService, private storeService: StoreService,
               private productService: ProductService, private orderService: OrderService, private statusService: StatusOrderService,
@@ -88,6 +91,7 @@ export class IndexCommandComponent implements OnInit {
   }
 
   //initialisation de création du formulaire de commande
+
   formOrder(){
     this.orderForm = this.fb.group({
       client: ['', [Validators.required, Validators.minLength(3)]],
@@ -120,8 +124,6 @@ export class IndexCommandComponent implements OnInit {
     if (event != '' && event.length >= 3){
       this.clientService.searchClient(event) .subscribe(
         resp => {
-          console.log(resp)
-          console.log(resp.length)
           this.clients = resp;
           if (!resp.length){
             this.notifsService.onError('Ce client n\'existe pas', '')
@@ -135,20 +137,6 @@ export class IndexCommandComponent implements OnInit {
       this.clients = []
     }
     return this.clients
-  }
-
-  findStore(event: string): Store[]{
-    if (event != '' && event.length >= 3){
-      this.storeService.searchStore(event) .subscribe(
-        resp => {
-          this.stores = resp;
-        }
-      )
-    }else {
-      this.stores = []
-    }
-    return this.stores
-
   }
 
   getStores(){
@@ -216,15 +204,46 @@ export class IndexCommandComponent implements OnInit {
   }
 
   getOrders(){
-    this.orderState$ = this.orderService.orders$(this.page - 1, this.size)
+    this.orderState$ = this.orderService.filterOrders$(
+      this.storeFilter , this.clientName, this.date, this.internalRef, this.statusFilter,
+      this.page - 1, this.size)
       .pipe(
         map(response => {
           this.dataSubjects.next(response)
-          this.orders = response.content
-          this.filtredOrders = response.content.filter(order => order.store.internalReference == parseInt(localStorage.getItem('store')))
           this.notifsService.onSuccess('Chargement des commandes')
-          console.log(this.orders)
-          console.log(this.filtredOrders)
+          return {dataState: DataState.LOADED_STATE, appData: response}
+        }),
+        startWith({dataState: DataState.LOADING_STATE, appData: null}),
+        catchError((error: string) => {
+          return of({dataState: DataState.ERROR_STATE, error: error})
+        })
+      )
+    // this.orderState$ = this.orderService.orders$(this.page - 1, this.size)
+    //   .pipe(
+    //     map(response => {
+    //       this.dataSubjects.next(response)
+    //       console.log(response)
+    //       this.orders = response.content
+    //       this.filtredOrders = response.content.filter(order => order.store.internalReference == parseInt(localStorage.getItem('store')))
+    //       this.notifsService.onSuccess('Chargement des commandes')
+    //       return {dataState: DataState.LOADED_STATE, appData: response}
+    //     }),
+    //     startWith({dataState: DataState.LOADING_STATE, appData: null}),
+    //     catchError((error: string) => {
+    //       return of({dataState: DataState.ERROR_STATE, error: error})
+    //     })
+    //   )
+  }
+
+  filterOrders(){
+
+    this.orderState$ = this.orderService.filterOrders$(
+      this.storeFilter, this.clientName, this.date, this.internalRef, this.statusFilter,
+      this.page - 1, this.size)
+      .pipe(
+        map(response => {
+          this.dataSubjects.next(response)
+          // this.notifsService.onSuccess('Chargement des commandes')
           return {dataState: DataState.LOADED_STATE, appData: response}
         }),
         startWith({dataState: DataState.LOADING_STATE, appData: null}),
@@ -268,32 +287,33 @@ export class IndexCommandComponent implements OnInit {
     this.order.ttcaggregateAmount = this.totalOrder;
     this.order.netAggregateAmount = this.totalOrder;
 
-
-    this.orderState$ = this.orderService.addOrder$(this.order)
-      .pipe(
-        map((response ) => {
-          // this.dataSubjects.next(
-          //   {...this.dataSubjects.value , content: [response, ...this.dataSubjects.value.content]}
-          // )
-          this.isLoading.next(false)
-          this.saveProductsOrder(response)
-          // this.getProforma(response);
-          this.annuler()
-          this.getOrders()
-          return {dataState: DataState.LOADED_STATE, appData: this.dataSubjects.value}
-        }),
-        startWith({dataState: DataState.LOADED_STATE, appData: this.dataSubjects.value}),
-        catchError((error: string) => {
-          this.isLoading.next(false)
-          return of({dataState: DataState.ERROR_STATE, error: error})
-        })
-      )
-
+if ( this.client.completeName ) {
+  this.orderState$ = this.orderService.addOrder$(this.order)
+    .pipe(
+      map((response) => {
+        // this.dataSubjects.next(
+        //   {...this.dataSubjects.value , content: [response, ...this.dataSubjects.value.content]}
+        // )
+        this.isLoading.next(false)
+        this.saveProductsOrder(response)
+        // this.getProforma(response);
+        this.annuler()
+        this.getOrders()
+        return {dataState: DataState.LOADED_STATE, appData: this.dataSubjects.value}
+      }),
+      startWith({dataState: DataState.LOADED_STATE, appData: this.dataSubjects.value}),
+      catchError((error: string) => {
+        this.isLoading.next(false)
+        return of({dataState: DataState.ERROR_STATE, error: error})
+      })
+    )
+}else {
+  this.notifsService.onWarning("Ce client n'existe pas")
+}
 
     //on enregistre une nouvelle commande
     // this.orderService.saveOrder(this.order).subscribe(
     //   resp => {
-    //     console.log(resp)
     //     this.isLoading.next(false);
     //     /**
     //      * je dois gérer cette partie
@@ -343,12 +363,13 @@ export class IndexCommandComponent implements OnInit {
 
   pageChange(event: number){
     this.page = event
-    this.orderState$ = this.orderService.orders$(this.page - 1, this.size)
+    this.orderState$ = this.orderService.filterOrders$(
+       this.storeFilter, this.clientName, this.date, this.internalRef, this.statusFilter,
+      this.page - 1, this.size)
       .pipe(
         map(response => {
           this.dataSubjects.next(response)
-          this.orders = response.content
-          this.filtredOrders = response.content.filter(order => order.idStore == parseInt(localStorage.getItem('store')))
+          // this.notifsService.onSuccess('Chargement des commandes')
           return {dataState: DataState.LOADED_STATE, appData: response}
         }),
         startWith({dataState: DataState.LOADING_STATE, appData: null}),
@@ -364,5 +385,42 @@ export class IndexCommandComponent implements OnInit {
 
   formatNumber(amount: any): string{
     return parseInt(amount).toFixed(0).replace(/(\d)(?=(\d{3})+\b)/g,'$1 ');
+  }
+
+  showFilter() {
+    this.onFilter = !this.onFilter
+
+    if (!this.onFilter){
+      this.statusFilter = '';
+      this.clientName = '';
+      this.storeFilter = localStorage.getItem('store')
+      this.refCli = ''
+      this.date = '';
+      this.internalRef = ''
+      this.filterOrders()
+    }
+  }
+
+  findClientsForFilter(event: string): Client[]{
+    if (event != '' && event.length >= 3){
+      this.clientService.searchClient(event) .subscribe(
+        resp => {
+          this.clients = resp;
+          if (this.clients.length <= 1){
+            this.filterOrders()
+          }
+
+          if (!resp.length){
+            this.notifsService.onError('Ce client n\'existe pas', '')
+          }
+        }
+      )
+    }else {
+      if (this.clientName == ''){
+        this.filterOrders()
+      }
+      this.clients = []
+    }
+    return this.clients
   }
 }

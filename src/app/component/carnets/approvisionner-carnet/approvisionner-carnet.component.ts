@@ -103,6 +103,7 @@ export class ApprovisionnerCarnetComponent implements OnInit {
       resp => {
 
         this.isLoading.next(false);
+        this.getCartons();
         this.notifsService.onSuccess('approvisionnement effectué')
         // this.annuler()
       },

@@ -30,18 +30,63 @@
           Liste des clients
           <div class="btn-actions-pane-right">
             <div role="group" class="btn-group-sm btn-group">
-              <input type="text" placeholder="Rechercher nom" [(ngModel)]="name"
-                     class="form-control form-control-sm mr-3">
-              <input type="text" placeholder="Rechercher societé" [(ngModel)]="compagny"
-                     class="form-control form-control-sm mr-3">
-              <input type="date" placeholder="Rechercher date" [(ngModel)]="date"
-                     class="form-control form-control-sm mr-3">
-              <input type="text" placeholder="Rechercher ref" [(ngModel)]="internalRef"
-                     class="form-control form-control-sm mr-3">
-              <!--              <button class="btn btn-sm mr-3 text-primary" (click)="searchByName()"><i class="fa fa-search"></i></button>-->
+              <button class="btn btn-icon btn-pill border-0 btn-transition" [ngClass]="onFilter? 'btn-outline-light' : 'btn-light'" (click)="showFilter()">
+                <i class="fa btn-icon-wrapper fa-sliders-h"></i>
+                {{!onFilter ? "Filtrer" : "Annuler"}}
+              </button>
             </div>
           </div>
 
+<!--          <div class="btn-actions-pane-right">-->
+<!--            <div role="group" class="btn-group-sm btn-group">-->
+<!--              <input type="text" placeholder="Rechercher nom" [(ngModel)]="name"-->
+<!--                     class="form-control form-control-sm mr-3">-->
+<!--              <input type="text" placeholder="Rechercher societé" [(ngModel)]="compagny"-->
+<!--                     class="form-control form-control-sm mr-3">-->
+<!--              <input type="date" placeholder="Rechercher date" [(ngModel)]="date"-->
+<!--                     class="form-control form-control-sm mr-3">-->
+<!--              <input type="text" placeholder="Rechercher ref" [(ngModel)]="internalRef"-->
+<!--                     class="form-control form-control-sm mr-3">-->
+<!--              &lt;!&ndash;              <button class="btn btn-sm mr-3 text-primary" (click)="searchByName()"><i class="fa fa-search"></i></button>&ndash;&gt;-->
+<!--            </div>-->
+<!--          </div>-->
+
+        </div>
+
+        <div class="card-body bg-tempting-azure card-header-tab-animation fadeInLeft"  *ngIf="onFilter">
+
+          <div class="menu-header-subtitle">
+            <div role="group" class="btn-group-sm btn-group">
+              <form class="form-row">
+                <div class="position-relative form-group mr-2">
+                  <label for="stats" class="text-dark font-weight-bold">Type de Client</label>
+                  <select name="stat" id="stats" class="form-control form-control-sm mr-3" [(ngModel)]="typeFilter" (ngModelChange)="filterClients()">
+                    <option value="" selected disabled hidden>Choix du type</option>
+                    <option value="ADMINISTRATION">Administration</option>
+                    <option value="ENTREPRISE">Entreprise</option>
+                    <option value="PARTICULAR">Particulier</option>
+                    <option value="">Tout afficher</option>
+                  </select>
+                </div>
+                <div class="position-relative form-group  mr-2">
+                  <label for="nameClient" class="text-dark font-weight-bold">Recherche par nom</label>
+                  <input type="text" name="nameClient" id="nameClient" placeholder="Rechercher nom" [(ngModel)]="clientNameFilter" (ngModelChange)="filterClients()"
+                         class="form-control form-control-sm mr-3">
+                </div>
+                <div class="position-relative form-group  mr-2">
+                  <label for="compagnie" class="text-dark font-weight-bold">Recherche par compagnie</label>
+                  <input type="text" name="compagnie" id="compagnie" placeholder="Rechercher compagnie" [(ngModel)]="companyNameFilter" (ngModelChange)="filterClients()"
+                         class="form-control form-control-sm mr-3">
+                </div>
+                <div class="position-relative form-group  mr-2">
+                  <label for="serial" class="text-dark font-weight-bold">Recherche par date</label>
+                  <input type="date" name="serial" id="serial" placeholder="Rechercher numéro" [(ngModel)]="dateFilter" (ngModelChange)="filterClients()"
+                         class="form-control form-control-sm mr-3">
+                </div>
+                <!--            <button class="btn btn-sm mr-3 text-primary" (click)="filterOrders()"><i class="fa fa-search"></i></button>-->
+              </form>
+            </div>
+          </div>
         </div>
         <ng-container class="bg-white" *ngIf="(appState$ | async) as appState" [ngSwitch]="appState.dataState">
           <div class="table-responsive">
@@ -239,8 +284,8 @@
             <div class="col-md-4">
               <div class="position-relative form-group">
                 <label for="niu" class="">NIU</label>
-                <input name="email" id="niu" ngModel="{{client.niu}}" placeholder="numéro d'identifiant unique" type="text"
-                       class="form-control" >
+                <input name="niu" id="niu" ngModel="{{client.niu}}" placeholder="numéro d'identifiant unique" type="text"
+                       class="form-control" formControlName="niu">
               </div>
             </div>
           </div>

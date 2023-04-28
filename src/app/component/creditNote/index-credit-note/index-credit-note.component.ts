@@ -6,7 +6,7 @@ import {RequestOpposition} from "../../../_model/requestOpposition";
 import {Unite} from "../../../_model/unite";
 import {TypeVoucher} from "../../../_model/typeVoucher";
 import {Client} from "../../../_model/client";
-import {BehaviorSubject, of} from "rxjs";
+import {BehaviorSubject, Observable, of} from "rxjs";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {StoreService} from "../../../_services/store/store.service";
 import {Router} from "@angular/router";
@@ -25,6 +25,9 @@ import {StatusService} from "../../../_services/status/status.service";
 import {CouponService} from "../../../_services/coupons/coupon.service";
 import {catchError, map, startWith} from "rxjs/operators";
 import {Coupon} from "../../../_model/coupon";
+import {AppState} from "../../../_interfaces/app-state";
+import {CustomResponse} from "../../../_interfaces/custom-response";
+import {DataState} from "../../../_enum/data.state.enum";
 
 @Component({
   selector: 'app-index-credit-note',
@@ -46,6 +49,9 @@ export class IndexCreditNoteComponent implements OnInit, OnDestroy {
   clients: Client[]
   stations: Station[]
   vouchers: number[] = []
+  appState$: Observable<AppState<CustomResponse<CreditNote>>>;
+  readonly DataState = DataState;
+  private dataSubjects = new BehaviorSubject<CustomResponse<CreditNote>>(null);
   private isLoading = new BehaviorSubject<boolean>(false);
   isLoading$ = this.isLoading.asObservable();
   modalTitle: string = 'Enregistrer nouvelle note de credit';
@@ -54,7 +60,11 @@ export class IndexCreditNoteComponent implements OnInit, OnDestroy {
   page = 1;
   size = 20;
   totalElements: number = 0;
-
+  onFilter: boolean = false;
+  dateFilter? = ''
+  statutFilter? = ''
+  internalRef? = ''
+  stationName? = ''
   constructor(private modalService: NgbModal, private fb: FormBuilder, private storeService: StoreService, private router: Router,
               private notifService: NotifsService, private unitService: UnitsService, private voucherService: VoucherService,
               private clientService: ClientService, private userService: UsersService, private creditNoteService: CreditNoteService,
@@ -116,6 +126,19 @@ export class IndexCreditNoteComponent implements OnInit, OnDestroy {
   }
 
   getCreditNote() {
+    this.appState$ = this.creditNoteService.filterCreditNote$(this.statutFilter, this.stationName, this.internalRef, this.dateFilter, this.page - 1, this.size)
+      .pipe(
+        map(response => {
+          this.dataSubjects.next(response)
+          // this.notifsService.onSuccess('Chargement des commandes')
+          return {dataState: DataState.LOADED_STATE, appData: response}
+        }),
+        startWith({dataState: DataState.LOADING_STATE, appData: null}),
+        catchError((error: string) => {
+          return of({dataState: DataState.ERROR_STATE, error: error})
+        })
+      )
+
     this.creditNoteService.getCreditNote(this.page - 1, this.size).subscribe(
       resp => {
         this.creditNotes = resp.content
@@ -127,11 +150,7 @@ export class IndexCreditNoteComponent implements OnInit, OnDestroy {
 
   pageChange(event: number) {
     this.page = event
-    this.creditNoteService.getCreditNote(this.page - 1, this.size).subscribe(
-      resp => {
-        this.creditNotes = resp.content
-      },
-    )
+    this.getCreditNote()
   }
 
   getStations() {
@@ -305,5 +324,40 @@ export class IndexCreditNoteComponent implements OnInit, OnDestroy {
 
   padWithZero(num, targetLength) {
     return String(num).padStart(targetLength, '0');
+  }
+
+  findStation(event: string): Station[]{
+    if (event != '' && event.length >= 3){
+      this.stationService.searchStation(event).subscribe(
+        resp => {
+          this.stations = resp;
+          if (this.stations.length <= 1){
+            this.getCreditNote()
+          }
+
+          if (!resp.length){
+            this.notifService.onError('Cette station n\'existe pas', '')
+          }
+        }
+      )
+    }else {
+      if (this.stationName == ''){
+        this.getCreditNote()
+      }
+      this.stations = []
+    }
+    return this.stations
+  }
+
+  showFilter() {
+    this.onFilter = !this.onFilter
+
+    if (!this.onFilter) {
+      this.dateFilter = '';
+      this.statutFilter = '';
+      this.stationName = '';
+      this.internalRef = '';
+      this.getCreditNote()
+    }
   }
 }

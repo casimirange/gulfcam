@@ -120,6 +120,7 @@ export class IndexEntrepotComponent implements OnInit {
     this.storeHouse = new StoreHouse()
     this.modalService.dismissAll()
     this.magasin = ''
+    this.modalTitle = 'Enregistrer un nouvel entrepot'
   }
   //open modal
   open(content: any){

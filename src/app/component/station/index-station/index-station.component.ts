@@ -1,6 +1,6 @@
 import {Component, ElementRef, OnDestroy, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
-import {BehaviorSubject, Subscription} from "rxjs";
+import {BehaviorSubject, Observable, of, Subscription} from "rxjs";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {NotifsService} from "../../../_services/notifications/notifs.service";
 import Swal from "sweetalert2";
@@ -11,6 +11,11 @@ import {UsersService} from "../../../_services/users/users.service";
 import {IUser} from "../../../_model/user";
 import {ISignup} from "../../../_model/signup";
 import {Router} from "@angular/router";
+import {AppState} from "../../../_interfaces/app-state";
+import {CustomResponse} from "../../../_interfaces/custom-response";
+import {Client} from "../../../_model/client";
+import {DataState} from "../../../_enum/data.state.enum";
+import {catchError, map, startWith} from "rxjs/operators";
 
 @Component({
   selector: 'app-index-station',
@@ -25,8 +30,6 @@ export class IndexStationComponent implements OnInit, OnDestroy {
   station: Station = new Station();
   @ViewChild('mymodal', { static: false }) viewMe?: ElementRef<HTMLElement>;
   stationForm: FormGroup ;
-  private isLoading = new BehaviorSubject<boolean>(false);
-  isLoading$ = this.isLoading.asObservable();
   modalTitle = 'Enregistrer une nouvelle station'
   page: number = 1;
   totalPages: number;
@@ -35,6 +38,17 @@ export class IndexStationComponent implements OnInit, OnDestroy {
   roleUser = localStorage.getItem('userAccount').toString()
   role: string[] = []
   suscription: Subscription;
+  appState$: Observable<AppState<CustomResponse<Station>>>;
+  readonly DataState = DataState;
+  private dataSubjects = new BehaviorSubject<CustomResponse<Station>>(null);
+  private isLoading = new BehaviorSubject<boolean>(false);
+  isLoading$ = this.isLoading.asObservable();
+  onFilter: boolean = false;
+  designation? = ''
+  localisation? = ''
+  idManagerStation? = ''
+  pinCode? = ''
+
   constructor(private fb: FormBuilder, private modalService: NgbModal, private stationService: StationService,
               private notifService: NotifsService, private statusService: StatusService, private router: Router,
               private userService: UsersService) {
@@ -42,14 +56,14 @@ export class IndexStationComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.getStations();
     this.getUsers();
     JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
       this.role.push(authority);
     });
-    this.suscription = this.stationService.refresh$.subscribe(() => {
-      this.getStations()
-    })
+    this.getStations();
+    // this.suscription = this.stationService.refresh$.subscribe(() => {
+    //   this.getStations()
+    // })
 
   }
 
@@ -59,56 +73,79 @@ export class IndexStationComponent implements OnInit, OnDestroy {
       localization: ['', [Validators.required, Validators.minLength(3)]],
       designation: ['', [Validators.required, Validators.minLength(3)]],
       pinCode: ['', [Validators.required, Validators.pattern('^[0-9 ]*$')]],
-      managerStation: ['', [Validators.required]],
+      managerStagion: ['', [Validators.required]],
     });
   }
 
   //récupération de la liste des stations
   getStations(){
-    this.stationService.getAllStationWithPagination(this.page-1, this.size).subscribe(
-      resp => {
-        this.stations = resp.content
-        this.userStations = resp.content.filter(station => station.idManagerStation == parseInt(localStorage.getItem('uid')))
-        console.log(this.userStations)
-        this.size = resp.size
-        this.totalPages = resp.totalPages
-        this.totalElements = resp.totalElements
-        this.notifService.onSuccess('chargement des stations')
-      },
-    )
+    this.idManagerStation = this.role.includes('ROLE_SUPERADMIN') ? this.idManagerStation : localStorage.getItem('uid');
+    this.appState$ = this.stationService.filterStation$(this.designation, this.localisation, this.pinCode, this.idManagerStation,this.page - 1, this.size)
+      .pipe(
+        map(response => {
+          this.dataSubjects.next(response)
+          return {dataState: DataState.LOADED_STATE, appData: response}
+        }),
+        startWith({dataState: DataState.LOADING_STATE, appData: null}),
+        catchError((error: string) => {
+          return of({dataState: DataState.ERROR_STATE, error: error})
+        })
+      )
   }
 
   //récupération de la liste des stations
   getUsers(){
-    this.userService.getAllUsersWithPagination(this.page-1, 100).subscribe(
+    const type = 'MANAGER_STATION';
+    this.userService.getUsersByTypeAccount(type.toString()).subscribe(
       resp => {
-        this.users = resp.content
-        this.users = this.users.filter(user => user.typeAccount.name === 'MANAGER_STATION')
+        this.users = resp
       },
     )
   }
 
   //save store house
   saveStation(){
-    this.isLoading.next(true);
+    this.isLoading.next(true)
+    this.station = this.stationForm.value
     this.station.balance = 0;
-    this.station.localization = this.stationForm.controls['localization'].value;
-    this.station.designation = this.stationForm.controls['designation'].value;
-    this.station.pinCode = this.stationForm.controls['pinCode'].value;
-    this.station.managerStagion = this.stationForm.controls['managerStation'].value;
+    this.appState$ = this.stationService.addStation$(this.station)
+      .pipe(
+        map((response) => {
+          // this.dataSubjects.next(
+          //   {...this.dataSubjects.value, content: [response, ...this.dataSubjects.value.content]}
+          // )
+          this.getStations()
+          this.annuler()
+          this.isLoading.next(false)
+          this.notifService.onSuccess("enregistrement effectué!")
+          return {dataState: DataState.LOADED_STATE, appData: this.dataSubjects.value}
+        }),
+        startWith({dataState: DataState.LOADED_STATE, appData: this.dataSubjects.value}),
+        catchError((error: string) => {
+          this.isLoading.next(false)
+          return of({dataState: DataState.ERROR_STATE, error: error})
+        })
+      )
 
-    this.stationService.createStation(this.station).subscribe(
-      resp => {
-        // this.stations.push(resp)
-        this.isLoading.next(false);
-        this.notifService.onSuccess('enregistrement effectué')
-        this.annuler()
-      },
-      error => {
-        this.isLoading.next(false);
-        // this.notifService.onError(error.error.message, 'Erreur lors de la création')
-      }
-    )
+    // this.isLoading.next(true);
+    // this.station.balance = 0;
+    // this.station.localization = this.stationForm.controls['localization'].value;
+    // this.station.designation = this.stationForm.controls['designation'].value;
+    // this.station.pinCode = this.stationForm.controls['pinCode'].value;
+    // this.station.managerStagion = this.stationForm.controls['managerStagion'].value;
+    //
+    // this.stationService.createStation(this.station).subscribe(
+    //   resp => {
+    //     this.getStations()
+    //     this.isLoading.next(false);
+    //     this.notifService.onSuccess('enregistrement effectué')
+    //     this.annuler()
+    //   },
+    //   error => {
+    //     this.isLoading.next(false);
+    //     // this.notifService.onError(error.error.message, 'Erreur lors de la création')
+    //   }
+    // )
   }
 
   annuler() {
@@ -131,7 +168,10 @@ export class IndexStationComponent implements OnInit, OnDestroy {
 
   updateStation() {
     this.isLoading.next(true);
-
+    this.station.localization = this.stationForm.controls['localization'].value;
+    this.station.designation = this.stationForm.controls['designation'].value;
+    this.station.pinCode = this.stationForm.controls['pinCode'].value;
+    this.station.managerStagion = this.stationForm.controls['managerStagion'].value;
     this.stationService.updateStation(this.stationForm.value, this.station.internalReference).subscribe(
       resp => {
         this.isLoading.next(false);
@@ -162,6 +202,18 @@ export class IndexStationComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.suscription.unsubscribe()
+    // this.suscription.unsubscribe()
+  }
+
+  showFilter() {
+    this.onFilter = !this.onFilter
+
+    if (!this.onFilter) {
+      this.designation = '';
+      this.localisation = '';
+      this.pinCode = '';
+      this.idManagerStation = '';
+      this.getStations()
+    }
   }
 }

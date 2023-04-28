@@ -12,7 +12,7 @@ export class CommandLayoutComponent implements OnInit {
   constructor(public globals: ConfigOptions) { }
 
   ngOnInit(): void {
-    console.log(this.globals.toggleSidebar)
+
   }
 
 }

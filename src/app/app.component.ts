@@ -65,12 +65,11 @@ export class AppComponent implements OnInit, OnDestroy{
 
   ngOnInit(): void {
     this.router.events.subscribe((val) => {
-      console.log(this._location.path())
       this.url = this._location.path()
     });
     if (!this.url.includes('/auth')) {
       this.timer = new IdleTimer({
-        timeout: 600, //expired after 10 minutes
+        timeout: 1800, //expired after 30 minutes
         onTimeout: () => {
           if (!this.url.startsWith('/auth')) {
             this.notifsService.inactivityUser()
@@ -111,7 +110,6 @@ export class AppComponent implements OnInit, OnDestroy{
     )
       .pipe(map(() => navigator.onLine))
       .subscribe(status => {
-        console.log('status', status);
         this.networkStatus = status;
       });
   }

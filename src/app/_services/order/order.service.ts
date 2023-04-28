@@ -54,7 +54,7 @@ export class OrderService {
   }
 
   denyOrder(internalReference: number, idManager: number, reason: string): Observable<any>{
-    return this.http.post<any>(environment.order + `/cancel/${internalReference}?idManagerCoupon=${idManager}&reasonForCancellation=${reason}`, null)
+    return this.http.post<any>(environment.order + `/cancel/${internalReference}?idCommercialAttache=${idManager}&reasonForCancellation=${reason}`, null)
   }
 
   getProforma(orderInternalReference: number): Observable<any>{
@@ -98,11 +98,11 @@ export class OrderService {
       responseType: 'arraybuffer' as 'json'
       // 'responseType'  : 'blob' as 'json'        //This also worked
     };
-    return this.http.post<any>(environment.order + `/valid/delivery/${orderInternalReference}?idManagerCoupon=${idManagerCoupon}`, data, httpOptions)
+    return this.http.post<any>(environment.order + `/valid/delivery/${orderInternalReference}?idSalesManager=${idManagerCoupon}`, data, httpOptions)
   }
 
   payOrder(orderInternalReference: number, idManagerCoupon: number): Observable<any>{
-    return this.http.post<any>(environment.order + `/pay/${orderInternalReference}?idManagerCoupon=${idManagerCoupon}`, null)
+    return this.http.post<any>(environment.order + `/pay/${orderInternalReference}?idSalesManager=${idManagerCoupon}`, null)
   }
 
   deliveryOrder(orderInternalReference: number, idManagerCoupon: number): Observable<any>{
@@ -110,7 +110,7 @@ export class OrderService {
       responseType: 'arraybuffer' as 'json'
       // 'responseType'  : 'blob' as 'json'        //This also worked
     };
-    return this.http.post<any>(environment.order + `/delivery/${orderInternalReference}?idManagerCoupon=${idManagerCoupon}`, null, httpOptions)
+    return this.http.post<any>(environment.order + `/delivery/${orderInternalReference}?idSalesManager=${idManagerCoupon}`, null, httpOptions)
   }
 
   /**
@@ -121,6 +121,10 @@ export class OrderService {
 
   orders$ = (page: number, size: number) => <Observable<CustomResponse<Order>>>
     this.http.get<CustomResponse<Order>>(environment.order + `?page=${page}&size=${size}`,)
+      .pipe(catchError(this.handleError));
+
+  filterOrders$ = (store?: string, client?: string, date?: string, ref?: string, statut?: string, page?: number, size?: number) => <Observable<CustomResponse<Order>>>
+    this.http.get<CustomResponse<Order>>(environment.order + `/filter?page=${page}&size=${size}&store=${store}&client=${client}&date=${date}&ref=${ref}&status=${statut}`,)
       .pipe(catchError(this.handleError));
 
   ordersByStore$ = (storeInternalRef: number, page: number, size: number) => <Observable<CustomResponse<Order>>>
@@ -184,7 +188,7 @@ export class OrderService {
       .pipe(catchError(this.handleError));}
 
   payOrder$ = (orderInternalReference: number, idManagerCoupon: number) => <Observable<Order>>
-    this.http.post<Order>(environment.order + `/pay/${orderInternalReference}?idManagerCoupon=${idManagerCoupon}`, null)
+    this.http.post<Order>(environment.order + `/pay/${orderInternalReference}?idSalesManager=${idManagerCoupon}`, null)
       .pipe(catchError(this.handleError));
 
   handleError(error: HttpErrorResponse): Observable<never>{

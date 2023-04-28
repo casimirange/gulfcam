@@ -24,6 +24,7 @@ import {CustomResponse} from "../../../_interfaces/custom-response";
 import {Client} from "../../../_model/client";
 import {DataState} from "../../../_enum/data.state.enum";
 import {catchError, map, startWith} from "rxjs/operators";
+import {ClientService} from "../../../_services/clients/client.service";
 
 @Component({
   selector: 'app-index-coupon',
@@ -41,7 +42,7 @@ export class IndexCouponComponent implements OnInit {
   coupons: Coupon[];
   coupon: Coupon = new Coupon();
   vouchers: TypeVoucher[] = [];
-
+  onFilter: boolean = false
   stores: Store[] = [];
   store: Store = new Store();
   appState$: Observable<AppState<CustomResponse<Coupon>>>;
@@ -57,12 +58,18 @@ export class IndexCouponComponent implements OnInit {
   totalPages: number;
   totalElements: number;
   size: number = 20;
-
+  serialNumber? = ''
+  statusFilter? = ''
+  typeFilter? = ''
+  clientName? = ''
+  stationName? = ''
+  clients: Client[] = [];
+  stations: Station[] = [];
 
   constructor(private fb: FormBuilder, private modalService: NgbModal, private storeHouseService: StoreHouseService,
               private storeService: StoreService, private notifService: NotifsService, private cartonService: CartonService,
               private carnetService: CarnetService, private voucherService: VoucherService, private couponService: CouponService,
-              private stationService: StationService, private statusService: StatusService) {
+              private stationService: StationService, private statusService: StatusService, private clientService: ClientService) {
     JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
       this.role.push(authority);
     });
@@ -70,6 +77,7 @@ export class IndexCouponComponent implements OnInit {
 
   ngOnInit(): void {
     this.getCoupons();
+    this.getVouchers();
   }
 
   //récupération de la liste des magasins
@@ -81,13 +89,20 @@ export class IndexCouponComponent implements OnInit {
     )
   }
 
+  getVouchers(){
+    this.voucherService.getTypevoucher().subscribe(
+      resp => {
+        this.vouchers = resp.content
+      },
+    )
+  }
+
   //récupération de la liste des entrepots
   getCoupons(){
     this.appState$ = this.couponService.coupons$(this.page - 1, this.size)
       .pipe(
         map(response => {
           this.dataSubjects.next(response)
-          console.log('coupons', response)
           this.notifService.onSuccess('chargement des coupons')
           return {dataState: DataState.LOADED_STATE, appData: response}
         }),
@@ -100,11 +115,22 @@ export class IndexCouponComponent implements OnInit {
 
   pageChange(event: number){
     this.page = event
-    this.appState$ = this.couponService.coupons$(this.page - 1, this.size)
+    // this.appState$ = this.couponService.filterCoupon$(this.serialNumber, this.statusFilter,this.page - 1, this.size)
+    //   .pipe(
+    //     map(response => {
+    //       this.dataSubjects.next(response)
+    //       // this.notifsService.onSuccess('Chargement des commandes')
+    //       return {dataState: DataState.LOADED_STATE, appData: response}
+    //     }),
+    //     startWith({dataState: DataState.LOADING_STATE, appData: null}),
+    //     catchError((error: string) => {
+    //       return of({dataState: DataState.ERROR_STATE, error: error})
+    //     })
+    //   )
+    this.appState$ = this.couponService.filterCoupon$(this.serialNumber, this.statusFilter, this.typeFilter, this.clientName, this.stationName, this.page - 1, this.size)
       .pipe(
         map(response => {
           this.dataSubjects.next(response)
-          console.log(response)
           return {dataState: DataState.LOADED_STATE, appData: response}
         }),
         startWith({dataState: DataState.LOADING_STATE, appData: null}),
@@ -124,5 +150,80 @@ export class IndexCouponComponent implements OnInit {
 
   formatNumber(amount: any): string{
     return parseInt(amount).toFixed(0).replace(/(\d)(?=(\d{3})+\b)/g,'$1 ');
+  }
+
+  filterCoupons() {
+    this.page=1
+    this.appState$ = this.couponService.filterCoupon$(this.serialNumber, this.statusFilter, this.typeFilter, this.clientName, this.stationName, this.page - 1, this.size)
+      .pipe(
+        map(response => {
+          this.dataSubjects.next(response)
+          // this.notifsService.onSuccess('Chargement des commandes')
+          return {dataState: DataState.LOADED_STATE, appData: response}
+        }),
+        startWith({dataState: DataState.LOADING_STATE, appData: null}),
+        catchError((error: string) => {
+          return of({dataState: DataState.ERROR_STATE, error: error})
+        })
+      )
+  }
+
+  showFilter() {
+    this.onFilter = !this.onFilter
+
+    if (!this.onFilter){
+      this.serialNumber = '';
+      this.statusFilter = '';
+      this.typeFilter = '';
+      this.clientName = '';
+      this.stationName = '';
+      this.filterCoupons()
+    }
+  }
+
+  findClients(event: string): Client[]{
+    if (event != '' && event.length >= 3){
+      this.clientService.searchClient(event) .subscribe(
+        resp => {
+          this.clients = resp;
+          if (this.clients.length <= 1){
+            this.filterCoupons()
+          }
+
+          if (!resp.length){
+            this.notifService.onError('Ce client n\'existe pas', '')
+          }
+        }
+      )
+    }else {
+      if (this.clientName == ''){
+        this.filterCoupons()
+      }
+      this.clients = []
+    }
+    return this.clients
+  }
+
+  findStation(event: string): Station[]{
+    if (event != '' && event.length >= 3){
+      this.stationService.searchStation(event).subscribe(
+        resp => {
+          this.stations = resp;
+          if (this.stations.length <= 1){
+            this.filterCoupons()
+          }
+
+          if (!resp.length){
+            this.notifService.onError('Cette station n\'existe pas', '')
+          }
+        }
+      )
+    }else {
+      if (this.stationName == ''){
+        this.filterCoupons()
+      }
+      this.stations = []
+    }
+    return this.stations
   }
 }

@@ -221,7 +221,7 @@ export class EditComponent implements OnInit {
       this.isLoading.next(true);
       this.order.idSalesManager = parseInt(localStorage.getItem('uid'))
       this.currentFileUpload = this.selectedFiles.item(0);
-      this.orderService.validOrder(this.order.internalReference, this.order.idManagerCoupon, this.currentFileUpload).subscribe(
+      this.orderService.validOrder(this.order.internalReference, this.order.idSalesManager, this.currentFileUpload).subscribe(
         resp => {
           this.isLoading.next(false);
           this.notifsService.onSuccess('Commande Terminée')
@@ -239,7 +239,7 @@ export class EditComponent implements OnInit {
   payOrder() {
     this.order.idSalesManager = parseInt(localStorage.getItem('uid'))
     this.isLoading.next(true);
-    this.orderService.payOrder(this.order.internalReference, this.order.idManagerCoupon).subscribe(
+    this.orderService.payOrder(this.order.internalReference, this.order.idSalesManager).subscribe(
       resp => {
         this.isLoading.next(false);
         this.refreshOrder()
@@ -252,7 +252,7 @@ export class EditComponent implements OnInit {
   generateBoredereau() {
     if (this.statut == "PAID") {
       this.isLoading.next(true);
-      this.orderService.deliveryOrder(this.order.internalReference, this.order.idManagerCoupon).subscribe(
+      this.orderService.deliveryOrder(this.order.internalReference, this.order.idSalesManager).subscribe(
         respProd => {
           // console.log('delivery', respProd)
           const file = new Blob([respProd], {type: 'application/pdf'});
@@ -426,7 +426,7 @@ export class EditComponent implements OnInit {
       this.isCanceling.next(true)
       this.order.idCommercialAttache = parseInt(localStorage.getItem('uid'))
       this.order.reasonForCancellation = this.editForm.controls['reason'].value
-      this.orderService.denyOrder(this.order.internalReference, this.order.idManagerCoupon, this.order.reasonForCancellation).subscribe(
+      this.orderService.denyOrder(this.order.internalReference, this.order.idCommercialAttache, this.order.reasonForCancellation).subscribe(
         res => {
           this.isCanceling.next(false)
           this.notifsService.onSuccess('commande annulée avec succès')
