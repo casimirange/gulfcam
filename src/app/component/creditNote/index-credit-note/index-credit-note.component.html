@@ -100,7 +100,6 @@
               </tr>
               </thead>
               <tbody *ngFor="let credit of appState.appData.content | paginate: { id: 'creditnote', itemsPerPage: size, currentPage: page, totalItems: appState.appData.totalElements }; let i = index">
-
               <tr>
                 <td>{{i + 1}}</td>
                 <td>{{credit.internalReference}}</td>
