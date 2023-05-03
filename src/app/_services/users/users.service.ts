@@ -20,8 +20,8 @@ export class UsersService {
     return this.http.get<any>(environment.users);
   }
 
-  users$ = (page: number, size: number) => <Observable<CustomResponse<ISignup>>>
-    this.http.get<CustomResponse<ISignup>>(environment.users + `?page=${page}&size=${size}`,)
+  users$ = (firstname?: string, lastname?: string, type?: string, status?: string, idStore?: string, page?: number, size?: number) => <Observable<CustomResponse<ISignup>>>
+    this.http.get<CustomResponse<ISignup>>(environment.users + `/filter?page=${page}&size=${size}&firstName=${firstname}&lastName=${lastname}&typeAccount=${type}&status=${status}&store=${idStore}`,)
       .pipe(catchError(this.handleError));
 
   getAllUsersWithPagination(page: number, size: number): Observable<any>{

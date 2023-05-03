@@ -34,6 +34,12 @@ export class IndexUsersComponent implements OnInit {
   private dataSubjects = new BehaviorSubject<CustomResponse<ISignup>>(null);
   private isLoading = new BehaviorSubject<boolean>(false);
   isLoading$ = this.isLoading.asObservable();
+  onFilter: boolean = false;
+  storeFilter? = ''
+  accountFilter? = ''
+  statusFilter? = ''
+  nameFilter? = ''
+  lastNameFilter? = ''
   constructor(private modalService: NgbModal, private userService: UsersService, private notifsService: NotifsService,
               private storeService: StoreService, private statusAccountService: StatusAccountService,
               private statusUserService: StatusUserService, private router: Router,) {
@@ -44,14 +50,15 @@ export class IndexUsersComponent implements OnInit {
 
   ngOnInit(): void {
     this.getUsers()
+    this.getStores()
   }
 
   getUsers(): void{
-    this.appState$ = this.userService.users$(this.page - 1, this.size)
+    this.appState$ = this.userService.users$(this.nameFilter, this.lastNameFilter, this.accountFilter, this.statusFilter, this.storeFilter, this.page - 1, this.size)
       .pipe(
         map(response => {
           this.dataSubjects.next(response)
-          this.notifsService.onSuccess('chargement des utilisateurs')
+          // this.notifsService.onSuccess('chargement des utilisateurs')
           return {dataState: DataState.LOADED_STATE, appData: response}
         }),
         startWith({dataState: DataState.LOADING_STATE, appData: null}),
@@ -73,6 +80,21 @@ export class IndexUsersComponent implements OnInit {
     // )
   }
 
+
+
+  showFilter() {
+    this.onFilter = !this.onFilter
+
+    if (!this.onFilter) {
+      this.accountFilter = '';
+      this.lastNameFilter = '';
+      this.nameFilter = '';
+      this.storeFilter = '';
+      this.statusFilter = '';
+      this.getUsers()
+    }
+  }
+
   getStatusAccount(status: string): string {
     return this.statusAccountService.allStatus(status)
   }
@@ -83,18 +105,7 @@ export class IndexUsersComponent implements OnInit {
 
   pageChanges(event: number){
     this.page = event
-    this.appState$ = this.userService.users$(this.page - 1, this.size)
-      .pipe(
-        map(response => {
-          console.log(response)
-          this.dataSubjects.next(response)
-          return {dataState: DataState.LOADED_STATE, appData: response}
-        }),
-        startWith({dataState: DataState.LOADING_STATE, appData: null}),
-        catchError((error: string) => {
-          return of({dataState: DataState.ERROR_STATE, error: error})
-        })
-      )
+    this.getUsers()
     // this.users = []
     // this.userService.getAllUsersWithPagination(this.page-1, this.size).subscribe(
     //   resp => {
@@ -108,6 +119,17 @@ export class IndexUsersComponent implements OnInit {
     //     // this.notifsService.onError(error.error.message, "échec de chargement des utilisateurs")
     //   }
     // )
+  }
+
+  getStores(){
+    this.storeService.getStore().subscribe(
+      resp => {
+        this.stores = resp.content
+      },
+      error => {
+        // this.notifsService.onError(error.error.message, 'échec chargement magasins')
+      }
+    )
   }
 
   showDetails(user: ISignup) {
