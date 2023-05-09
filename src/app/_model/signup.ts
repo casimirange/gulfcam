@@ -25,7 +25,9 @@ export class ISignup{
   lastName: string;
   firstName: string;
   position: string;
+  account: string;
   idStore?: number;
+  iStore?: string;
   typeAccount: TypeAccount;
   roles: IRole[];
   status: Status;

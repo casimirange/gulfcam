@@ -9,6 +9,7 @@ import {AuthService} from "../../../_services/auth.service";
 import {Router} from "@angular/router";
 import {StoreService} from "../../../_services/store/store.service";
 import {NotifsService} from "../../../_services/notifications/notifs.service";
+import {aesUtil, key} from "../../../_helpers/aes";
 
 @Component({
   selector: 'app-add-user',
@@ -47,8 +48,8 @@ export class AddUserComponent implements OnInit {
 
     this.form = this.signup.controls;
     this.findStore = new Store()
-    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
-      this.role.push(authority);
+    JSON.parse(localStorage.getItem('Roles').toString()).forEach(authority => {
+      this.role.push(aesUtil.decrypt(key,authority));
     });
   }
 

@@ -15,6 +15,7 @@ import {CustomResponse} from "../../../_interfaces/custom-response";
 import {DataState} from "../../../_enum/data.state.enum";
 import {catchError, map, startWith} from "rxjs/operators";
 import {Coupon} from "../../../_model/coupon";
+import {aesUtil, key} from "../../../_helpers/aes";
 
 
 @Component({
@@ -27,7 +28,7 @@ export class DetailsComponent implements OnInit {
   orders: Order[] = [];
   order: Order = new Order();
   stores: Store[] = [];
-  roleUser = localStorage.getItem('userAccount').toString()
+  roleUser = aesUtil.decrypt(key, localStorage.getItem('userAccount').toString())
   role: string[] = []
   appState$: Observable<AppState<Client>>;
   sendMailOrder$: Observable<AppState<Order>>;
@@ -54,8 +55,8 @@ export class DetailsComponent implements OnInit {
               private couponService: CouponService, private statusService: StatusOrderService) {
     this.client = new Client()
     this.IdParam = this.route.snapshot.paramMap.get('id');
-    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
-      this.role.push(authority);
+    JSON.parse(localStorage.getItem('Roles').toString()).forEach(authority => {
+      this.role.push(aesUtil.decrypt(key,authority));
     });
   }
 

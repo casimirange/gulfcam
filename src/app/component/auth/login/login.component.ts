@@ -10,12 +10,15 @@ import {AppState} from "../../../_interfaces/app-state";
 import {catchError, count, map, startWith} from "rxjs/operators";
 import {DataState} from "../../../_enum/data.state.enum";
 import {NotifsService} from "../../../_services/notifications/notifs.service";
+import * as CryptoJS from 'crypto-js';
+import {aesUtil, AESUtil, key} from "../../../_helpers/aes";
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
+
 export class LoginComponent implements OnInit {
 
   project = 'Gulfcam';
@@ -45,6 +48,7 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
     this.notifsService.apiError.subscribe(
       data => {
         // this.notifsService.onError(data)
@@ -55,9 +59,16 @@ export class LoginComponent implements OnInit {
 
 
   login() {
+
     this.isLoading.next(true);
-    this.credentials.login = this.loginForm.controls['username'].value;
-    this.credentials.password = this.loginForm.controls['password'].value;
+    // this.credentials.login = this.loginForm.controls['username'].value;
+    // this.credentials.password = this.loginForm.controls['password'].value;
+
+    this.credentials.login = aesUtil.encrypt(key, this.loginForm.controls['username'].value).toString();
+    this.credentials.password = aesUtil.encrypt(key, this.loginForm.controls['password'].value).toString();
+    // this.credentials.login = CryptoJS.enc.Hex.parse(this.loginForm.controls['username'].value).toString(CryptoJS.enc.Hex);
+    // this.credentials.password = CryptoJS.enc.Hex.parse(this.loginForm.controls['password'].value).toString(CryptoJS.enc.Hex);
+
     // console.log(this.credentials)
     // this.appState$ = this.authService.login$(this.credentials)
     //   .pipe(
@@ -86,8 +97,8 @@ export class LoginComponent implements OnInit {
     //       return of({dataState: DataState.ERROR_STATE, error: error});
     //     }))
     //   );
-    this.credentials.login = this.loginForm.controls['username'].value;
-    this.credentials.password = this.loginForm.controls['password'].value;
+    // this.credentials.login = this.loginForm.controls['username'].value;
+    // this.credentials.password = this.loginForm.controls['password'].value;
     this.authService.login(this.credentials).subscribe(
       (data) => {
         this.user = data;
@@ -99,6 +110,7 @@ export class LoginComponent implements OnInit {
         this.isLoggedIn = true;
       },
       (error: any) => {
+        console.log(error)
         this.errorMessage = error.error.error[0];
         this.count += this.count
         console.log(this.count)

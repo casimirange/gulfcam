@@ -25,6 +25,7 @@ import {Client} from "../../../_model/client";
 import {DataState} from "../../../_enum/data.state.enum";
 import {catchError, map, startWith} from "rxjs/operators";
 import {ClientService} from "../../../_services/clients/client.service";
+import {aesUtil, key} from "../../../_helpers/aes";
 
 @Component({
   selector: 'app-index-coupon',
@@ -48,7 +49,7 @@ export class IndexCouponComponent implements OnInit {
   appState$: Observable<AppState<CustomResponse<Coupon>>>;
   readonly DataState = DataState;
   private dataSubjects = new BehaviorSubject<CustomResponse<Coupon>>(null);
-  roleUser = localStorage.getItem('userAccount').toString()
+  roleUser = aesUtil.decrypt(key,localStorage.getItem('userAccount').toString())
   role: string[] = []
   magasin: string
   entrepot: string;
@@ -70,8 +71,8 @@ export class IndexCouponComponent implements OnInit {
               private storeService: StoreService, private notifService: NotifsService, private cartonService: CartonService,
               private carnetService: CarnetService, private voucherService: VoucherService, private couponService: CouponService,
               private stationService: StationService, private statusService: StatusService, private clientService: ClientService) {
-    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
-      this.role.push(authority);
+    JSON.parse(localStorage.getItem('Roles').toString()).forEach(authority => {
+      this.role.push(aesUtil.decrypt(key,authority));
     });
   }
 

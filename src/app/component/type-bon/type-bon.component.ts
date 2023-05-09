@@ -8,6 +8,7 @@ import {NotifsService} from "../../_services/notifications/notifs.service";
 import {StoreHouse} from "../../_model/storehouse";
 import Swal from "sweetalert2";
 import {StatusService} from "../../_services/status/status.service";
+import {aesUtil, key} from "../../_helpers/aes";
 
 @Component({
   selector: 'app-type-bon',
@@ -22,14 +23,13 @@ export class TypeBonComponent implements OnInit {
   private isLoading = new BehaviorSubject<boolean>(false);
   isLoading$ = this.isLoading.asObservable();
   modalTitle: string = 'Enregistrer nouveau bon';
-  roleUser = localStorage.getItem('userAccount').toString()
   role: string[] = []
   constructor(private modalService: NgbModal, private fb: FormBuilder, private voucherService: VoucherService,
               private statusService: StatusService, private notifService: NotifsService) {
     this.formVoucherType();
     this.voucher = new TypeVoucher()
-    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
-      this.role.push(authority);
+    JSON.parse(localStorage.getItem('Roles').toString()).forEach(authority => {
+      this.role.push(aesUtil.decrypt(key,authority));
     });
   }
 

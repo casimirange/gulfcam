@@ -9,6 +9,7 @@ import IdleTimer from "../../_helpers/idleTimer.js";
 import {NotifsService} from "../notifications/notifs.service";
 import Swal from "sweetalert2";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
+import {aesUtil, key} from "../../_helpers/aes";
 
 @Injectable({
   providedIn: 'root'
@@ -27,7 +28,7 @@ export class TokenService {
   }
 
   saveEmail(email: string){
-    localStorage.setItem('email', <string>email);
+    localStorage.setItem('email', email);
   }
 
   getTimer(){
@@ -35,7 +36,7 @@ export class TokenService {
   }
 
   public saveAuthorities(authorities: string[]) {
-    localStorage.setItem('Roles', JSON.stringify(authorities));
+    localStorage.setItem('Roles', JSON.stringify(authorities))
   }
 
   saveUserInfo(user: ISignup){
@@ -43,9 +44,11 @@ export class TokenService {
     localStorage.setItem('lastName', user.lastName)
     localStorage.setItem('uid', user.internalReference.toString())
     localStorage.setItem('id', user.userId.toString())
-    localStorage.setItem('email', user.email)
-    localStorage.setItem('userAccount', user.typeAccount.name)
-    localStorage.setItem('store', user.idStore.toString())
+    localStorage.setItem('store', user.iStore)
+  }
+
+  saveUserAccount(account: any){
+    localStorage.setItem('userAccount', account.toString())
   }
 
   userInactivity(){
@@ -136,7 +139,7 @@ export class TokenService {
   }
 
   isLogged(): boolean{
-    const token = localStorage.getItem(('bearerToken'))
+    const token = localStorage.getItem(('bearerToken')) ? aesUtil.decrypt(key, localStorage.getItem(('bearerToken'))).toString() : null
     return !! token;
   }
 
@@ -146,7 +149,7 @@ export class TokenService {
   }
 
   getToken(): string | null{
-    return localStorage.getItem('bearerToken');
+    return localStorage.getItem('bearerToken') ? aesUtil.decrypt(key, localStorage.getItem('bearerToken')).toString() : null;
   }
 
   public getAuthorities(): string[] {

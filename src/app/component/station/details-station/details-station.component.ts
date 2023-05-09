@@ -24,6 +24,7 @@ import {Coupon} from "../../../_model/coupon";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {BehaviorSubject} from "rxjs";
+import {aesUtil, key} from "../../../_helpers/aes";
 
 @Component({
   selector: 'app-details-station',
@@ -33,11 +34,11 @@ import {BehaviorSubject} from "rxjs";
 export class DetailsStationComponent implements OnInit {
 
   station: Station = new Station();
-  roleUser = localStorage.getItem('userAccount').toString()
+  roleUser = aesUtil.decrypt(key, localStorage.getItem('userAccount').toString())
   role: string[] = []
   creditNotes: CreditNote[] = [];
   coupons: Coupon[] = [];
-  user = parseInt(localStorage.getItem('uid').toString())
+  user = parseInt(aesUtil.decrypt(key, localStorage.getItem('uid').toString()))
   pageCoupon: number = 1;
   totalPagesCoupon: number;
   totalElementsCoupon: number;
@@ -52,8 +53,8 @@ export class DetailsStationComponent implements OnInit {
   constructor(private stationService: StationService, private activatedRoute: ActivatedRoute, private router: Router,private modalService: NgbModal,
               private _location: Location, private voucherService: VoucherService, private statusService: StatusService,private fb: FormBuilder,
               private creditNoteService: CreditNoteService, private couponService: CouponService, private notifService: NotifsService) {
-    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
-      this.role.push(authority);
+    JSON.parse(localStorage.getItem('Roles').toString()).forEach(authority => {
+      this.role.push(aesUtil.decrypt(key,authority));
     });
     this.formCoupon()
     this.activatedRoute.params.subscribe(params => {

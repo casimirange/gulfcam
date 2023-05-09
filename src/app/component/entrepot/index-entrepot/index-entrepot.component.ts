@@ -10,6 +10,7 @@ import {BehaviorSubject} from "rxjs";
 import Swal from "sweetalert2";
 import {Router} from "@angular/router";
 import {StatusService} from "../../../_services/status/status.service";
+import {aesUtil, key} from "../../../_helpers/aes";
 
 @Component({
   selector: 'app-index-entrepot',
@@ -30,7 +31,7 @@ export class IndexEntrepotComponent implements OnInit {
   isLoading$ = this.isLoading.asObservable();
   modalTitle = 'Enregistrer un nouvel entrepot'
   magasin: string
-  roleUser = localStorage.getItem('userAccount').toString()
+  roleUser = aesUtil.decrypt(key, localStorage.getItem('userAccount').toString())
   role: string[] = []
   page: number = 1;
   totalPages: number;
@@ -40,8 +41,8 @@ export class IndexEntrepotComponent implements OnInit {
               private storeService: StoreService, private notifService: NotifsService, private router: Router,
               private statusService: StatusService) {
     this.formStoreHouse();
-    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
-      this.role.push(authority);
+    JSON.parse(localStorage.getItem('Roles').toString()).forEach(authority => {
+      this.role.push(aesUtil.decrypt(key,authority));
     });
   }
 
@@ -77,7 +78,7 @@ export class IndexEntrepotComponent implements OnInit {
       resp => {
         console.log(resp)
         this.storeHouses = resp.content
-        this.storeHousesByStore = resp.content.filter(sh => sh.store.internalReference === parseInt(localStorage.getItem('store')))
+        this.storeHousesByStore = resp.content.filter(sh => sh.store.internalReference === parseInt(aesUtil.decrypt(key, localStorage.getItem('store'))))
         console.log(this.storeHousesByStore)
         this.size = resp.size
         this.totalPages = resp.totalPages
@@ -214,9 +215,7 @@ export class IndexEntrepotComponent implements OnInit {
   }
 
   showDetails(storeHouse: StoreHouse) {
-    if (this.roleUser == 'MANAGER_STORE' || this.roleUser == 'MANAGER_COUPON' || this.roleUser == 'STORE_KEEPER'){
-      this.router.navigate(['/entrepots/details', storeHouse.internalReference])
-    }
+    this.router.navigate(['/entrepots/details', storeHouse.internalReference])
   }
 
   getStatuts(status: string): string {

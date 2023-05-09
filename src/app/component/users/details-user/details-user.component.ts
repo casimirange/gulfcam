@@ -12,6 +12,7 @@ import {BehaviorSubject} from "rxjs";
 import {StatusAccountService} from "../../../_services/status/status-account.service";
 import {StatusUserService} from "../../../_services/status/status-user.service";
 import {RoleUserService} from "../../../_services/role/role-user.service";
+import {aesUtil, key} from "../../../_helpers/aes";
 
 @Component({
   selector: 'app-details-user',
@@ -49,8 +50,8 @@ export class DetailsUserComponent implements OnInit {
     });
 
     this.form = this.updateUser.controls;
-    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
-      this.role.push(authority);
+    JSON.parse(localStorage.getItem('Roles').toString()).forEach(authority => {
+      this.role.push(aesUtil.decrypt(key,authority));
     });
   }
 

@@ -15,6 +15,7 @@ import {StoreHouseService} from "../../../_services/storeHouse/store-house.servi
 import {CartonService} from "../../../_services/cartons/carton.service";
 import {Carton} from "../../../_model/carton";
 import Swal from "sweetalert2";
+import {aesUtil, key} from "../../../_helpers/aes";
 
 @Component({
   selector: 'app-approvisionner-carnet',
@@ -32,15 +33,15 @@ export class ApprovisionnerCarnetComponent implements OnInit {
   isLoading$ = this.isLoading.asObservable();
   sn: any;
   storeHouses2: StoreHouse[] = [];
-  roleUser = localStorage.getItem('userAccount').toString()
+  roleUser = aesUtil.decrypt(key,localStorage.getItem('userAccount').toString())
   role: string[] = []
   constructor(private userService: UsersService,  private notifsService: NotifsService, private route: ActivatedRoute,
               private storeService: StoreService, private storeHouseService: StoreHouseService, private fb: FormBuilder,
               private voucherService: VoucherService, private cartonService: CartonService) {
     this.formSupply()
     this.form = this.supplyForm.controls;
-    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
-      this.role.push(authority);
+    JSON.parse(localStorage.getItem('Roles').toString()).forEach(authority => {
+      this.role.push(aesUtil.decrypt(key,authority));
     });
   }
 
@@ -61,7 +62,7 @@ export class ApprovisionnerCarnetComponent implements OnInit {
   getCartons(): void{
     this.cartonService.getAllCartonWithPagination(0, 500).subscribe(
       resp => {
-        this.cartons = resp.content.filter((carton: Carton) => carton.status.name === 'AVAILABLE' && carton.storeHouse.idStore == parseInt(localStorage.getItem('store')))
+        this.cartons = resp.content.filter((carton: Carton) => carton.status.name === 'AVAILABLE' && carton.storeHouse.idStore == parseInt(aesUtil.decrypt(key, localStorage.getItem('store'))))
       }
     )
   }
@@ -69,7 +70,7 @@ export class ApprovisionnerCarnetComponent implements OnInit {
   getStoreHouses(){
     this.storeHouseService.getAllStoreHousesWithPagination(0, 500).subscribe(
       resp => {
-        this.storeHouses2 = resp.content.filter(st => st.type == 'vente' && st.store.internalReference == parseInt(localStorage.getItem('store')))
+        this.storeHouses2 = resp.content.filter(st => st.type == 'vente' && st.store.internalReference == parseInt(aesUtil.decrypt(key, localStorage.getItem('store'))))
       },
     )
   }

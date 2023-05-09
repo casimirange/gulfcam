@@ -16,6 +16,7 @@ import {CartonService} from "../../../_services/cartons/carton.service";
 import {MvtStockService} from "../../../_services/stock/mvt-stock.service";
 import {Stock} from "../../../_model/stock";
 import {Carton} from "../../../_model/carton";
+import {aesUtil, key} from "../../../_helpers/aes";
 
 @Component({
   selector: 'app-transferer-carton',
@@ -31,14 +32,14 @@ export class TransfererCartonComponent implements OnInit {
   isLoading$ = this.isLoading.asObservable();
   cartons: Carton[] = [];
   storeHouses1: StoreHouse[] = [];
-  roleUser = localStorage.getItem('userAccount').toString()
+  roleUser = aesUtil.decrypt(key, localStorage.getItem('userAccount').toString())
   role: string[] = []
   constructor(private notifsService: NotifsService, private storeHouseService: StoreHouseService, private fb: FormBuilder,
               private cartonService: CartonService, private mvtService: MvtStockService) {
     this.formTransfert()
     this.form = this.tranfertForm.controls;
-    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
-      this.role.push(authority);
+    JSON.parse(localStorage.getItem('Roles').toString()).forEach(authority => {
+      this.role.push(aesUtil.decrypt(key,authority));
     });
   }
 
@@ -58,7 +59,7 @@ export class TransfererCartonComponent implements OnInit {
   getCartons(): void{
     this.cartonService.getAllCartonWithPagination(0, 500).subscribe(
       resp => {
-        this.cartons = resp.content.filter((carton: Carton) => carton.status.name === 'AVAILABLE' && carton.storeHouse.idStore == parseInt(localStorage.getItem('store')))
+        this.cartons = resp.content.filter((carton: Carton) => carton.status.name === 'AVAILABLE' && carton.storeHouse.idStore == parseInt(aesUtil.decrypt(key, localStorage.getItem('store'))))
       }
     )
   }
@@ -66,7 +67,7 @@ export class TransfererCartonComponent implements OnInit {
   getStoreHouses(){
     this.storeHouseService.getAllStoreHousesWithPagination(0, 500).subscribe(
       resp => {
-        this.storeHouses1 = resp.content.filter(st => st.type == 'stockage' && st.store.internalReference != parseInt(localStorage.getItem('store')))
+        this.storeHouses1 = resp.content.filter(st => st.type == 'stockage' && st.store.internalReference != parseInt(aesUtil.decrypt(key, localStorage.getItem('store'))))
       },
     )
   }
@@ -74,7 +75,7 @@ export class TransfererCartonComponent implements OnInit {
   //save carton
   transfertCarton(){
     this.isLoading.next(true);
-    this.stock.idSpaceManager1 = parseInt(localStorage.getItem('uid').toString())
+    this.stock.idSpaceManager1 = parseInt(aesUtil.decrypt(key, localStorage.getItem('uid').toString()))
     this.stock.idStoreHouseStockage = parseInt(this.tranfertForm.controls['idStoreHouseStockage'].value)
     let cartons =[]
     cartons.push(this.tranfertForm.controls['idCarton'].value)

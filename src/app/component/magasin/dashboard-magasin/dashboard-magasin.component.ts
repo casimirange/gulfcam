@@ -16,6 +16,7 @@ import {Router} from "@angular/router";
 import {StoreHouseService} from "../../../_services/storeHouse/store-house.service";
 import {environment} from "../../../../environments/environment";
 import {StatusService} from "../../../_services/status/status.service";
+import {aesUtil, key} from "../../../_helpers/aes";
 
 @Component({
   selector: 'app-dashboard-magasin',
@@ -38,14 +39,14 @@ export class DashboardMagasinComponent implements OnInit {
   totalPages: number;
   totalElements: number;
   size: number = 10;
-  roleUser = localStorage.getItem('userAccount').toString()
+  roleUser = aesUtil.decrypt(key, localStorage.getItem('userAccount').toString())
   role: string[] = []
   constructor(private modalService: NgbModal, private fb: FormBuilder, private storeService: StoreService, private router: Router,
               private notifService: NotifsService, private unitService: UnitsService, private voucherService: VoucherService,
               private storehouseService: StoreHouseService, private statusService: StatusService) {
     this.formStore();
-    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
-      this.role.push(authority);
+    JSON.parse(localStorage.getItem('Roles').toString()).forEach(authority => {
+      this.role.push(aesUtil.decrypt(key,authority));
     });
   }
 
@@ -97,7 +98,7 @@ export class DashboardMagasinComponent implements OnInit {
     this.storeService.getAllStoresWithPagination(this.page-1, this.size).subscribe(
       resp => {
         this.stores = resp.content
-        this.storeFilter = resp.content.filter(sh => sh.internalReference === parseInt(localStorage.getItem('store')))
+        this.storeFilter = resp.content.filter(sh => sh.internalReference === parseInt(aesUtil.decrypt(key, localStorage.getItem('store'))))
         this.size = resp.size
         this.totalPages = resp.totalPages
         this.totalElements = resp.totalElements

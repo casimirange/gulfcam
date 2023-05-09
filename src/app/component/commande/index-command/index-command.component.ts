@@ -23,6 +23,7 @@ import {CustomResponse} from "../../../_interfaces/custom-response";
 import {DataState} from "../../../_enum/data.state.enum";
 import {catchError, map, startWith} from "rxjs/operators";
 import {ConfigOptions} from "../../../configOptions/config-options";
+import {aesUtil, key} from "../../../_helpers/aes";
 export class Product{
   quantity: number;
   voucher: number;
@@ -58,7 +59,7 @@ export class IndexCommandComponent implements OnInit {
   order: Order = new Order();
   @ViewChild('orderModal', { static: false }) commandModal?: ElementRef<HTMLElement>;
   clientName = ''
-  storeFilter = localStorage.getItem('store')
+  storeFilter = aesUtil.decrypt(key,localStorage.getItem('store'))
   statusFilter = ''
   refCli = ''
   date = '';
@@ -74,7 +75,7 @@ export class IndexCommandComponent implements OnInit {
   isSearching$ = this.isSearching.asObservable();
   private isLoading = new BehaviorSubject<boolean>(false);
   isLoading$ = this.isLoading.asObservable();
-  roleUser = localStorage.getItem('userAccount').toString()
+  roleUser = aesUtil.decrypt(key, localStorage.getItem('userAccount').toString())
   role: string[] = []
   clientNotFound: boolean = false;
   onFilter: boolean = false;
@@ -85,8 +86,8 @@ export class IndexCommandComponent implements OnInit {
   ) {
     this.formOrder();
     this.orF = this.orderForm.controls;
-    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
-      this.role.push(authority);
+    JSON.parse(localStorage.getItem('Roles').toString()).forEach(authority => {
+      this.role.push(aesUtil.decrypt(key,authority));
     });
   }
 
@@ -276,13 +277,13 @@ export class IndexCommandComponent implements OnInit {
     // this.store = this.findStore(this.orF['store'].value)[0]
 
     // this.order.idStore = this.store.internalReference
-    this.order.idStore = parseInt(localStorage.getItem("store"))
+    this.order.idStore = parseInt(aesUtil.decrypt(key, localStorage.getItem("store")))
     this.order.idClient = this.client.internalReference
     this.order.channel = this.orF['chanel'].value
     this.order.description = this.orF['description'].value
     this.order.deliveryTime = this.orF['delais'].value.toString()
     this.order.clientReference = this.orF['refCli'].value
-    this.order.idCommercialAttache = parseInt(localStorage.getItem('uid'))
+    this.order.idCommercialAttache = parseInt(aesUtil.decrypt(key, localStorage.getItem('uid')))
     this.order.tax = this.global.tax;
     this.order.ttcaggregateAmount = this.totalOrder;
     this.order.netAggregateAmount = this.totalOrder;
@@ -393,7 +394,7 @@ if ( this.client.completeName ) {
     if (!this.onFilter){
       this.statusFilter = '';
       this.clientName = '';
-      this.storeFilter = localStorage.getItem('store')
+      this.storeFilter = aesUtil.decrypt(key, localStorage.getItem('store'))
       this.refCli = ''
       this.date = '';
       this.internalRef = ''

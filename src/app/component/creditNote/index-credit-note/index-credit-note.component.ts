@@ -28,6 +28,7 @@ import {Coupon} from "../../../_model/coupon";
 import {AppState} from "../../../_interfaces/app-state";
 import {CustomResponse} from "../../../_interfaces/custom-response";
 import {DataState} from "../../../_enum/data.state.enum";
+import {aesUtil, key} from "../../../_helpers/aes";
 
 @Component({
   selector: 'app-index-credit-note',
@@ -55,7 +56,7 @@ export class IndexCreditNoteComponent implements OnInit, OnDestroy {
   private isLoading = new BehaviorSubject<boolean>(false);
   isLoading$ = this.isLoading.asObservable();
   modalTitle: string = 'Enregistrer nouvelle note de credit';
-  roleUser = localStorage.getItem('userAccount').toString()
+  roleUser = aesUtil.decrypt(key, localStorage.getItem('userAccount'))
   role: string[] = []
   page = 1;
   size = 20;
@@ -70,8 +71,8 @@ export class IndexCreditNoteComponent implements OnInit, OnDestroy {
               private clientService: ClientService, private userService: UsersService, private creditNoteService: CreditNoteService,
               private stationService: StationService, private statusService: StatusService, private couponService: CouponService) {
     this.formStore();
-    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
-      this.role.push(authority);
+    JSON.parse(localStorage.getItem('Roles').toString()).forEach(authority => {
+      this.role.push(aesUtil.decrypt(key,authority));
     });
   }
 

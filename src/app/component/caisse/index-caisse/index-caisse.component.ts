@@ -18,6 +18,7 @@ import {CustomResponse} from "../../../_interfaces/custom-response";
 import {DataState} from "../../../_enum/data.state.enum";
 import {catchError, map, startWith} from "rxjs/operators";
 import {StatusOrderService} from "../../../_services/status/status-order.service";
+import {aesUtil, key} from "../../../_helpers/aes";
 
 export class Product{
   quantity: number;
@@ -52,7 +53,8 @@ export class IndexCaisseComponent implements OnInit {
   voucher: TypeVoucher = new TypeVoucher()
   orders: Order[] = [];
   order: Order = new Order();
-  roleUser = localStorage.getItem('userAccount').toString()
+  roleUser = aesUtil.decrypt(key,localStorage.getItem('userAccount').toString())
+  role: string[] = []
   name = ''
   refCli = ''
   date = ''
@@ -103,6 +105,9 @@ export class IndexCaisseComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    JSON.parse(localStorage.getItem('Roles').toString()).forEach(authority => {
+      this.role.push(aesUtil.decrypt(key,authority));
+    });
     this.getOrders()
     // this.getStores()
   }

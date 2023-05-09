@@ -69,7 +69,7 @@ export class AppComponent implements OnInit, OnDestroy{
     });
     if (!this.url.includes('/auth')) {
       this.timer = new IdleTimer({
-        timeout: 900, //expired after 15 minutes
+        timeout: 1800, //expired after 30 minutes
         onTimeout: () => {
           if (!this.url.startsWith('/auth')) {
             this.notifsService.inactivityUser()

@@ -20,6 +20,7 @@ import {CustomResponse} from "../../../_interfaces/custom-response";
 import {Coupon} from "../../../_model/coupon";
 import {DataState} from "../../../_enum/data.state.enum";
 import {catchError, map, startWith} from "rxjs/operators";
+import {aesUtil, key} from "../../../_helpers/aes";
 
 @Component({
   selector: 'app-index-carnet',
@@ -52,13 +53,13 @@ export class IndexCarnetComponent implements OnInit {
   totalPages: number;
   totalElements: number;
   size: number = 20;
-  roleUser = localStorage.getItem('userAccount').toString()
+  roleUser = aesUtil.decrypt(key,localStorage.getItem('userAccount').toString())
   role: string[] = []
   constructor(private fb: FormBuilder, private modalService: NgbModal, private storeHouseService: StoreHouseService,
               private storeService: StoreService, private notifService: NotifsService, private cartonService: CartonService,
               private carnetService: CarnetService, private voucherService: VoucherService, private statusService: StatusService) {
-    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
-      this.role.push(authority);
+    JSON.parse(localStorage.getItem('Roles').toString()).forEach(authority => {
+      this.role.push(aesUtil.decrypt(key,authority));
     });
   }
 

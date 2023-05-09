@@ -25,6 +25,7 @@ import {DataState} from "../../../_enum/data.state.enum";
 import {LoaderComponent} from "../../../preloader/loader/loader.component";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {ConfigOptions} from "../../../configOptions/config-options";
+import {aesUtil, key} from "../../../_helpers/aes";
 
 export class Product {
   coupon: number;
@@ -57,7 +58,7 @@ export class EditComponent implements OnInit {
   canaux = ['Appel', 'Courier papier', 'Email', 'Sur site']
   stores: Store[] = [];
   typeVoucher = [3000, 5000, 10000]
-  roleUser = localStorage.getItem('userAccount').toString();
+  roleUser = aesUtil.decrypt(key,localStorage.getItem('userAccount').toString());
   role: string[] = [];
   private isLoading = new BehaviorSubject<boolean>(false);
   isLoading$ = this.isLoading.asObservable();
@@ -82,8 +83,8 @@ export class EditComponent implements OnInit {
       pdf: ['']
     });
     this.IdParam = this.route.snapshot.paramMap.get('id');
-    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
-      this.role.push(authority);
+    JSON.parse(localStorage.getItem('Roles').toString()).forEach(authority => {
+      this.role.push(aesUtil.decrypt(key,authority));
     });
   }
 
@@ -193,7 +194,7 @@ export class EditComponent implements OnInit {
   acceptOrder() {
     if (this.selectedFiles.item(0).type == 'application/pdf') {
       this.isLoading.next(true);
-      this.order.idFund = parseInt(localStorage.getItem('uid'))
+      this.order.idFund = parseInt(aesUtil.decrypt(key, localStorage.getItem('uid')))
       this.order.idPaymentMethod = this.editForm.controls['method'].value
       this.order.paymentReference = this.editForm.controls['peimentRef'].value
       const docType = 'pdf'
@@ -219,7 +220,7 @@ export class EditComponent implements OnInit {
   endOrder() {
     if (this.selectedFiles.item(0).type == 'application/pdf') {
       this.isLoading.next(true);
-      this.order.idSalesManager = parseInt(localStorage.getItem('uid'))
+      this.order.idSalesManager = parseInt(aesUtil.decrypt(key, localStorage.getItem('uid')))
       this.currentFileUpload = this.selectedFiles.item(0);
       this.orderService.validOrder(this.order.internalReference, this.order.idSalesManager, this.currentFileUpload).subscribe(
         resp => {
@@ -237,7 +238,7 @@ export class EditComponent implements OnInit {
   }
 
   payOrder() {
-    this.order.idSalesManager = parseInt(localStorage.getItem('uid'))
+    this.order.idSalesManager = parseInt(aesUtil.decrypt(key, localStorage.getItem('uid')))
     this.isLoading.next(true);
     this.orderService.payOrder(this.order.internalReference, this.order.idSalesManager).subscribe(
       resp => {
@@ -424,7 +425,7 @@ export class EditComponent implements OnInit {
       this.notifsService.onError('veuillez préciser la raison d\'annulation de la commande', '')
     } else {
       this.isCanceling.next(true)
-      this.order.idCommercialAttache = parseInt(localStorage.getItem('uid'))
+      this.order.idCommercialAttache = parseInt(aesUtil.decrypt(key, localStorage.getItem('uid')))
       this.order.reasonForCancellation = this.editForm.controls['reason'].value
       this.orderService.denyOrder(this.order.internalReference, this.order.idCommercialAttache, this.order.reasonForCancellation).subscribe(
         res => {

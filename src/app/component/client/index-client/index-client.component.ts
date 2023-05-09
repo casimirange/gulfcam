@@ -11,6 +11,7 @@ import {Router} from "@angular/router";
 import Swal from "sweetalert2";
 import {AppState} from "../../../_interfaces/app-state";
 import {DataState} from "../../../_enum/data.state.enum";
+import {aesUtil, key} from "../../../_helpers/aes";
 
 @Component({
   selector: 'app-index-client',
@@ -36,7 +37,7 @@ export class IndexClientComponent implements OnInit {
   totalPages: number;
   totalElements: number;
   size: number = 20;
-  roleUser = localStorage.getItem('userAccount').toString()
+  roleUser = aesUtil.decrypt(key, localStorage.getItem('userAccount').toString())
   role: string[] = []
   modalTitle = 'Enregistrer nouveau client'
   @ViewChild('mymodals', {static: false}) viewMe?: ElementRef<HTMLElement>;
@@ -49,8 +50,8 @@ export class IndexClientComponent implements OnInit {
   constructor(private fb: FormBuilder, private modalService: NgbModal, private clientService: ClientService, private router: Router,
               private notifService: NotifsService) {
     this.formClient();
-    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
-      this.role.push(authority);
+    JSON.parse(localStorage.getItem('Roles').toString()).forEach(authority => {
+      this.role.push(aesUtil.decrypt(key,authority));
     });
   }
 

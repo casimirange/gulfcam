@@ -6,6 +6,7 @@ import {Observable} from "rxjs";
 import {ConfigOptions} from "../../../configOptions/config-options";
 import {Store} from "../../../_model/store";
 import {Router} from "@angular/router";
+import {aesUtil, key} from "../../../_helpers/aes";
 
 @Component({
   selector: 'app-header',
@@ -16,13 +17,13 @@ export class HeaderComponent implements OnInit {
   firstName: string | null = '';
   lastName: string | null = '';
   isLogged: boolean = false;
-  roleUser = localStorage.getItem('userAccount').toString()
+  roleUser = aesUtil.decrypt(key,localStorage.getItem('userAccount').toString()).toString()
   constructor(private tokenService: TokenService, private statusAccountSercive: StatusAccountService, public globals: ConfigOptions, private router: Router) { }
 
   ngOnInit(): void {
     this.isLogged = this.tokenService.isLogged();
-    this.firstName = localStorage.getItem('firstName')
-    this.lastName = localStorage.getItem('firstName')
+    this.firstName = aesUtil.decrypt(key, localStorage.getItem('firstName')).toString()
+    this.lastName = aesUtil.decrypt(key, localStorage.getItem('lastName')).toString()
   }
 
   logout(){

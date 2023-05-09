@@ -16,6 +16,7 @@ import {CustomResponse} from "../../../_interfaces/custom-response";
 import {Client} from "../../../_model/client";
 import {DataState} from "../../../_enum/data.state.enum";
 import {catchError, map, startWith} from "rxjs/operators";
+import {aesUtil, key} from "../../../_helpers/aes";
 
 @Component({
   selector: 'app-index-station',
@@ -35,7 +36,7 @@ export class IndexStationComponent implements OnInit, OnDestroy {
   totalPages: number;
   totalElements: number;
   size: number = 10;
-  roleUser = localStorage.getItem('userAccount').toString()
+  roleUser = aesUtil.decrypt(key, localStorage.getItem('userAccount').toString())
   role: string[] = []
   suscription: Subscription;
   appState$: Observable<AppState<CustomResponse<Station>>>;
@@ -53,13 +54,13 @@ export class IndexStationComponent implements OnInit, OnDestroy {
               private notifService: NotifsService, private statusService: StatusService, private router: Router,
               private userService: UsersService) {
     this.formStation();
+    JSON.parse(localStorage.getItem('Roles').toString()).forEach(authority => {
+      this.role.push(aesUtil.decrypt(key,authority));
+    });
   }
 
   ngOnInit(): void {
     this.getUsers();
-    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
-      this.role.push(authority);
-    });
     this.getStations();
     // this.suscription = this.stationService.refresh$.subscribe(() => {
     //   this.getStations()
@@ -79,7 +80,7 @@ export class IndexStationComponent implements OnInit, OnDestroy {
 
   //récupération de la liste des stations
   getStations(){
-    this.idManagerStation = this.role.includes('ROLE_SUPERADMIN') ? this.idManagerStation : localStorage.getItem('uid');
+    this.idManagerStation = this.role.includes('ROLE_SUPERADMIN') ? this.idManagerStation : aesUtil.decrypt(key, localStorage.getItem('uid'));
     this.appState$ = this.stationService.filterStation$(this.designation, this.localisation, this.pinCode, this.idManagerStation,this.page - 1, this.size)
       .pipe(
         map(response => {

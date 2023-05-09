@@ -11,6 +11,7 @@ import {Location} from "@angular/common";
 import {CreditNote} from "../../../_model/creditNote";
 import {CreditNoteService} from "../../../_services/creditNote/credit-note.service";
 import {Coupon} from "../../../_model/coupon";
+import {aesUtil, key} from "../../../_helpers/aes";
 
 @Component({
   selector: 'app-details-credit-note',
@@ -20,7 +21,7 @@ import {Coupon} from "../../../_model/coupon";
 export class DetailsCreditNoteComponent implements OnInit {
 
   creditNote: CreditNote = new CreditNote();
-  roleUser = localStorage.getItem('userAccount').toString()
+  roleUser = aesUtil.decrypt(key, localStorage.getItem('userAccount').toString())
   role: string[] = []
   private isLoading = new BehaviorSubject<boolean>(false);
   isLoading$ = this.isLoading.asObservable();
@@ -31,8 +32,8 @@ export class DetailsCreditNoteComponent implements OnInit {
 
   constructor(private noteService: CreditNoteService, private activatedRoute: ActivatedRoute, private router: Router,
               private statusService: StatusService, private _location: Location, private notifService: NotifsService) {
-    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
-      this.role.push(authority);
+    JSON.parse(localStorage.getItem('Roles').toString()).forEach(authority => {
+      this.role.push(aesUtil.decrypt(key,authority));
     });
   }
 

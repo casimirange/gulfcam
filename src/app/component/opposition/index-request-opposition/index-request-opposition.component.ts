@@ -25,6 +25,7 @@ import {AppState} from "../../../_interfaces/app-state";
 import {CustomResponse} from "../../../_interfaces/custom-response";
 import {DataState} from "../../../_enum/data.state.enum";
 import {catchError, map, startWith} from "rxjs/operators";
+import {aesUtil, key} from "../../../_helpers/aes";
 
 @Component({
   selector: 'app-index-request-opposition',
@@ -50,7 +51,7 @@ export class IndexRequestOppositionComponent implements OnInit {
   private isLoading = new BehaviorSubject<boolean>(false);
   isLoading$ = this.isLoading.asObservable();
   modalTitle: string = 'Enregistrer nouvelle requête';
-  roleUser = localStorage.getItem('userAccount').toString()
+  roleUser = aesUtil.decrypt(key, localStorage.getItem('userAccount').toString())
   role: string[] = []
   page: number = 1;
   totalPages: number;
@@ -68,8 +69,8 @@ export class IndexRequestOppositionComponent implements OnInit {
               private clientService: ClientService, private userService: UsersService, private requestService: OppositionService,
               private statusService: StatusService, private couponService: CouponService) {
     this.formRequest();
-    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
-      this.role.push(authority);
+    JSON.parse(localStorage.getItem('Roles').toString()).forEach(authority => {
+      this.role.push(aesUtil.decrypt(key,authority));
     });
   }
 
@@ -100,7 +101,7 @@ export class IndexRequestOppositionComponent implements OnInit {
   createRequest() {
     this.requestOpposition.reason = this.requestForm.controls['reason'].value
     this.requestOpposition.description = this.requestForm.controls['description'].value
-    this.requestOpposition.idCommercialAttache = parseInt(localStorage.getItem('uid'))
+    this.requestOpposition.idCommercialAttache = parseInt(aesUtil.decrypt(key, localStorage.getItem('uid')))
     this.requestOpposition.idClient = this.clients.find(client => client.completeName === this.requestForm.controls['idClient'].value).internalReference
     // this.requestOpposition.idSalesManager = parseInt(this.requestForm.controls['idManagerCoupon'].value)
     // console.log("vouchers", this.vouchers)

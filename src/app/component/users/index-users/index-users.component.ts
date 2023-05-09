@@ -14,6 +14,7 @@ import {AppState} from "../../../_interfaces/app-state";
 import {CustomResponse} from "../../../_interfaces/custom-response";
 import {DataState} from "../../../_enum/data.state.enum";
 import {catchError, map, startWith} from "rxjs/operators";
+import {aesUtil, key} from "../../../_helpers/aes";
 
 @Component({
   selector: 'app-index-users',
@@ -43,8 +44,8 @@ export class IndexUsersComponent implements OnInit {
   constructor(private modalService: NgbModal, private userService: UsersService, private notifsService: NotifsService,
               private storeService: StoreService, private statusAccountService: StatusAccountService,
               private statusUserService: StatusUserService, private router: Router,) {
-    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
-      this.role.push(authority);
+    JSON.parse(localStorage.getItem('Roles').toString()).forEach(authority => {
+      this.role.push(aesUtil.decrypt(key,authority));
     });
   }
 

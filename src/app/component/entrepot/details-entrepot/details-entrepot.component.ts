@@ -26,6 +26,7 @@ import {BehaviorSubject, Observable, of} from "rxjs";
 import {AppState} from "../../../_interfaces/app-state";
 import {CustomResponse} from "../../../_interfaces/custom-response";
 import {DataState} from "../../../_enum/data.state.enum";
+import {aesUtil, key} from "../../../_helpers/aes";
 
 @Component({
   selector: 'app-details-entrepot',
@@ -60,7 +61,7 @@ export class DetailsEntrepotComponent implements OnInit {
   isLoading$ = this.isLoading.asObservable();
   private isLoadingCarton = new BehaviorSubject<boolean>(false);
   isLoadingCarton$ = this.isLoadingCarton.asObservable();
-  roleUser = localStorage.getItem('userAccount').toString()
+  roleUser = aesUtil.decrypt(key, localStorage.getItem('userAccount').toString())
   role: string[] = []
   constructor(private clientService: ClientService, private activatedRoute: ActivatedRoute, private router: Router,
               private orderService: OrderService, private notifService: NotifsService, private storeService: StoreService,
@@ -68,8 +69,8 @@ export class DetailsEntrepotComponent implements OnInit {
               private itemService: ItemService, private voucherService: VoucherService, private cartonService: CartonService,
               private carnetService: CarnetService, private statusService: StatusService) {
     this.store = new Store()
-    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
-      this.role.push(authority);
+    JSON.parse(localStorage.getItem('Roles').toString()).forEach(authority => {
+      this.role.push(aesUtil.decrypt(key,authority));
     });
   }
 

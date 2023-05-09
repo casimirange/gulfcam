@@ -14,6 +14,7 @@ import {Stock} from "../../../_model/stock";
 import {MvtStockService} from "../../../_services/stock/mvt-stock.service";
 import {StoreHouseService} from "../../../_services/storeHouse/store-house.service";
 import {StoreHouse} from "../../../_model/storehouse";
+import {aesUtil, key} from "../../../_helpers/aes";
 
 @Component({
   selector: 'app-index-mvt-stock',
@@ -37,14 +38,14 @@ export class IndexMvtStockComponent implements OnInit {
   totalPages: number;
   totalElements: number;
   size: number = 20;
-  roleUser = localStorage.getItem('userAccount').toString()
+  roleUser = aesUtil.decrypt(key, localStorage.getItem('userAccount').toString())
   role: string[] = []
   constructor(private modalService: NgbModal, private fb: FormBuilder, private storeService: StoreService,
               private storeHouseService: StoreHouseService, private notifService: NotifsService, private unitService: UnitsService,
               private voucherService: VoucherService, private mvtStockService: MvtStockService) {
     this.formStore();
-    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
-      this.role.push(authority);
+    JSON.parse(localStorage.getItem('Roles').toString()).forEach(authority => {
+      this.role.push(aesUtil.decrypt(key,authority));
     });
   }
 

@@ -26,6 +26,7 @@ import {Client} from "../../../_model/client";
 import {DataState} from "../../../_enum/data.state.enum";
 import {UsersService} from "../../../_services/users/users.service";
 import {ISignup} from "../../../_model/signup";
+import {aesUtil, key} from "../../../_helpers/aes";
 
 @Component({
   selector: 'app-stock-carton',
@@ -73,7 +74,7 @@ export class StockCartonComponent implements OnInit {
   totalPages: number;
   totalElements: number;
   size: number = 20;
-  roleUser = localStorage.getItem('userAccount').toString()
+  roleUser = aesUtil.decrypt(key,localStorage.getItem('userAccount').toString())
   role: string[] = []
   onFilter = false;
   number = '';
@@ -87,8 +88,8 @@ export class StockCartonComponent implements OnInit {
               private carnetService: CarnetService, private voucherService: VoucherService, private couponService: CouponService,
               private mvtStockService: MvtStockService, private statusService: StatusService, private userService: UsersService) {
     this.formCarton();
-    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
-      this.role.push(authority);
+    JSON.parse(localStorage.getItem('Roles').toString()).forEach(authority => {
+      this.role.push(aesUtil.decrypt(key,authority));
     });
   }
 
@@ -138,7 +139,7 @@ export class StockCartonComponent implements OnInit {
 
   //récupération de la liste des entrepots
   getStoreHouses() {
-    this.storeHouseService.getStoreHousesByStore(parseInt(localStorage.getItem('store'))).subscribe(
+    this.storeHouseService.getStoreHousesByStore(parseInt(aesUtil.decrypt(key, localStorage.getItem('store')))).subscribe(
       resp => {
         this.isLoading.next(false);
         this.storeHouses = resp.content.filter(sth => sth.type == 'stockage')
@@ -154,7 +155,7 @@ export class StockCartonComponent implements OnInit {
   saveCarton() {
     this.isLoading.next(true);
     let typ = this.vouchers.find(tv => tv.amount == parseInt(this.cartonForm.controls['typeVoucher'].value))
-    this.carton.idSpaceManager1 = parseInt(localStorage.getItem('uid').toString())
+    this.carton.idSpaceManager1 = parseInt(aesUtil.decrypt(key, localStorage.getItem('uid').toString()))
     this.carton.idStoreHouseStockage = parseInt(this.cartonForm.controls['idStoreHouse'].value)
     this.carton.number = parseInt(this.cartonForm.controls['number'].value)
     this.carton.from = parseInt(this.cartonForm.controls['from'].value)

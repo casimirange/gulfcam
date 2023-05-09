@@ -4,6 +4,8 @@ import {TokenService} from "../../../_services/token/token.service";
 import {NotifsService} from "../../../_services/notifications/notifs.service";
 import {Router} from "@angular/router";
 import {BnNgIdleService} from "bn-ng-idle";
+import {aesUtil, key} from "../../../_helpers/aes";
+import {ISignup} from "../../../_model/signup";
 
 @Component({
   selector: 'app-otp',
@@ -18,8 +20,9 @@ export class OtpComponent implements OnInit {
   timer: number = 0;
   minutes: number = 0;
   seconds: number = 0;
+  user: ISignup = new ISignup()
   sendNewVerifyCode: boolean = false;
-  userEmail: string = localStorage.getItem('email').toString()
+  userEmail: string = aesUtil.decrypt(key, localStorage.getItem('email').toString()).toString()
   newOtp = {
     appProvider: '',
     email: ''
@@ -74,12 +77,21 @@ export class OtpComponent implements OnInit {
 
   verifyOtp(){
 
-      this.authService.verifyOtp(this.otp).subscribe(
+      this.authService.verifyOtp(aesUtil.encrypt(key,this.otp)).subscribe(
         (resp) => {
           this.token.saveRefreshToken(resp.refreshToken);
+          console.log('roles crypté', resp.roles)
+          // console.log('roles décrypté', aesUtil.decrypt(key, resp.roles))
           this.token.saveAuthorities(resp.roles)
-          this.token.saveUserInfo(resp.user)
-          this.firstName = localStorage.getItem('firstName')
+          this.user.iStore =  resp.idStore
+          this.user.firstName =  resp.firstname
+          this.user.lastName =  resp.lastname
+          this.user.internalReference =  resp.uid
+          this.user.userId =  resp.id
+
+          this.token.saveUserInfo(this.user)
+          this.token.saveUserAccount(resp.account)
+          this.firstName = aesUtil.decrypt(key, localStorage.getItem('firstName')).toString()
           this.notifService.onSuccess(`Bienvenue ${this.firstName}`)
           // this.bnIdle.stopTimer()
           this.bnIdle.resetTimer()

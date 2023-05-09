@@ -8,6 +8,7 @@ import {PaiementService} from "../../../../_services/paiement/paiement.service";
 import {NotifsService} from "../../../../_services/notifications/notifs.service";
 import {BehaviorSubject} from "rxjs";
 import Swal from "sweetalert2";
+import {aesUtil, key} from "../../../../_helpers/aes";
 
 @Component({
   selector: 'app-index-paiement-method',
@@ -22,12 +23,12 @@ export class IndexPaiementMethodComponent implements OnInit {
   private isLoading = new BehaviorSubject<boolean>(false);
   isLoading$ = this.isLoading.asObservable();
   modalTitle = 'Enregistrer mode de paiement';
-  roleUser = localStorage.getItem('userAccount').toString()
+  roleUser = aesUtil.decrypt(key, localStorage.getItem('userAccount').toString())
   role: string[] = []
   constructor(private modalService: NgbModal, private fb: FormBuilder, private paiementService: PaiementService, private notifServices: NotifsService) {
     this.formPaiement()
-    JSON.parse(localStorage.getItem('Roles')).forEach(authority => {
-      this.role.push(authority);
+    JSON.parse(localStorage.getItem('Roles').toString()).forEach(authority => {
+      this.role.push(aesUtil.decrypt(key,authority));
     });
   }
 
