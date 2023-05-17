@@ -22,12 +22,12 @@ export class CarnetService {
     return this.http.get<any>(environment.carnet+`/storehouse/${idStoreHouse}?page=${page}&size=${size}`)
   }
 
-  carnets$ = (page: number, size: number) => <Observable<CustomResponse<Carnet>>>
-    this.http.get<CustomResponse<Carnet>>(environment.carnet + `?page=${page}&size=${size}`,)
+  carnets$ = (page: number, size: number) => <Observable<any>>
+    this.http.get<any>(environment.carnet + `?page=${page}&size=${size}`,)
       .pipe(catchError(this.handleError));
 
-  carnetsByStoreHouse$ = (idStoreHouse: number, page: number, size: number) => <Observable<CustomResponse<Carnet>>>
-    this.http.get<CustomResponse<Carnet>>(environment.carnet + `/storehouse/${idStoreHouse}?page=${page}&size=${size}`)
+  carnetsByStoreHouse$ = (idStoreHouse: string, page: number, size: number) => <Observable<any>>
+    this.http.get<any>(environment.carnet + `/storehouse/${idStoreHouse}?page=${page}&size=${size}`)
       .pipe(catchError(this.handleError));
 
   handleError(error: HttpErrorResponse): Observable<never>{

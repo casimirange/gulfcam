@@ -49,15 +49,15 @@ export class OrderService {
     return this.http.get<any>(environment.order + `/store/${storeInternalRef}`,)
   }
 
-  sendOrderByClient(clientInternalReference: number): Observable<any>{
+  sendOrderByClient(clientInternalReference: string): Observable<any>{
     return this.http.get<any>(environment.order + `/export/excel/client/${clientInternalReference}`,)
   }
 
-  denyOrder(internalReference: number, idManager: number, reason: string): Observable<any>{
+  denyOrder(internalReference: string, idManager: string, reason: string): Observable<any>{
     return this.http.post<any>(environment.order + `/cancel/${internalReference}?idCommercialAttache=${idManager}&reasonForCancellation=${reason}`, null)
   }
 
-  getProforma(orderInternalReference: number): Observable<any>{
+  getProforma(orderInternalReference: string): Observable<any>{
     const httpOptions = {
       responseType: 'arraybuffer' as 'json'
       // 'responseType'  : 'blob' as 'json'        //This also worked
@@ -65,7 +65,7 @@ export class OrderService {
     return this.http.get<any>(environment.order + `/invoice/${orderInternalReference}`, httpOptions)
   }
 
-  getFile(orderInternalReference: number, type: string, docType: string): Observable<any>{
+  getFile(orderInternalReference: string, type: string, docType: string): Observable<any>{
     const httpOptions = {
       responseType: 'arraybuffer' as 'json'
       // 'responseType'  : 'blob' as 'json'        //This also worked
@@ -73,7 +73,7 @@ export class OrderService {
     return this.http.get<any>(environment.order + `/file/${orderInternalReference}/downloadFile?type=${type}&docType=${docType}`, httpOptions)
   }
 
-  getReçu(orderInternalReference: number, type: string): Observable<any>{
+  getReçu(orderInternalReference: string, type: string): Observable<any>{
     const httpOptions = {
       responseType: 'arraybuffer' as 'json'
       // 'responseType'  : 'blob' as 'json'        //This also worked
@@ -81,7 +81,7 @@ export class OrderService {
     return this.http.post<any>(environment.order + `/document/${orderInternalReference}?type=${type}`,null, httpOptions)
   }
 
-  acceptOrder(orderInternalReference: number, idFund: number, idPaymentMethod: number, paymentRef: string, docType: string, file: File): Observable<any>{
+  acceptOrder(orderInternalReference: string, idFund: string, idPaymentMethod: string, paymentRef: string, docType: string, file: File): Observable<any>{
     const data: FormData = new FormData();
     data.append('file', file);
     const httpOptions = {
@@ -91,7 +91,7 @@ export class OrderService {
     return this.http.post<any>(environment.order + `/accept/${orderInternalReference}?idFund=${idFund}&idPaymentMethod=${idPaymentMethod}&paymentReference=${paymentRef}&docType=${docType}`, data, httpOptions)
   }
 
-  validOrder(orderInternalReference: number, idManagerCoupon: number, file: File): Observable<any>{
+  validOrder(orderInternalReference: string, idManagerCoupon: string, file: File): Observable<any>{
     const data: FormData = new FormData();
     data.append('file', file);
     const httpOptions = {
@@ -101,11 +101,11 @@ export class OrderService {
     return this.http.post<any>(environment.order + `/valid/delivery/${orderInternalReference}?idSalesManager=${idManagerCoupon}`, data, httpOptions)
   }
 
-  payOrder(orderInternalReference: number, idManagerCoupon: number): Observable<any>{
+  payOrder(orderInternalReference: string, idManagerCoupon: string): Observable<any>{
     return this.http.post<any>(environment.order + `/pay/${orderInternalReference}?idSalesManager=${idManagerCoupon}`, null)
   }
 
-  deliveryOrder(orderInternalReference: number, idManagerCoupon: number): Observable<any>{
+  deliveryOrder(orderInternalReference: string, idManagerCoupon: string): Observable<any>{
     const httpOptions = {
       responseType: 'arraybuffer' as 'json'
       // 'responseType'  : 'blob' as 'json'        //This also worked
@@ -123,8 +123,8 @@ export class OrderService {
     this.http.get<CustomResponse<Order>>(environment.order + `?page=${page}&size=${size}`,)
       .pipe(catchError(this.handleError));
 
-  filterOrders$ = (store?: string, client?: string, date?: string, ref?: string, statut?: string, page?: number, size?: number) => <Observable<CustomResponse<Order>>>
-    this.http.get<CustomResponse<Order>>(environment.order + `/filter?page=${page}&size=${size}&store=${store}&client=${client}&date=${date}&ref=${ref}&status=${statut}`,)
+  filterOrders$ = (store?: string, client?: string, date?: string, ref?: string, statut?: string, page?: number, size?: number) => <Observable<any>>
+    this.http.get<any>(environment.order + `/filter?page=${page}&size=${size}&store=${store}&client=${client}&date=${date}&ref=${ref}&status=${statut}`,)
       .pipe(catchError(this.handleError));
 
   ordersByStore$ = (storeInternalRef: number, page: number, size: number) => <Observable<CustomResponse<Order>>>
@@ -138,16 +138,16 @@ export class OrderService {
       }
     ).pipe(catchError(this.handleError))
 
-  addOrder$ = (order: Order) => <Observable<Order>>
-    this.http.post<Order>(environment.order, order)
+  addOrder$ = (order: Order) => <Observable<any>>
+    this.http.post<any>(environment.order, order)
       .pipe(catchError(this.handleError));
 
-  showOrder$ = (internalRef: number) => <Observable<Order>>
-    this.http.get<Order>(environment.order+`/${internalRef}`)
+  showOrder$ = (internalRef: string) => <Observable<any>>
+    this.http.get<any>(environment.order+`/${internalRef}`)
       .pipe(catchError(this.handleError));
 
-  clientOrders$ = (page: number, size: number, internalRef: number) => <Observable<CustomResponse<Order>>>
-    this.http.get<CustomResponse<Order>>(environment.order+`/client/${internalRef}?page=${page}&size=${size}`)
+  clientOrders$ = (page: number, size: number, internalRef: string) => <Observable<any>>
+    this.http.get<any>(environment.order+`/client/${internalRef}?page=${page}&size=${size}`)
       .pipe(catchError(this.handleError));
 
   sendMailOrder$ = (internalRef: number) => <Observable<Order>>

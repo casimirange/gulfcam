@@ -99,10 +99,17 @@ export class LoginComponent implements OnInit {
     //   );
     // this.credentials.login = this.loginForm.controls['username'].value;
     // this.credentials.password = this.loginForm.controls['password'].value;
+    console.log(this.credentials)
     this.authService.login(this.credentials).subscribe(
       (data) => {
-        this.user = data;
-
+        // this.user = aesUtil.decrypt(key, data.key.toString()) as IToken;
+        console.log('hum')
+        // console.log('premières données', data)
+        // console.log('deuxième données', this.user)
+        // console.log('deuxièmelllllllllll données', this.user.authenticated)
+        // console.log('deuxièmelllllllllll données', aaa)
+        // console.log('troisième données', aesUtil.decrypt(key, data.key.toString()))
+        // console.log('quatrième données', aesUtil.decrypt(key, data.key.toString()) as IToken)
         this.tokenService.saveToken(data);
         this.tokenService.saveEmail(this.credentials.login);
         this.isLoading.next(false);

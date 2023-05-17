@@ -75,16 +75,16 @@ export class DetailsUserComponent implements OnInit {
   getUser() {
     const id = this.route.snapshot.paramMap.get('id');
 
-    this.userService.getUser(parseInt(id)).subscribe(
+    this.userService.getUser(id).subscribe(
       resp => {
-        this.user = resp
+        console.log(JSON.parse(aesUtil.decrypt(key,resp.key.toString())))
+        this.user = JSON.parse(aesUtil.decrypt(key,resp.key.toString()))
         this.typeAccount = this.user.typeAccount.name
         this.statusUser = this.user.status.name
-        console.log(resp)
 
-        this.storeService.getStoreByInternalref(this.user.idStore).subscribe(
+        this.storeService.getStoreByInternalref(aesUtil.encrypt(key, this.user.idStore.toString())).subscribe(
           resp => {
-            this.store = resp
+            this.store = JSON.parse(aesUtil.decrypt(key,resp.key.toString()))
           }
         )
       },
@@ -96,9 +96,10 @@ export class DetailsUserComponent implements OnInit {
   }
 
   enableDesable(){
-    this.activeUser = this.user.status.name == 'USER_ENABLED' ? false : true
+    this.activeUser = this.user.status.name != 'USER_ENABLED'
     this.isLoading.next(true);
-    this.userService.enableDesable(this.user.userId, this.activeUser).subscribe(
+    const id = this.route.snapshot.paramMap.get('id')
+    this.userService.enableDesable(id.toString(), this.activeUser).subscribe(
       resp => {
         this.isLoading.next(false);
         this.notifsService.onSuccess(resp.message)
@@ -112,7 +113,7 @@ export class DetailsUserComponent implements OnInit {
     this.credentials = this.updateUser.value;
     const store = this.stores.filter(store => store.localization === this.updateUser.controls['idStore'].value)
     // for (let st of store){
-    this.credentials.idStore = store[0].internalReference;
+    this.credentials.idStore = store[0].internalReference.toString();
     // }
 
     this.userService.updateUser(this.credentials).subscribe(

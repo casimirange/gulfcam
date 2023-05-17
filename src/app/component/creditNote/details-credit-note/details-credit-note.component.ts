@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {RequestOpposition} from "../../../_model/requestOpposition";
 import {Ticket} from "../../../_model/ticket";
 import {BehaviorSubject} from "rxjs";
@@ -30,10 +30,11 @@ export class DetailsCreditNoteComponent implements OnInit {
   statut: string;
   coupons: Coupon[] = []
 
+  idmanager = aesUtil.decrypt(key, localStorage.getItem('uid').toString())
   constructor(private noteService: CreditNoteService, private activatedRoute: ActivatedRoute, private router: Router,
               private statusService: StatusService, private _location: Location, private notifService: NotifsService) {
     JSON.parse(localStorage.getItem('Roles').toString()).forEach(authority => {
-      this.role.push(aesUtil.decrypt(key,authority));
+      this.role.push(aesUtil.decrypt(key, authority));
     });
   }
 
@@ -43,9 +44,10 @@ export class DetailsCreditNoteComponent implements OnInit {
 
   private getCreditNoteInfos() {
     this.activatedRoute.params.subscribe(params => {
-      this.noteService.getCreditNoteByInternqlRef(params['id']).subscribe(
+      this.noteService.getCreditNoteByInternqlRef(params['id'] as number).subscribe(
         res => {
-          this.creditNote = res;
+          console.log(JSON.parse(aesUtil.decrypt(key, res.key.toString())))
+          this.creditNote = JSON.parse(aesUtil.decrypt(key, res.key.toString()));
           this.statut = this.creditNote.status.name
           this.coupons = this.creditNote.coupon
         }
@@ -58,17 +60,19 @@ export class DetailsCreditNoteComponent implements OnInit {
   }
 
   validCreditNote() {
-    this.isLoading.next(true);
-    this.noteService.validCreditNote(this.creditNote.internalReference).subscribe(
-      resp => {
-        this.isLoading.next(false);
-        this.getCreditNoteInfos()
-        this.notifService.onSuccess("note de crédit validée")
-      },
-      error => {
-        this.isLoading.next(false);
-      }
-    )
+    this.activatedRoute.params.subscribe(params => {
+      this.isLoading.next(true);
+      this.noteService.validCreditNote(params['id'] as number).subscribe(
+        resp => {
+          this.isLoading.next(false);
+          this.getCreditNoteInfos()
+          this.notifService.onSuccess("note de crédit validée")
+        },
+        error => {
+          this.isLoading.next(false);
+        }
+      )
+    })
   }
 
   getStatuts(status: string): string {
@@ -79,17 +83,19 @@ export class DetailsCreditNoteComponent implements OnInit {
     return String(num).padStart(targetLength, '0');
   }
 
-  exportCreditNote(){
-    this.isExporting.next(true)
-    this.noteService.exportCreditNote(this.creditNote.internalReference).subscribe(
-      respProd => {
-        this.isExporting.next(false)
-        const file = new Blob([respProd], { type: 'application/pdf' });
-        const fileURL = URL.createObjectURL(file);
-        window.open(fileURL);
-      },error => {
-        this.isExporting.next(false)
-      }
-    )
+  exportCreditNote() {
+    this.activatedRoute.params.subscribe(params => {
+      this.isExporting.next(true)
+      this.noteService.exportCreditNote(params['id'] as number).subscribe(
+        resp => {
+          this.isExporting.next(false)
+          const file = new Blob([resp], {type: 'application/pdf'});
+          const fileURL = URL.createObjectURL(file);
+          window.open(fileURL);
+        }, error => {
+          this.isExporting.next(false)
+        }
+      )
+    })
   }
 }

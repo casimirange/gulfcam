@@ -81,31 +81,22 @@ export class IndexCouponComponent implements OnInit {
     this.getVouchers();
   }
 
-  //récupération de la liste des magasins
-  getStores(){
-    this.storeService.getStore().subscribe(
-      resp => {
-        this.stores = resp.content
-      },
-    )
-  }
-
   getVouchers(){
     this.voucherService.getTypevoucher().subscribe(
       resp => {
-        this.vouchers = resp.content
+        this.vouchers = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content
       },
     )
   }
 
   //récupération de la liste des entrepots
   getCoupons(){
-    this.appState$ = this.couponService.coupons$(this.page - 1, this.size)
+    this.appState$ = this.couponService.filterCoupon$(this.serialNumber, this.statusFilter, this.typeFilter, this.clientName, this.stationName, this.page - 1, this.size)
       .pipe(
         map(response => {
-          this.dataSubjects.next(response)
-          this.notifService.onSuccess('chargement des coupons')
-          return {dataState: DataState.LOADED_STATE, appData: response}
+          this.dataSubjects.next(JSON.parse(aesUtil.decrypt(key,response.key.toString())))
+          // this.notifService.onSuccess('Chargement des coupons')
+          return {dataState: DataState.LOADED_STATE, appData: JSON.parse(aesUtil.decrypt(key,response.key.toString()))}
         }),
         startWith({dataState: DataState.LOADING_STATE, appData: null}),
         catchError((error: string) => {
@@ -128,17 +119,7 @@ export class IndexCouponComponent implements OnInit {
     //       return of({dataState: DataState.ERROR_STATE, error: error})
     //     })
     //   )
-    this.appState$ = this.couponService.filterCoupon$(this.serialNumber, this.statusFilter, this.typeFilter, this.clientName, this.stationName, this.page - 1, this.size)
-      .pipe(
-        map(response => {
-          this.dataSubjects.next(response)
-          return {dataState: DataState.LOADED_STATE, appData: response}
-        }),
-        startWith({dataState: DataState.LOADING_STATE, appData: null}),
-        catchError((error: string) => {
-          return of({dataState: DataState.ERROR_STATE, error: error})
-        })
-      )
+    this.getCoupons()
   }
 
   getStatuts(status: string): string {
@@ -158,9 +139,9 @@ export class IndexCouponComponent implements OnInit {
     this.appState$ = this.couponService.filterCoupon$(this.serialNumber, this.statusFilter, this.typeFilter, this.clientName, this.stationName, this.page - 1, this.size)
       .pipe(
         map(response => {
-          this.dataSubjects.next(response)
+          this.dataSubjects.next(JSON.parse(aesUtil.decrypt(key,response.key.toString())))
           // this.notifsService.onSuccess('Chargement des commandes')
-          return {dataState: DataState.LOADED_STATE, appData: response}
+          return {dataState: DataState.LOADED_STATE, appData: JSON.parse(aesUtil.decrypt(key,response.key.toString()))}
         }),
         startWith({dataState: DataState.LOADING_STATE, appData: null}),
         catchError((error: string) => {
@@ -186,12 +167,12 @@ export class IndexCouponComponent implements OnInit {
     if (event != '' && event.length >= 3){
       this.clientService.searchClient(event) .subscribe(
         resp => {
-          this.clients = resp;
+          this.clients = JSON.parse(aesUtil.decrypt(key,resp.key.toString()));
           if (this.clients.length <= 1){
             this.filterCoupons()
           }
 
-          if (!resp.length){
+          if (!JSON.parse(aesUtil.decrypt(key,resp.key.toString())).length){
             this.notifService.onError('Ce client n\'existe pas', '')
           }
         }
@@ -209,12 +190,12 @@ export class IndexCouponComponent implements OnInit {
     if (event != '' && event.length >= 3){
       this.stationService.searchStation(event).subscribe(
         resp => {
-          this.stations = resp;
+          this.stations = JSON.parse(aesUtil.decrypt(key,resp.key.toString()));
           if (this.stations.length <= 1){
             this.filterCoupons()
           }
 
-          if (!resp.length){
+          if (!JSON.parse(aesUtil.decrypt(key,resp.key.toString())).length){
             this.notifService.onError('Cette station n\'existe pas', '')
           }
         }

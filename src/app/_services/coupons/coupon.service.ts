@@ -22,15 +22,15 @@ export class CouponService {
     return this.http.get<any>(environment.coupon+`/station/${idStation}?page=${page}&size=${size}`)
   }
 
-  getCouponsBySerialNumber(coupon: string): Observable<Coupon>{
-    return this.http.get<Coupon>(environment.coupon+`/serial/${coupon}`)
+  getCouponsBySerialNumber(coupon: string): Observable<any>{
+    return this.http.get<any>(environment.coupon+`/serial/${coupon}`)
   }
 
   getCouponByInternalRel(coupon: number): Observable<Coupon>{
     return this.http.get<Coupon>(environment.coupon+`/${coupon}`)
   }
 
-  sendCouponByClient(clientInternalReference: number): Observable<any>{
+  sendCouponByClient(clientInternalReference: string): Observable<any>{
     return this.http.get<any>(environment.coupon + `/export/excel/client/${clientInternalReference}`,)
   }
 
@@ -46,8 +46,8 @@ export class CouponService {
    *
    */
 
-  coupons$ = (page?: number, size?: number) => <Observable<CustomResponse<Coupon>>>
-    this.http.get<CustomResponse<Coupon>>(environment.coupon + `?page=${page}&size=${size}`,)
+  coupons$ = (page?: number, size?: number) => <Observable<any>>
+    this.http.get<any>(environment.coupon + `?page=${page}&size=${size}`,)
       .pipe(catchError(this.handleError));
 
   affectClientCoupon$ = (serialNumber: string, idClient: number) => <Observable<Coupon>>
@@ -70,7 +70,7 @@ export class CouponService {
     return throwError(`Une erreur est survenue: ${error.error.message.toString().bold()}` )
   }
 
-  filterCoupon$ = (serialNumber?: string, statut?: string, type?: string, clientName?: string, stationName?: string, page?: number, size?: number) => <Observable<CustomResponse<Coupon>>>
-    this.http.get<CustomResponse<Coupon>>(environment.coupon + `/filter?page=${page}&size=${size}&serialnumber=${serialNumber}&status=${statut}&client=${clientName}&type=${type}&station=${stationName}`,)
+  filterCoupon$ = (serialNumber?: string, statut?: string, type?: string, clientName?: string, stationName?: string, page?: number, size?: number) => <Observable<any>>
+    this.http.get<any>(environment.coupon + `/filter?page=${page}&size=${size}&serialnumber=${serialNumber}&status=${statut}&client=${clientName}&type=${type}&station=${stationName}`,)
       .pipe(catchError(this.handleError));
 }

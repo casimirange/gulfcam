@@ -22,6 +22,7 @@ export class IndexClientComponent implements OnInit {
 
   clients: Client[] = [];
   client: Client = new Client();
+  client2: Client = new Client();
   clientType: string;
   clientForm: FormGroup;
   appState$: Observable<AppState<CustomResponse<Client>>>;
@@ -63,9 +64,9 @@ export class IndexClientComponent implements OnInit {
     this.appState$ = this.clientService.clients$(this.page - 1, this.size)
       .pipe(
         map(response => {
-          this.dataSubjects.next(response)
+          this.dataSubjects.next(JSON.parse(aesUtil.decrypt(key,response.key.toString())) as CustomResponse<Client>)
           this.notifService.onSuccess('chargement des clients')
-          return {dataState: DataState.LOADED_STATE, appData: response}
+          return {dataState: DataState.LOADED_STATE, appData: JSON.parse(aesUtil.decrypt(key,response.key.toString())) as CustomResponse<Client>}
         }),
         startWith({dataState: DataState.LOADING_STATE, appData: null}),
         catchError((error: string) => {
@@ -79,9 +80,9 @@ export class IndexClientComponent implements OnInit {
     this.appState$ = this.clientService.filterClient$(this.companyNameFilter, this.typeFilter, this.clientNameFilter, this.dateFilter, this.page - 1, this.size)
       .pipe(
         map(response => {
-          this.dataSubjects.next(response)
+          this.dataSubjects.next(JSON.parse(aesUtil.decrypt(key,response.key.toString())))
           // this.notifsService.onSuccess('Chargement des commandes')
-          return {dataState: DataState.LOADED_STATE, appData: response}
+          return {dataState: DataState.LOADED_STATE, appData: JSON.parse(aesUtil.decrypt(key,response.key.toString()))}
         }),
         startWith({dataState: DataState.LOADING_STATE, appData: null}),
         catchError((error: string) => {
@@ -106,13 +107,22 @@ export class IndexClientComponent implements OnInit {
 
   saveClient() {
     this.isLoading.next(true)
-    this.client = this.clientForm.value
+    this.client2.completeName = aesUtil.encrypt(key, this.clientForm.controls['completeName'].value.toString())
+    this.client2.companyName = this.clientForm.controls['companyName'].value != '' ? aesUtil.encrypt(key, this.clientForm.controls['companyName'].value.toString()) : ''
+    this.client2.email = this.clientForm.controls['email'].value != '' ? aesUtil.encrypt(key, this.clientForm.controls['email'].value.toString()) : ''
+    this.client2.phone = aesUtil.encrypt(key, this.clientForm.controls['phone'].value.toString())
+    this.client2.address = aesUtil.encrypt(key, this.clientForm.controls['address'].value.toString())
+    this.client2.gulfcamAccountNumber = aesUtil.encrypt(key, this.clientForm.controls['gulfcamAccountNumber'].value.toString())
+    this.client2.rccm = this.clientForm.controls['rccm'].value != '' ? aesUtil.encrypt(key, this.clientForm.controls['rccm'].value.toString()) : ''
+    this.client2.niu = this.clientForm.controls['niu'].value != '' ? aesUtil.encrypt(key, this.clientForm.controls['niu'].value.toString()) : ''
+    this.client2.typeClient = aesUtil.encrypt(key, this.clientForm.controls['typeClient'].value.toString())
+    // console.log(this.client2)
     // this.client.phone = this.clientForm.controls['phone'].value.e164Number
-    this.appState$ = this.clientService.addClient$(this.client)
+    this.appState$ = this.clientService.addClient$(this.client2)
       .pipe(
         map((response) => {
           this.dataSubjects.next(
-            {...this.dataSubjects.value, content: [response, ...this.dataSubjects.value.content]}
+            {...this.dataSubjects.value, content: [JSON.parse(aesUtil.decrypt(key,response.key.toString())), ...this.dataSubjects.value.content]}
           )
           this.annuler()
           this.isLoading.next(false)
@@ -168,7 +178,7 @@ export class IndexClientComponent implements OnInit {
   }
 
   detailsClient(client: Client) {
-    this.router.navigate(['/clients/', client.internalReference])
+    this.router.navigate(['/clients/', aesUtil.encrypt(key, client.internalReference.toString())])
   }
 
   updateClientModal(mymodal: TemplateRef<any>, client: Client) {
@@ -180,11 +190,20 @@ export class IndexClientComponent implements OnInit {
 
   updateClient() {
     this.isLoading.next(true)
-    this.appState$ = this.clientService.updateClient$(this.clientForm.value as Client, this.client.internalReference)
+    this.client2.completeName = aesUtil.encrypt(key, this.clientForm.controls['completeName'].value.toString())
+    this.client2.companyName = this.clientForm.controls['companyName'].value != '' ? aesUtil.encrypt(key, this.clientForm.controls['companyName'].value.toString()) : ''
+    this.client2.email = this.clientForm.controls['email'].value != '' ? aesUtil.encrypt(key, this.clientForm.controls['email'].value.toString()) : ''
+    this.client2.phone = aesUtil.encrypt(key, this.clientForm.controls['phone'].value.toString())
+    this.client2.address = aesUtil.encrypt(key, this.clientForm.controls['address'].value.toString())
+    this.client2.gulfcamAccountNumber = aesUtil.encrypt(key, this.clientForm.controls['gulfcamAccountNumber'].value.toString())
+    this.client2.rccm = this.clientForm.controls['rccm'].value != '' ? aesUtil.encrypt(key, this.clientForm.controls['rccm'].value.toString()) : ''
+    this.client2.niu = this.clientForm.controls['niu'].value != '' ? aesUtil.encrypt(key, this.clientForm.controls['niu'].value.toString()) : ''
+    this.client2.typeClient = aesUtil.encrypt(key, this.clientForm.controls['typeClient'].value.toString())
+    this.appState$ = this.clientService.updateClient$(this.client2, aesUtil.encrypt(key, this.client.internalReference.toString()) as number)
       .pipe(
         map(response => {
-          const index = this.dataSubjects.value.content.findIndex(client => client.internalReference === response.internalReference)
-          this.dataSubjects.value.content[index] = response
+          const index = this.dataSubjects.value.content.findIndex(client => client.internalReference === JSON.parse(aesUtil.decrypt(key,response.key.toString())).internalReference)
+          this.dataSubjects.value.content[index] = JSON.parse(aesUtil.decrypt(key,response.key.toString()))
           this.isLoading.next(false)
           this.notifService.onSuccess("client modifié avec succès!")
           this.annuler()
@@ -235,9 +254,9 @@ export class IndexClientComponent implements OnInit {
     this.appState$ = this.clientService.filterClient$(this.companyNameFilter, this.typeFilter, this.clientNameFilter, this.dateFilter, this.page - 1, this.size)
       .pipe(
         map(response => {
-          this.dataSubjects.next(response)
+          this.dataSubjects.next(JSON.parse(aesUtil.decrypt(key,response.key.toString())))
           // this.notifsService.onSuccess('Chargement des commandes')
-          return {dataState: DataState.LOADED_STATE, appData: response}
+          return {dataState: DataState.LOADED_STATE, appData: JSON.parse(aesUtil.decrypt(key,response.key.toString()))}
         }),
         startWith({dataState: DataState.LOADING_STATE, appData: null}),
         catchError((error: string) => {
@@ -245,5 +264,7 @@ export class IndexClientComponent implements OnInit {
         })
       )
   }
-
+  padWithZero(num, targetLength) {
+    return String(num).padStart(targetLength, '0');
+  }
 }

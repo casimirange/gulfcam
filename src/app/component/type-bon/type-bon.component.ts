@@ -76,8 +76,8 @@ export class TypeBonComponent implements OnInit {
     console.log(this.voucherForm.value)
     this.voucherService.getTypevoucher().subscribe(
       resp => {
-        console.log(resp)
-        this.vouchers = resp.content
+        console.log(JSON.parse(aesUtil.decrypt(key,resp.key.toString())))
+        this.vouchers = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content
         this.notifService.onSuccess('chargement des types de coupons')
       },
       error => {

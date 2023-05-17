@@ -19,11 +19,11 @@ export class OppositionService {
     return this.http.post<any>(environment.requestOpposition, product)
   }
 
-  validOppositionRequest(internalRef: number): Observable<any>{
+  validOppositionRequest(internalRef: string): Observable<any>{
     return this.http.post<any>(environment.requestOpposition+`/${internalRef}`, null)
   }
 
-  getRequestByInternalRef(internalRef: number): Observable<any>{
+  getRequestByInternalRef(internalRef: string): Observable<any>{
     return this.http.get<any>(environment.requestOpposition+`/${internalRef}` )
   }
 
@@ -35,8 +35,8 @@ export class OppositionService {
     return this.http.get<any>(environment.requestOpposition+`/filtre?page=${page}&size=${size}&client=${client}&date=${date}&status=${statut}`,)
   }
 
-  requests$ = (page: number, size: number, client?: string, date?: string, statut?: string, commAttach?: string, saleManager?: string) => <Observable<CustomResponse<RequestOpposition>>>
-    this.http.get<CustomResponse<RequestOpposition>>(environment.requestOpposition + `/filter?page=${page}&size=${size}&client=${client}&date=${date}&status=${statut}&commercialAttach=${commAttach}&salemanager=${saleManager}`,)
+  requests$ = (page: number, size: number, client?: string, date?: string, statut?: string, commAttach?: string, saleManager?: string) => <Observable<any>>
+    this.http.get<any>(environment.requestOpposition + `/filter?page=${page}&size=${size}&client=${client}&date=${date}&status=${statut}&commercialAttach=${commAttach}&salemanager=${saleManager}`,)
       .pipe(catchError(this.handleError));
 
   saveRequest$ = (requestOpposition: RequestOpposition) => <Observable<RequestOpposition>>

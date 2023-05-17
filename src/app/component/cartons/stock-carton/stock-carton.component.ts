@@ -83,6 +83,8 @@ export class StockCartonComponent implements OnInit {
   spaceManager = '';
   dateFilter = '';
   idStoreHouse = '';
+  storeFilter = aesUtil.decrypt(key,localStorage.getItem('store'))
+  idmanager = aesUtil.decrypt(key, localStorage.getItem('uid').toString())
   constructor(private fb: FormBuilder, private modalService: NgbModal, private storeHouseService: StoreHouseService,
               private storeService: StoreService, private notifService: NotifsService, private cartonService: CartonService,
               private carnetService: CarnetService, private voucherService: VoucherService, private couponService: CouponService,
@@ -96,8 +98,11 @@ export class StockCartonComponent implements OnInit {
   ngOnInit(): void {
     this.getTypeVoucher();
     this.getUsers();
+    this.getStores();
     this.getStoreHouses();
     this.getCartons();
+    console.log(localStorage.getItem('uid').toString())
+    console.log(aesUtil.decrypt(key, localStorage.getItem('uid').toString()))
   }
 
   //formulaire de création
@@ -114,32 +119,27 @@ export class StockCartonComponent implements OnInit {
   }
 
   //récupération de la liste des magasins
-  getStores() {
+  getStores(){
     this.storeService.getStore().subscribe(
       resp => {
-        this.stores = resp.content
+        this.stores = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content
       },
+      error => {
+        // this.notifsService.onError(error.error.message, 'échec chargement magasins')
+      }
     )
   }
 
   //récupération de la liste des entrepots
   getCartons() {
-    this.appState$ = this.cartonService.filterCarton$(this.number, this.statusFilter, this.typeFilter, this.idStoreHouse, this.spaceManager, this.dateFilter, this.page - 1, this.size)
-      .pipe(
-        map(response => {
-          this.dataSubjects.next(response)
-          return {dataState: DataState.LOADED_STATE, appData: response}
-        }),
-        startWith({dataState: DataState.LOADING_STATE, appData: null}),
-        catchError((error: string) => {
-          return of({dataState: DataState.ERROR_STATE, error: error})
-        })
-      )
+    this.filterCartons()
+    this.notifService.onSuccess('chargement des cartons')
   }
 
   //récupération de la liste des entrepots
   getStoreHouses() {
-    this.storeHouseService.getStoreHousesByStore(parseInt(aesUtil.decrypt(key, localStorage.getItem('store')))).subscribe(
+    this.idStoreHouse = ''
+    this.storeHouseService.getStoreHousesByStore(this.storeFilter).subscribe(
       resp => {
         this.isLoading.next(false);
         this.storeHouses = resp.content.filter(sth => sth.type == 'stockage')
@@ -155,14 +155,15 @@ export class StockCartonComponent implements OnInit {
   saveCarton() {
     this.isLoading.next(true);
     let typ = this.vouchers.find(tv => tv.amount == parseInt(this.cartonForm.controls['typeVoucher'].value))
-    this.carton.idSpaceManager1 = parseInt(aesUtil.decrypt(key, localStorage.getItem('uid').toString()))
-    this.carton.idStoreHouseStockage = parseInt(this.cartonForm.controls['idStoreHouse'].value)
-    this.carton.number = parseInt(this.cartonForm.controls['number'].value)
-    this.carton.from = parseInt(this.cartonForm.controls['from'].value)
-    this.carton.to = parseInt(this.cartonForm.controls['to'].value)
-    this.carton.serialFrom = parseInt(this.cartonForm.controls['serialFrom'].value)
-    this.carton.serialTo = parseInt(this.cartonForm.controls['serialTo'].value)
-    this.carton.typeVoucher = typ.amount
+    this.carton.idSpaceManager1 = aesUtil.encrypt(key, this.idmanager.toString()) as number
+    this.carton.idStoreHouseStockage = aesUtil.encrypt(key, this.cartonForm.controls['idStoreHouse'].value.toString()) as number
+    this.carton.number = aesUtil.encrypt(key, this.cartonForm.controls['number'].value.toString()) as number
+    this.carton.from = aesUtil.encrypt(key, this.cartonForm.controls['from'].value.toString()) as number
+    this.carton.to = aesUtil.encrypt(key, this.cartonForm.controls['to'].value.toString()) as number
+    this.carton.serialFrom = aesUtil.encrypt(key, this.cartonForm.controls['serialFrom'].value.toString()) as number
+    this.carton.serialTo = aesUtil.encrypt(key, this.cartonForm.controls['serialTo'].value.toString()) as number
+    this.carton.typeVoucher = aesUtil.encrypt(key, typ.amount.toString()) as number
+    console.log(this.carton)
     this.cartonService.createCarton(this.carton).subscribe(
       resp => {
         this.isLoading.next(false);
@@ -180,7 +181,7 @@ export class StockCartonComponent implements OnInit {
   getTypeVoucher(): void {
     this.voucherService.getTypevoucher().subscribe(
       resp => {
-        this.vouchers = resp.content
+        this.vouchers = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content
       }
     )
   }
@@ -189,8 +190,8 @@ export class StockCartonComponent implements OnInit {
     const type = 'MANAGER_SPACES_1'
     this.userService.getUsersByTypeAccount(type.toString()).subscribe(
       resp => {
-        console.log(resp)
-        this.users = resp
+        // console.log(resp)
+        this.users = JSON.parse((aesUtil.decrypt(key, resp.key.toString())))
       }
     )
   }
@@ -220,17 +221,7 @@ export class StockCartonComponent implements OnInit {
 
   pageChange(event: number) {
     this.page = event
-    this.appState$ = this.cartonService.filterCarton$(this.number, this.statusFilter, this.typeFilter, this.idStoreHouse, this.spaceManager, this.dateFilter, this.page - 1, this.size)
-      .pipe(
-        map(response => {
-          this.dataSubjects.next(response)
-          return {dataState: DataState.LOADED_STATE, appData: response}
-        }),
-        startWith({dataState: DataState.LOADING_STATE, appData: null}),
-        catchError((error: string) => {
-          return of({dataState: DataState.ERROR_STATE, error: error})
-        })
-      )
+    this.filterCartons()
   }
 
   removeZeros(coupon: string): string {
@@ -256,9 +247,9 @@ export class StockCartonComponent implements OnInit {
     this.appState$ = this.cartonService.filterCarton$(this.number, this.statusFilter, this.typeFilter, this.idStoreHouse, this.spaceManager, this.dateFilter, this.page - 1, this.size)
       .pipe(
         map(response => {
-          this.dataSubjects.next(response)
+          this.dataSubjects.next(JSON.parse(aesUtil.decrypt(key,response.key.toString())))
           // this.notifsService.onSuccess('Chargement des commandes')
-          return {dataState: DataState.LOADED_STATE, appData: response}
+          return {dataState: DataState.LOADED_STATE, appData: JSON.parse(aesUtil.decrypt(key,response.key.toString()))}
         }),
         startWith({dataState: DataState.LOADING_STATE, appData: null}),
         catchError((error: string) => {

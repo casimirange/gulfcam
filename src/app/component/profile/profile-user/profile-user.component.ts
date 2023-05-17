@@ -10,6 +10,7 @@ import {StoreService} from "../../../_services/store/store.service";
 import {StatusAccountService} from "../../../_services/status/status-account.service";
 import {StatusUserService} from "../../../_services/status/status-user.service";
 import {RoleUserService} from "../../../_services/role/role-user.service";
+import {aesUtil, key} from "../../../_helpers/aes";
 
 @Component({
   selector: 'app-profile-user',
@@ -28,6 +29,7 @@ export class ProfileUserComponent implements OnInit {
   form: any;
   private isLoading = new BehaviorSubject<boolean>(false);
   isLoading$ = this.isLoading.asObservable();
+  id: any
   constructor(private userService: UsersService,  private notifsService: NotifsService, private route: ActivatedRoute,
               private router: Router, private fb: FormBuilder) {
     this.changePwd = this.fb.group({
@@ -36,19 +38,24 @@ export class ProfileUserComponent implements OnInit {
       cpass: ['', [Validators.required, Validators.pattern("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*+./;:-]).{8,}$")]]
     });
 
+
     this.form = this.changePwd.controls;
   }
 
   ngOnInit(): void {
+    console.log(aesUtil.decrypt(key, localStorage.getItem('id').toString()))
+    this.id = aesUtil.encrypt(key, (aesUtil.decrypt(key, this.route.snapshot.paramMap.get('id').toString()) as string));
     this.getUser()
   }
 
   getUser() {
-    const id = this.route.snapshot.paramMap.get('id');
+    // this.id = aesUtil.encrypt(key, (aesUtil.decrypt(key, this.route.snapshot.paramMap.get('id').toString()) as string));
 
-    this.userService.getUser(parseInt(id)).subscribe(
+    this.userService.getUser(this.id).subscribe(
       resp => {
-        this.user = resp
+        console.log(JSON.parse(aesUtil.decrypt(key,resp.key.toString())))
+        this.user = JSON.parse(aesUtil.decrypt(key,resp.key.toString()))
+
       },
       err => {
         this.notifsService.onError(err.error.message, 'échec chargement de l\'utilisateur')
@@ -63,11 +70,13 @@ export class ProfileUserComponent implements OnInit {
       "oldPassword": "string",
       "password": "string"
     }
-    body.oldPassword = this.changePwd.controls['oldpassword'].value;
-    body.password = this.changePwd.controls['password'].value;
-    const id = this.route.snapshot.paramMap.get('id');
+    body.oldPassword = aesUtil.encrypt(key, this.changePwd.controls['oldpassword'].value);
+    body.password = aesUtil.encrypt(key, this.changePwd.controls['password'].value);
+    const id = aesUtil.encrypt(key, (aesUtil.decrypt(key, this.route.snapshot.paramMap.get('id').toString()) as string));
+    console.log(id)
+    console.log(body)
 
-    this.userService.changePassword(parseInt(id), body).subscribe(
+    this.userService.changePassword(this.id, body).subscribe(
       resp => {
         console.log(resp)
         this.isLoading.next(false);

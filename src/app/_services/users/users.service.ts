@@ -20,15 +20,15 @@ export class UsersService {
     return this.http.get<any>(environment.users);
   }
 
-  users$ = (firstname?: string, lastname?: string, type?: string, status?: string, idStore?: string, page?: number, size?: number) => <Observable<CustomResponse<ISignup>>>
-    this.http.get<CustomResponse<ISignup>>(environment.users + `/filter?page=${page}&size=${size}&firstName=${firstname}&lastName=${lastname}&typeAccount=${type}&status=${status}&store=${idStore}`,)
+  users$ = (firstname?: string, lastname?: string, type?: string, status?: string, idStore?: string, page?: number, size?: number) => <Observable<any>>
+    this.http.get<any>(environment.users + `/filter?page=${page}&size=${size}&firstName=${firstname}&lastName=${lastname}&typeAccount=${type}&status=${status}&store=${idStore}`,)
       .pipe(catchError(this.handleError));
 
   getAllUsersWithPagination(page: number, size: number): Observable<any>{
     return this.http.get<any>(environment.users+ `?page=${page}&size=${size}`)
   }
 
-  getUser(internalRef: number): Observable<any>{
+  getUser(internalRef: string): Observable<any>{
     return this.http.get<any>(environment.users + `/${internalRef}`);
   }
 
@@ -36,7 +36,7 @@ export class UsersService {
     return this.http.get<any>(environment.users + `/typeaccount/${type}`);
   }
 
-  enableDesable(internalRef: number, status: boolean): Observable<any>{
+  enableDesable(internalRef: string, status: boolean): Observable<any>{
     return this.http.get<any>(environment.users + `/lockAndUnlockAccount/${internalRef}/${status}`);
   }
 
@@ -44,7 +44,7 @@ export class UsersService {
     return this.http.put<any>(environment.users, user);
   }
 
-  changePassword(userId: number, body: any): Observable<any>{
+  changePassword(userId: string, body: any): Observable<any>{
     return this.http.put<any>(environment.changePassword + `/${userId}/password-update`, body);
   }
 

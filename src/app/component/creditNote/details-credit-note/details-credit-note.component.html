@@ -14,12 +14,12 @@
               <li class="breadcrumb-item">
                 <a>
                   <i aria-hidden="true" class="fa fa-calendar"></i> Date:
-                  &nbsp; {{creditNote.createdAt | date: 'dd/MM/yyyy'}}
+                  &nbsp; {{creditNote.createdAt[2]+'/'+creditNote.createdAt[1]+'/'+creditNote.createdAt[0]}}
                 </a>
               </li>
               <li class="active breadcrumb-item" aria-current="page">
                 <a>
-                  <i class="fa fa-charging-station"></i> Statut&nbsp; {{getStatuts(statut)}}
+                  <i class="fa fa-charging-station"></i> Statut:&nbsp; <span class="text-success font-weight-bold">{{getStatuts(statut) == 'ACTIVE(E)' ? 'VALIDEE' : 'NON VALIDEE' }}</span>
                 </a>
               </li>
             </ol>
@@ -83,7 +83,7 @@
                 <th>Carnet</th>
                 <th>Statut</th>
                 <th>Note credit</th>
-                <th>Date</th>
+<!--                <th>Date</th>-->
               </tr>
               </thead>
               <tbody *ngFor="let coupon of coupons; let i = index">
@@ -95,7 +95,7 @@
                 <td>{{coupon.idNotebook}}</td>
                 <td>{{getStatuts(coupon.status.name)}}</td>
                 <td>{{coupon.idCreditNote}}</td>
-                <td>{{coupon.createdAt | date: 'dd/MM/yyyy'}}</td>
+<!--                <td>{{coupon.createdAt | date: 'dd/MM/yyyy'}}</td>-->
               </tr>
               </tbody>
             </table>

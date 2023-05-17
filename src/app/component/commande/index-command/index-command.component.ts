@@ -24,11 +24,14 @@ import {DataState} from "../../../_enum/data.state.enum";
 import {catchError, map, startWith} from "rxjs/operators";
 import {ConfigOptions} from "../../../configOptions/config-options";
 import {aesUtil, key} from "../../../_helpers/aes";
-export class Product{
+import {Router} from "@angular/router";
+
+export class Product {
   quantity: number;
   voucher: number;
   total?: number
 }
+
 @Component({
   selector: 'app-index-command',
   templateUrl: './index-command.component.html',
@@ -41,7 +44,7 @@ export class IndexCommandComponent implements OnInit {
   client: Client;
   store: Store;
   showClientForm = false;
-  orderForm: FormGroup ;
+  orderForm: FormGroup;
   orF: any;
   canaux = ['Appel', 'Courier papier', 'Email', 'Sur site']
   stores: Store[] = [];
@@ -57,9 +60,9 @@ export class IndexCommandComponent implements OnInit {
   orders: Order[] = [];
   filtredOrders: Order[] = [];
   order: Order = new Order();
-  @ViewChild('orderModal', { static: false }) commandModal?: ElementRef<HTMLElement>;
+  @ViewChild('orderModal', {static: false}) commandModal?: ElementRef<HTMLElement>;
   clientName = ''
-  storeFilter = aesUtil.decrypt(key,localStorage.getItem('store'))
+  storeFilter = aesUtil.decrypt(key, localStorage.getItem('store'))
   statusFilter = ''
   refCli = ''
   date = '';
@@ -79,30 +82,31 @@ export class IndexCommandComponent implements OnInit {
   role: string[] = []
   clientNotFound: boolean = false;
   onFilter: boolean = false;
+
   constructor(private fb: FormBuilder, private modalService: NgbModal, private clientService: ClientService,
               private voucherService: VoucherService, private notifsService: NotifsService, private storeService: StoreService,
               private productService: ProductService, private orderService: OrderService, private statusService: StatusOrderService,
-              public global: ConfigOptions
+              public global: ConfigOptions, private router: Router
   ) {
     this.formOrder();
     this.orF = this.orderForm.controls;
     JSON.parse(localStorage.getItem('Roles').toString()).forEach(authority => {
-      this.role.push(aesUtil.decrypt(key,authority));
+      this.role.push(aesUtil.decrypt(key, authority));
     });
   }
 
   //initialisation de création du formulaire de commande
 
-  formOrder(){
+  formOrder() {
     this.orderForm = this.fb.group({
       client: ['', [Validators.required, Validators.minLength(3)]],
       // store: ['', [Validators.required, ]],
-      chanel: ['', [Validators.required, ]],
+      chanel: ['', [Validators.required,]],
       quantity: ['', [Validators.required, Validators.pattern('^[1,2,3,4,5,6,7,8,9][0-9]*$')]],
       voucherType: ['', [Validators.required]],
       delais: ['',],
       description: ['',],
-      refCli: ['', ],
+      refCli: ['',],
     });
   }
 
@@ -113,37 +117,37 @@ export class IndexCommandComponent implements OnInit {
     this.getOrders()
   }
 
-  getClients(): void{
-    this.clientService.getAllClients().subscribe(
-      resp => {
-        this.clients = resp.content;
-      }
-    )
+  getClients(): void {
+    // this.clientService.getAllClients().subscribe(
+    //   resp => {
+    //     this.clients = resp.content;
+    //   }
+    // )
   }
 
-  findClients(event: string): Client[]{
-    if (event != '' && event.length >= 3){
-      this.clientService.searchClient(event) .subscribe(
+  findClients(event: string): Client[] {
+    if (event != '' && event.length >= 3) {
+      this.clientService.searchClient(event).subscribe(
         resp => {
-          this.clients = resp;
-          if (!resp.length){
+          this.clients = JSON.parse(aesUtil.decrypt(key, resp.key.toString()));
+          if (!this.clients.length) {
             this.notifsService.onError('Ce client n\'existe pas', '')
             this.clientNotFound = true
-          }else {
+          } else {
             this.clientNotFound = false
           }
         }
       )
-    }else {
+    } else {
       this.clients = []
     }
     return this.clients
   }
 
-  getStores(){
+  getStores() {
     this.storeService.getStore().subscribe(
       resp => {
-        this.stores = resp.content
+        this.stores = JSON.parse(aesUtil.decrypt(key, resp.key.toString())).content
       },
       error => {
         // this.notifsService.onError(error.error.message, 'échec chargement magasins')
@@ -151,31 +155,32 @@ export class IndexCommandComponent implements OnInit {
     )
   }
 
-  getTypeVoucher(): void{
+  getTypeVoucher(): void {
     this.voucherService.getTypevoucher().subscribe(
       resp => {
-        this.vouchers = resp.content
+        this.vouchers = JSON.parse(aesUtil.decrypt(key, resp.key.toString())).content
       }
     )
   }
 
-  addProduct(){
+  addProduct() {
     this.tabProd = new Product();
     this.tabProd.quantity = parseInt(this.orF['quantity'].value);
     this.tabProd.voucher = this.orF['voucherType'].value;
     this.tabProd.total = this.orF['quantity'].value * this.orF['voucherType'].value * 10;
     const prod = this.tabProducts.find(tb => tb.voucher == this.tabProd.voucher)
     const index = this.tabProducts.findIndex(client => client.voucher === this.tabProd.voucher);
-      if (!prod){
-        this.tabProducts.push(this.tabProd)
-      }else {
-        prod.quantity += this.tabProd.quantity
-        prod.total += this.tabProd.total
-      }
+    if (!prod) {
+      this.tabProducts.push(this.tabProd)
+    } else {
+      prod.quantity += this.tabProd.quantity
+      prod.total += this.tabProd.total
+    }
     this.tabProducts[index] = prod
-    this.orF['quantity'].clear; this.orF['voucherType'].clear
+    this.orF['quantity'].clear;
+    this.orF['voucherType'].clear
     this.totalOrder = 0;
-    for(let prod of this.tabProducts){
+    for (let prod of this.tabProducts) {
       this.totalOrder = this.totalOrder + prod.total
     }
     this.totalTTC = this.totalOrder * this.global.tax + this.totalOrder
@@ -183,36 +188,36 @@ export class IndexCommandComponent implements OnInit {
     this.orF['voucherType'].reset();
   }
 
-  removeProduct(index: Product){
+  removeProduct(index: Product) {
     this.tabProd = new Product()
     const prodIndex = this.tabProducts.indexOf(index)
     this.tabProducts.splice(prodIndex, 1)
     this.totalOrder = 0;
-    for(let prod of this.tabProducts){
+    for (let prod of this.tabProducts) {
       this.totalOrder = this.totalOrder + prod.total
     }
     this.totalTTC = this.totalOrder * this.global.tax + this.totalOrder
   }
 
-  showClientForms(){
+  showClientForms() {
     this.showClientForm = true;
     this.title = 'Enregistrer nouveau client';
   }
 
-  showOrderForms(){
+  showOrderForms() {
     this.showClientForm = false;
     this.title = 'Enregistrer nouvelle commande';
   }
 
-  getOrders(){
+  getOrders() {
     this.orderState$ = this.orderService.filterOrders$(
-      this.storeFilter , this.clientName, this.date, this.internalRef, this.statusFilter,
+      this.storeFilter, this.clientName, this.date, this.internalRef, this.statusFilter,
       this.page - 1, this.size)
       .pipe(
         map(response => {
-          this.dataSubjects.next(response)
+          this.dataSubjects.next(JSON.parse(aesUtil.decrypt(key, response.key.toString())))
           this.notifsService.onSuccess('Chargement des commandes')
-          return {dataState: DataState.LOADED_STATE, appData: response}
+          return {dataState: DataState.LOADED_STATE, appData: JSON.parse(aesUtil.decrypt(key, response.key.toString()))}
         }),
         startWith({dataState: DataState.LOADING_STATE, appData: null}),
         catchError((error: string) => {
@@ -236,16 +241,16 @@ export class IndexCommandComponent implements OnInit {
     //   )
   }
 
-  filterOrders(){
+  filterOrders() {
 
     this.orderState$ = this.orderService.filterOrders$(
       this.storeFilter, this.clientName, this.date, this.internalRef, this.statusFilter,
       this.page - 1, this.size)
       .pipe(
         map(response => {
-          this.dataSubjects.next(response)
+          this.dataSubjects.next(JSON.parse(aesUtil.decrypt(key, response.key.toString())))
           // this.notifsService.onSuccess('Chargement des commandes')
-          return {dataState: DataState.LOADED_STATE, appData: response}
+          return {dataState: DataState.LOADED_STATE, appData: JSON.parse(aesUtil.decrypt(key, response.key.toString()))}
         }),
         startWith({dataState: DataState.LOADING_STATE, appData: null}),
         catchError((error: string) => {
@@ -269,7 +274,7 @@ export class IndexCommandComponent implements OnInit {
     this.showOrderForms();
   }
 
-  saveOrder(){
+  saveOrder() {
     this.isLoading.next(true);
     //on récupère les informations du client
     this.client = this.findClients(this.orF['client'].value)[0]
@@ -288,29 +293,29 @@ export class IndexCommandComponent implements OnInit {
     this.order.ttcaggregateAmount = this.totalOrder;
     this.order.netAggregateAmount = this.totalOrder;
 
-if ( this.client.completeName ) {
-  this.orderState$ = this.orderService.addOrder$(this.order)
-    .pipe(
-      map((response) => {
-        // this.dataSubjects.next(
-        //   {...this.dataSubjects.value , content: [response, ...this.dataSubjects.value.content]}
-        // )
-        this.isLoading.next(false)
-        this.saveProductsOrder(response)
-        // this.getProforma(response);
-        this.annuler()
-        this.getOrders()
-        return {dataState: DataState.LOADED_STATE, appData: this.dataSubjects.value}
-      }),
-      startWith({dataState: DataState.LOADED_STATE, appData: this.dataSubjects.value}),
-      catchError((error: string) => {
-        this.isLoading.next(false)
-        return of({dataState: DataState.ERROR_STATE, error: error})
-      })
-    )
-}else {
-  this.notifsService.onWarning("Ce client n'existe pas")
-}
+    if (this.client.completeName) {
+      this.orderState$ = this.orderService.addOrder$(this.order)
+        .pipe(
+          map((response) => {
+            // this.dataSubjects.next(
+            //   {...this.dataSubjects.value , content: [response, ...this.dataSubjects.value.content]}
+            // )
+            this.isLoading.next(false)
+            this.saveProductsOrder(JSON.parse(aesUtil.decrypt(key,response.key.toString())))
+            // this.getProforma(response);
+            this.annuler()
+            this.getOrders()
+            return {dataState: DataState.LOADED_STATE, appData: this.dataSubjects.value}
+          }),
+          startWith({dataState: DataState.LOADED_STATE, appData: this.dataSubjects.value}),
+          catchError((error: string) => {
+            this.isLoading.next(false)
+            return of({dataState: DataState.ERROR_STATE, error: error})
+          })
+        )
+    } else {
+      this.notifsService.onWarning("Ce client n'existe pas")
+    }
 
     //on enregistre une nouvelle commande
     // this.orderService.saveOrder(this.order).subscribe(
@@ -336,9 +341,9 @@ if ( this.client.completeName ) {
 
   }
 
-  saveProductsOrder(order: Order){
+  saveProductsOrder(order: Order) {
     //une fois la commande enregistrée, on enregistre les produits liés à cette commande
-    for(let prod of this.tabProducts){
+    for (let prod of this.tabProducts) {
       this.voucher = this.vouchers.find(v => v.amount == prod.voucher)
       this.Product.quantityNotebook = prod.quantity
       this.Product.idTypeVoucher = this.voucher.internalReference
@@ -347,25 +352,25 @@ if ( this.client.completeName ) {
     }
   }
 
-  getProforma(order: Order){
-    this.orderService.getProforma(order.internalReference).subscribe(
+  getProforma(order: Order) {
+    this.orderService.getProforma(aesUtil.encrypt(key, order.internalReference.toString())).subscribe(
       respProd => {
-        const file = new Blob([respProd], { type: 'application/pdf' });
+        const file = new Blob([respProd], {type: 'application/pdf'});
         const fileURL = URL.createObjectURL(file);
         window.open(fileURL);
       },
     )
   }
 
-  openCommandModal(content: any){
+  openCommandModal(content: any) {
     const modal = true;
-    this.modalService.open(content, {ariaLabelledBy: 'modal-basic-titles', size: 'xl', });
+    this.modalService.open(content, {ariaLabelledBy: 'modal-basic-titles', size: 'xl',});
   }
 
-  pageChange(event: number){
+  pageChange(event: number) {
     this.page = event
     this.orderState$ = this.orderService.filterOrders$(
-       this.storeFilter, this.clientName, this.date, this.internalRef, this.statusFilter,
+      this.storeFilter, this.clientName, this.date, this.internalRef, this.statusFilter,
       this.page - 1, this.size)
       .pipe(
         map(response => {
@@ -384,14 +389,14 @@ if ( this.client.completeName ) {
     return this.statusService.allStatus(status)
   }
 
-  formatNumber(amount: any): string{
-    return parseInt(amount).toFixed(0).replace(/(\d)(?=(\d{3})+\b)/g,'$1 ');
+  formatNumber(amount: any): string {
+    return parseInt(amount).toFixed(0).replace(/(\d)(?=(\d{3})+\b)/g, '$1 ');
   }
 
   showFilter() {
     this.onFilter = !this.onFilter
 
-    if (!this.onFilter){
+    if (!this.onFilter) {
       this.statusFilter = '';
       this.clientName = '';
       this.storeFilter = aesUtil.decrypt(key, localStorage.getItem('store'))
@@ -402,26 +407,30 @@ if ( this.client.completeName ) {
     }
   }
 
-  findClientsForFilter(event: string): Client[]{
-    if (event != '' && event.length >= 3){
-      this.clientService.searchClient(event) .subscribe(
+  findClientsForFilter(event: string): Client[] {
+    if (event != '' && event.length >= 3) {
+      this.clientService.searchClient(event).subscribe(
         resp => {
-          this.clients = resp;
-          if (this.clients.length <= 1){
+          this.clients = JSON.parse(aesUtil.decrypt(key, resp.key.toString()));
+          if (this.clients.length <= 1) {
             this.filterOrders()
           }
 
-          if (!resp.length){
+          if (!JSON.parse(aesUtil.decrypt(key, resp.key.toString())).length) {
             this.notifsService.onError('Ce client n\'existe pas', '')
           }
         }
       )
-    }else {
-      if (this.clientName == ''){
+    } else {
+      if (this.clientName == '') {
         this.filterOrders()
       }
       this.clients = []
     }
     return this.clients
+  }
+
+  detailsOrder(id: number) {
+    this.router.navigate(['/commandes/complete-order/', aesUtil.encrypt(key, id.toString())])
   }
 }

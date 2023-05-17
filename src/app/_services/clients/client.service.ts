@@ -31,8 +31,8 @@ export class ClientService {
     return this.http.post<Client>(environment.client, client)
   }
 
-  findClient(internalRef: number): Observable<Client>{
-    return this.http.get<Client>(environment.client+`/${internalRef}`)
+  findClient(internalRef: string): Observable<any>{
+    return this.http.get<any>(environment.client+`/${internalRef}`)
   }
 
   deleteClient(internalref: number): Observable<any>{
@@ -51,28 +51,28 @@ export class ClientService {
    */
 
 
-  clients$ = (page: number, size: number) => <Observable<CustomResponse<Client>>>
-    this.http.get<CustomResponse<Client>>(environment.client + `?page=${page}&size=${size}`,)
+  clients$ = (page: number, size: number) => <Observable<any>>
+    this.http.get<any>(environment.client + `?page=${page}&size=${size}`,)
       .pipe(catchError(this.handleError));
 
-  addClient$ = (client: Client) => <Observable<Client>>
-    this.http.post<Client>(environment.client, client)
+  addClient$ = (client: Client) => <Observable<any>>
+    this.http.post<any>(environment.client, client)
       .pipe(catchError(this.handleError));
 
-  updateClient$ = (client: Client, internalRef: number) => <Observable<Client>>
-    this.http.put<Client>(environment.client+`/${internalRef}`, client)
+  updateClient$ = (client: Client, internalRef: number) => <Observable<any>>
+    this.http.put<any>(environment.client+`/${internalRef}`, client)
       .pipe(catchError(this.handleError));
 
   deleteClient$ = (internalRef: number) => <Observable<Client>>
     this.http.delete<Client>(environment.client+`/${internalRef}`)
       .pipe(catchError(this.handleError));
 
-  showClient$ = (internalRef: number) => <Observable<Client>>
-    this.http.get<Client>(environment.client+`/${internalRef}`)
+  showClient$ = (internalRef: string) => <Observable<any>>
+    this.http.get<any>(environment.client+`/${internalRef}`)
       .pipe(catchError(this.handleError));
 
-  filterClient$ = (companyName?: string, type?: string, clientName?: string, date?: string, page?: number, size?: number) => <Observable<CustomResponse<Client>>>
-    this.http.get<CustomResponse<Client>>(environment.client + `/filter?page=${page}&size=${size}&company=${companyName}&date=${date}&name=${clientName}&type=${type}`,)
+  filterClient$ = (companyName?: string, type?: string, clientName?: string, date?: string, page?: number, size?: number) => <Observable<any>>
+    this.http.get<any>(environment.client + `/filter?page=${page}&size=${size}&company=${companyName}&date=${date}&name=${clientName}&type=${type}`,)
       .pipe(catchError(this.handleError));
 
   handleError(error: HttpErrorResponse): Observable<never>{

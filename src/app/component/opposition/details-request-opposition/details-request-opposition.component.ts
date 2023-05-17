@@ -31,7 +31,7 @@ export class DetailsRequestOppositionComponent implements OnInit {
   totalElements: number;
   size: number = 10;
   statut: string;
-
+  idmanager = aesUtil.decrypt(key, localStorage.getItem('uid').toString())
 
   constructor(private requestService: OppositionService, private activatedRoute: ActivatedRoute, private router: Router,
               private ticketService: TicketService, private notifService: NotifsService, private statusService: StatusService,
@@ -48,9 +48,11 @@ export class DetailsRequestOppositionComponent implements OnInit {
 
   getRequestInfos() {
     this.activatedRoute.params.subscribe(params => {
-      this.requestService.getRequestByInternalRef(params['id']).subscribe(
+      this.requestService.getRequestByInternalRef(params['id'] as string).subscribe(
         res => {
-          this.request = res;
+
+          console.log(JSON.parse(aesUtil.decrypt(key,res.key.toString())));
+          this.request = JSON.parse(aesUtil.decrypt(key,res.key.toString()));
           this.statut = this.request.status.name
         }
       )
@@ -60,13 +62,13 @@ export class DetailsRequestOppositionComponent implements OnInit {
   getTicketsByRequestOpposition() {
     this.tickets = []
     this.activatedRoute.params.subscribe(params => {
-      this.ticketService.getTicketByRequestOpposition(params['id'], this.page-1, this.size).subscribe(
-        res => {
-          this.tickets = res.content;
-          this.size = res.size
-          this.totalPages = res.totalPages
-          this.totalElements = res.totalElements
-          this.getCoupons()
+      this.ticketService.getTicketByRequestOpposition(params['id'] as number, this.page-1, this.size).subscribe(
+        resp => {
+          this.tickets = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content;
+          this.size = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).size
+          this.totalPages = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).totalPages
+          this.totalElements = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).totalElements
+          // this.getCoupons()
           this.notifService.onSuccess('chargement des tickets')
         }
       )

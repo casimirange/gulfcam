@@ -60,8 +60,8 @@ export class StationService {
     return throwError(`Une erreur est survenue: ${error.error.message.toString().bold()}` )
   }
 
-  filterStation$ = (designation?: string, localization?: string, pinCode?: string, idManagerStation?: string, page?: number, size?: number) => <Observable<CustomResponse<Station>>>
-    this.http.get<CustomResponse<Station>>(environment.station + `/filter?page=${page}&size=${size}&designation=${designation}&localization=${localization}&pinCode=${pinCode}&idManagerStation=${idManagerStation}`,)
+  filterStation$ = (designation?: string, localization?: string, pinCode?: string, idManagerStation?: string, page?: number, size?: number) => <Observable<any>>
+    this.http.get<any>(environment.station + `/filter?page=${page}&size=${size}&designation=${designation}&localization=${localization}&pinCode=${pinCode}&idManagerStation=${idManagerStation}`,)
       .pipe(catchError(this.handleError));
 
   addStation$ = (station: Station) => <Observable<Station>>

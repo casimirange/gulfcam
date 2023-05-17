@@ -118,6 +118,7 @@ export class TokenService {
     localStorage.removeItem('firstName')
     localStorage.removeItem('lastName')
     localStorage.removeItem('uid')
+    localStorage.removeItem('store')
     localStorage.removeItem('id')
     // localStorage.setItem('roles', <string>token.roles);
     this.router.navigate(['auth']);
@@ -134,8 +135,10 @@ export class TokenService {
     localStorage.removeItem('id')
     localStorage.removeItem('Roles')
     localStorage.removeItem('exp')
+    localStorage.removeItem('store')
     localStorage.removeItem('_expiredTime')
     this.router.navigate(['auth']);
+    this.bnIdle.stopTimer()
   }
 
   isLogged(): boolean{

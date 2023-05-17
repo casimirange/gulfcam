@@ -74,11 +74,21 @@ export class AddUserComponent implements OnInit {
   saveUser() {
     this.isLoading.next(true);
     this.credentials = this.signup.value;
+    console.log('user1', this.credentials)
+    this.credentials.email = aesUtil.encrypt(key, this.signup.controls['email'].value);
+    this.credentials.typeAccount = aesUtil.encrypt(key, this.signup.controls['typeAccount'].value);
+    this.credentials.telephone = aesUtil.encrypt(key, this.signup.controls['telephone'].value);
+    this.credentials.firstName = aesUtil.encrypt(key, this.signup.controls['firstName'].value);
+    this.credentials.lastName = aesUtil.encrypt(key, this.signup.controls['lastName'].value);
+    this.credentials.roleName = aesUtil.encrypt(key, this.signup.controls['roleName'].value);
+    this.credentials.password = aesUtil.encrypt(key, this.signup.controls['password'].value);
+    this.credentials.pinCode = aesUtil.encrypt(key, this.signup.controls['pinCode'].value);
+    this.credentials.position = aesUtil.encrypt(key, this.signup.controls['position'].value);
     // on recherche l'id du magasin dans la liste des magasins
-    console.log(this.credentials)
-    const store = this.stores.find(store => store.localization === this.signup.controls['idStore'].value)
-    this.credentials.idStore = store.internalReference;
 
+    const store = this.stores.find(store => store.localization === this.signup.controls['idStore'].value)
+    this.credentials.idStore = aesUtil.encrypt(key, store.internalReference.toString());
+    console.log('user2', this.credentials)
     this.authService.signup(this.credentials).subscribe(
       resp => {
         this.isLoading.next(false);

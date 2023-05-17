@@ -62,7 +62,7 @@ export class ApprovisionnerCarnetComponent implements OnInit {
   getCartons(): void{
     this.cartonService.getAllCartonWithPagination(0, 500).subscribe(
       resp => {
-        this.cartons = resp.content.filter((carton: Carton) => carton.status.name === 'AVAILABLE' && carton.storeHouse.idStore == parseInt(aesUtil.decrypt(key, localStorage.getItem('store'))))
+        this.cartons = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content.filter((carton: Carton) => carton.status.name === 'AVAILABLE' && carton.storeHouse.idStore == (aesUtil.decrypt(key, localStorage.getItem('store').toString()) as number))
       }
     )
   }
@@ -70,15 +70,15 @@ export class ApprovisionnerCarnetComponent implements OnInit {
   getStoreHouses(){
     this.storeHouseService.getAllStoreHousesWithPagination(0, 500).subscribe(
       resp => {
-        this.storeHouses2 = resp.content.filter(st => st.type == 'vente' && st.store.internalReference == parseInt(aesUtil.decrypt(key, localStorage.getItem('store'))))
+        this.storeHouses2 = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content.filter(st => st.type == 'vente' && st.store.internalReference == (aesUtil.decrypt(key, localStorage.getItem('store').toString()) as number))
       },
     )
   }
   //save carton
   supplyNoteBook(){
     this.isLoading.next(true);
-    this.supply.idCarton = this.supplyForm.controls['idCarton'].value
-    this.supply.idStoreHouseSell = this.supplyForm.controls['idStoreHouseSell'].value
+    this.supply.idCarton = aesUtil.encrypt(key, this.supplyForm.controls['idCarton'].value.toString()) as number;
+    this.supply.idStoreHouseSell = aesUtil.encrypt(key, this.supplyForm.controls['idStoreHouseSell'].value.toString()) as number;
     setTimeout(() =>{
       const notif = 'Vous recevrez une notification une fois l\'opération terminée'
       Swal.fire({

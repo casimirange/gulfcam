@@ -76,32 +76,32 @@ export class DetailsStationComponent implements OnInit {
     this.getCreditNoteByStation()
     this.getCouponByStation()
     this.getTypeVoucher()
-    this.getStations()
+    // this.getStations()
   }
 
   getStationInfos(){
     // this.activatedRoute.params.subscribe(params => {
-      this.stationService.getStationByInternalref(this.idParam).subscribe(
+      this.stationService.getStationByInternalref(this.idParam as number).subscribe(
         res => {
-          this.station = res;
+          this.station = JSON.parse(aesUtil.decrypt(key,res.key.toString()));
         }
       )
     // })
   }
 
-  getStations(){
-    this.stationService.getStations().subscribe(
-      resp => {
-        this.stations = resp.content
-      },
-    )
-  }
+  // getStations(){
+  //   this.stationService.getStations().subscribe(
+  //     resp => {
+  //       this.stations = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content
+  //     },
+  //   )
+  // }
 
   //on récupère la liste des types de coupon
   getTypeVoucher(): void{
     this.voucherService.getTypevoucher().subscribe(
       resp => {
-        this.vouchers = resp.content
+        this.vouchers = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content
       }
     )
   }
@@ -122,8 +122,8 @@ export class DetailsStationComponent implements OnInit {
     // this.activatedRoute.params.subscribe(params => {
       this.creditNoteService.getCreditNoteByStation(this.idParam).subscribe(
         resp => {
-          this.creditNotes = resp.content
-          console.log(resp)
+          this.creditNotes = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content
+          // console.log(resp)
         },
       )
     // })
@@ -131,11 +131,11 @@ export class DetailsStationComponent implements OnInit {
 
   getCouponByStation(){
     // this.activatedRoute.params.subscribe(params => {
-      this.couponService.getCouponsByStation(this.idParam, this.pageCoupon -1, this.size).subscribe(
+      this.couponService.getCouponsByStation(this.idParam as number, this.pageCoupon -1, this.size).subscribe(
         resp => {
-          this.coupons = resp.content
-          this.totalElementsCoupon = resp.totalElements
-          this.totalPagesCoupon = resp.totalPages
+          this.coupons = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content
+          this.totalElementsCoupon = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).totalElements
+          this.totalPagesCoupon = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).totalPages
         },
       )
     // })
@@ -146,7 +146,7 @@ export class DetailsStationComponent implements OnInit {
   }
 
   creditNoteDetails(note: CreditNote) {
-    this.router.navigate(['/credit-note/details', note.internalReference])
+    this.router.navigate(['/credit-note/details', aesUtil.encrypt(key,note.internalReference.toString())])
   }
 
   open(content: any){
@@ -155,16 +155,18 @@ export class DetailsStationComponent implements OnInit {
 
   accepterCoupon() {
     let str= parseInt(this.couponForm.controls['coupon'].value).toString();
-    this.coupon.serialNumber = str
+    this.coupon.serialNumber = aesUtil.encrypt(key, str.toString())
     const body = {
       "idStation": 0,
       "modulo": 0,
       "productionDate": "2022-12-16"
     }
-    body.idStation = this.idParam
+    const modulo = 0
+    body.idStation = this.idParam as number
+    body.modulo = aesUtil.encrypt(key, modulo.toString()) as number
     // body.idStation = this.couponForm.controls['idStation'].value
     // body.productionDate = new Date().toLocaleString().toString()
-    // console.log(body.productionDate)
+    console.log(body)
     this.isLoading.next(true);
     this.couponService.acceptCoupon(this.coupon.serialNumber, body).subscribe(
       resp => {

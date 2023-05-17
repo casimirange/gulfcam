@@ -29,6 +29,7 @@ export class IndexStationComponent implements OnInit, OnDestroy {
   userStations: Station[] = [];
   users: ISignup[] = [];
   station: Station = new Station();
+  station1: Station = new Station();
   @ViewChild('mymodal', { static: false }) viewMe?: ElementRef<HTMLElement>;
   stationForm: FormGroup ;
   modalTitle = 'Enregistrer une nouvelle station'
@@ -84,8 +85,8 @@ export class IndexStationComponent implements OnInit, OnDestroy {
     this.appState$ = this.stationService.filterStation$(this.designation, this.localisation, this.pinCode, this.idManagerStation,this.page - 1, this.size)
       .pipe(
         map(response => {
-          this.dataSubjects.next(response)
-          return {dataState: DataState.LOADED_STATE, appData: response}
+          this.dataSubjects.next(JSON.parse(aesUtil.decrypt(key,response.key.toString())))
+          return {dataState: DataState.LOADED_STATE, appData: JSON.parse(aesUtil.decrypt(key,response.key.toString()))}
         }),
         startWith({dataState: DataState.LOADING_STATE, appData: null}),
         catchError((error: string) => {
@@ -99,7 +100,7 @@ export class IndexStationComponent implements OnInit, OnDestroy {
     const type = 'MANAGER_STATION';
     this.userService.getUsersByTypeAccount(type.toString()).subscribe(
       resp => {
-        this.users = resp
+        this.users = JSON.parse(aesUtil.decrypt(key,resp.key.toString()))
       },
     )
   }
@@ -107,18 +108,22 @@ export class IndexStationComponent implements OnInit, OnDestroy {
   //save store house
   saveStation(){
     this.isLoading.next(true)
-    this.station = this.stationForm.value
-    this.station.balance = 0;
-    this.appState$ = this.stationService.addStation$(this.station)
+    const balance = 0;
+    this.station1.managerStagion = aesUtil.encrypt(key, this.stationForm.controls['managerStagion'].value.toString())
+    this.station1.pinCode = aesUtil.encrypt(key, this.stationForm.controls['pinCode'].value.toString())
+    this.station1.designation = aesUtil.encrypt(key, this.stationForm.controls['designation'].value.toString())
+    this.station1.localization = aesUtil.encrypt(key, this.stationForm.controls['localization'].value.toString())
+    this.station1.balance = aesUtil.encrypt(key, balance.toString());
+    this.appState$ = this.stationService.addStation$(this.station1)
       .pipe(
         map((response) => {
           // this.dataSubjects.next(
           //   {...this.dataSubjects.value, content: [response, ...this.dataSubjects.value.content]}
           // )
+          this.notifService.onSuccess("enregistrement effectué!")
           this.getStations()
           this.annuler()
           this.isLoading.next(false)
-          this.notifService.onSuccess("enregistrement effectué!")
           return {dataState: DataState.LOADED_STATE, appData: this.dataSubjects.value}
         }),
         startWith({dataState: DataState.LOADED_STATE, appData: this.dataSubjects.value}),
@@ -169,18 +174,21 @@ export class IndexStationComponent implements OnInit, OnDestroy {
 
   updateStation() {
     this.isLoading.next(true);
-    this.station.localization = this.stationForm.controls['localization'].value;
-    this.station.designation = this.stationForm.controls['designation'].value;
-    this.station.pinCode = this.stationForm.controls['pinCode'].value;
-    this.station.managerStagion = this.stationForm.controls['managerStagion'].value;
-    this.stationService.updateStation(this.stationForm.value, this.station.internalReference).subscribe(
+    const balance = 0;
+    this.station1.managerStagion = aesUtil.encrypt(key, this.stationForm.controls['managerStagion'].value.toString())
+    this.station1.pinCode = aesUtil.encrypt(key, this.stationForm.controls['pinCode'].value.toString())
+    this.station1.designation = aesUtil.encrypt(key, this.stationForm.controls['designation'].value.toString())
+    this.station1.localization = aesUtil.encrypt(key, this.stationForm.controls['localization'].value.toString())
+    this.station1.balance = aesUtil.encrypt(key, balance.toString());
+    this.stationService.updateStation(this.station1, aesUtil.encrypt(key, this.station.internalReference.toString()) as number).subscribe(
       resp => {
         this.isLoading.next(false);
         // on recherche l'index du client dont on veut faire la modification dans liste des clients
-        const index = this.stations.findIndex(station => station.internalReference === resp.internalReference);
-        this.stations[ index ] = resp;
+        const index = this.stations.findIndex(station => station.internalReference === JSON.parse(aesUtil.decrypt(key,resp.key.toString())).internalReference);
+        this.stations[ index ] = JSON.parse(aesUtil.decrypt(key,resp.key.toString()));
         this.modalTitle = 'Enregistrer une nouvelle station'
         this.notifService.onSuccess("station modifiée avec succès!")
+        this.getStations()
         this.annuler()
       },
       error => {
@@ -199,7 +207,7 @@ export class IndexStationComponent implements OnInit, OnDestroy {
   }
 
   showDetails(station: Station) {
-    this.router.navigate(['/stations/details', station.internalReference])
+    this.router.navigate(['/stations/details', aesUtil.encrypt(key, station.internalReference.toString())])
   }
 
   ngOnDestroy(): void {

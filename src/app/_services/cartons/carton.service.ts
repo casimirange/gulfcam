@@ -51,12 +51,12 @@ export class CartonService {
     this.http.get<CustomResponse<Carton>>(environment.carton + `?page=${page}&size=${size}`,)
       .pipe(catchError(this.handleError));
 
-  cartonsByStoreHouse$ = (idStoreHouse: number, page: number, size: number) => <Observable<CustomResponse<Carton>>>
-    this.http.get<CustomResponse<Carton>>(environment.carton + `/storehouse/${idStoreHouse}?page=${page}&size=${size}`,)
+  cartonsByStoreHouse$ = (idStoreHouse: string, page: number, size: number) => <Observable<any>>
+    this.http.get<any>(environment.carton + `/storehouse/${idStoreHouse}?page=${page}&size=${size}`,)
       .pipe(catchError(this.handleError));
 
-  filterCarton$ = (number?: string, statut?: string, type?: string, storehouse?: string, spacemanager1?: string, date?: string, page?: number, size?: number) => <Observable<CustomResponse<Carton>>>
-    this.http.get<CustomResponse<Carton>>(environment.carton + `/filter?page=${page}&size=${size}&number=${number}&status=${statut}&storehouse=${storehouse}&type=${type}&spacemanager1=${spacemanager1}&date=${date}`,)
+  filterCarton$ = (number?: string, statut?: string, type?: string, storehouse?: string, spacemanager1?: string, date?: string, page?: number, size?: number) => <Observable<any>>
+    this.http.get<any>(environment.carton + `/filter?page=${page}&size=${size}&number=${number}&status=${statut}&storehouse=${storehouse}&type=${type}&spacemanager1=${spacemanager1}&date=${date}`,)
       .pipe(catchError(this.handleError));
 
   handleError(error: HttpErrorResponse): Observable<never>{

@@ -64,7 +64,7 @@ export class IndexEntrepotComponent implements OnInit {
   getStores(){
     this.storeService.getStore().subscribe(
       resp => {
-        this.stores = resp.content
+        this.stores = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content
       },
       // error => {
         // this.notifService.onError(error.error.message, 'Erreur de chargement des magasins')
@@ -75,14 +75,14 @@ export class IndexEntrepotComponent implements OnInit {
   //récupération de la liste des entrepots
   getStoreHouses(){
     this.storeHouseService.getAllStoreHousesWithPagination(this.page-1, this.size).subscribe(
-      resp => {
-        console.log(resp)
-        this.storeHouses = resp.content
-        this.storeHousesByStore = resp.content.filter(sh => sh.store.internalReference === parseInt(aesUtil.decrypt(key, localStorage.getItem('store'))))
+      response => {
+        console.log(JSON.parse(aesUtil.decrypt(key,response.key.toString())))
+        this.storeHouses = JSON.parse(aesUtil.decrypt(key,response.key.toString())).content
+        this.storeHousesByStore = JSON.parse(aesUtil.decrypt(key,response.key.toString())).content.filter(sh => sh.store.internalReference === parseInt(aesUtil.decrypt(key, localStorage.getItem('store'))))
         console.log(this.storeHousesByStore)
-        this.size = resp.size
-        this.totalPages = resp.totalPages
-        this.totalElements = resp.totalElements
+        this.size = JSON.parse(aesUtil.decrypt(key,response.key.toString())).size
+        this.totalPages = JSON.parse(aesUtil.decrypt(key,response.key.toString())).totalPages
+        this.totalElements = JSON.parse(aesUtil.decrypt(key,response.key.toString())).totalElements
         this.notifService.onSuccess('chargement des entrepots')
       },
       // error => {
@@ -95,9 +95,9 @@ export class IndexEntrepotComponent implements OnInit {
   saveStoreHouse(){
     this.isLoading.next(true);
     this.store = this.stores.find(store => store.localization === this.storeHouseForm.controls['store'].value)
-    this.storeHouse.idStore = this.store.internalReference
-    this.storeHouse.type = this.storeHouseForm.controls['type'].value
-    this.storeHouse.name = this.storeHouseForm.controls['name'].value
+    this.storeHouse.idStore = aesUtil.encrypt(key, this.store.internalReference.toString())
+    this.storeHouse.type = aesUtil.encrypt(key, this.storeHouseForm.controls['type'].value.toString())
+    this.storeHouse.name = aesUtil.encrypt(key, this.storeHouseForm.controls['name'].value.toString())
     this.storeHouseService.createStoreHouse(this.storeHouse).subscribe(
       resp => {
         /**
@@ -183,21 +183,20 @@ export class IndexEntrepotComponent implements OnInit {
       "type" : '',
       "name" : '',
     }
-    updateStoreHouse.type = this.storeHouseForm.controls['type'].value
-    updateStoreHouse.name = this.storeHouseForm.controls['name'].value
-    updateStoreHouse.idStore = this.store.internalReference
+    updateStoreHouse.type = aesUtil.encrypt(key, this.storeHouseForm.controls['type'].value.toString())
+    updateStoreHouse.name = aesUtil.encrypt(key, this.storeHouseForm.controls['name'].value.toString())
+    updateStoreHouse.idStore = aesUtil.encrypt(key, this.store.internalReference.toString())
 
-    this.storeHouseService.updateStoreHouse(updateStoreHouse, this.storeHouse.internalReference).subscribe(
-      resp => {
-        console.log(resp)
+    this.storeHouseService.updateStoreHouse(updateStoreHouse, aesUtil.encrypt(key, this.storeHouse.internalReference.toString())).subscribe(
+      res => {
         this.isLoading.next(false);
         // on recherche l'index du client dont on veut faire la modification dans liste des clients
-        const index = this.storeHouses.findIndex(storeHouse => storeHouse.internalReference === resp.internalReference);
+        const index = this.storeHouses.findIndex(storeHouse => storeHouse.internalReference === JSON.parse(aesUtil.decrypt(key,res.key.toString())).internalReference);
         // this.storeHouses[ index ] = resp;
-        this.storeHouses[ index ].internalReference = resp.internalReference;
-        this.storeHouses[ index ].localisationStore = resp.localisationStore;
-        this.storeHouses[ index ].name = resp.name;
-        this.storeHouses[ index ].updateAt = resp.updateAt;
+        this.storeHouses[ index ].internalReference = JSON.parse(aesUtil.decrypt(key,res.key.toString())).internalReference;
+        this.storeHouses[ index ].localisationStore = JSON.parse(aesUtil.decrypt(key,res.key.toString())).localisationStore;
+        this.storeHouses[ index ].name = JSON.parse(aesUtil.decrypt(key,res.key.toString())).name;
+        this.storeHouses[ index ].updateAt = JSON.parse(aesUtil.decrypt(key,res.key.toString())).updateAt;
         this.getStoreHouses()
         this.notifService.onSuccess("entrepot modifié avec succès!")
         this.modalTitle = 'Enregistrer un nouvel entrepot'
@@ -215,7 +214,7 @@ export class IndexEntrepotComponent implements OnInit {
   }
 
   showDetails(storeHouse: StoreHouse) {
-    this.router.navigate(['/entrepots/details', storeHouse.internalReference])
+    this.router.navigate(['/entrepots/details', aesUtil.encrypt(key, storeHouse.internalReference.toString())])
   }
 
   getStatuts(status: string): string {

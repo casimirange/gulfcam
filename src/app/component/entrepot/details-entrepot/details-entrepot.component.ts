@@ -88,8 +88,8 @@ export class DetailsEntrepotComponent implements OnInit {
       this.cartonState$ = this.cartonService.cartonsByStoreHouse$(params['id'],this.page - 1, this.size)
         .pipe(
           map(response => {
-            this.datacartonSubjects.next(response)
-            return {dataState: DataState.LOADED_STATE, appData: response}
+            this.datacartonSubjects.next(JSON.parse(aesUtil.decrypt(key,response.key.toString())))
+            return {dataState: DataState.LOADED_STATE, appData: JSON.parse(aesUtil.decrypt(key,response.key.toString()))}
           }),
           startWith({dataState: DataState.LOADING_STATE, appData: null}),
           catchError((error: string) => {
@@ -115,8 +115,8 @@ export class DetailsEntrepotComponent implements OnInit {
       this.carnetState$ = this.carnetService.carnetsByStoreHouse$(params['id'],this.page1 - 1, this.size)
         .pipe(
           map(response => {
-            this.datacarnetSubjects.next(response)
-            return {dataState: DataState.LOADED_STATE, appData: response}
+            this.datacarnetSubjects.next(JSON.parse(aesUtil.decrypt(key,response.key.toString())))
+            return {dataState: DataState.LOADED_STATE, appData: JSON.parse(aesUtil.decrypt(key,response.key.toString()))}
           }),
           startWith({dataState: DataState.LOADING_STATE, appData: null}),
           catchError((error: string) => {
@@ -130,7 +130,7 @@ export class DetailsEntrepotComponent implements OnInit {
     this.activatedRoute.params.subscribe(params => {
       this.storeHouseService.getStoreHouseByInternalRef(params['id']).subscribe(
         res => {
-          this.storeHouse = res;
+          this.storeHouse = JSON.parse(aesUtil.decrypt(key,res.key.toString()));
         }
       )
     })
@@ -140,7 +140,7 @@ export class DetailsEntrepotComponent implements OnInit {
     this.activatedRoute.params.subscribe(params => {
       this.storeHouseService.getItemByStoreHouse(params['id']).subscribe(
         res => {
-          this.items = res;
+          this.items = JSON.parse(aesUtil.decrypt(key,res.key.toString()));
         }
       )
     })
@@ -152,11 +152,11 @@ export class DetailsEntrepotComponent implements OnInit {
 
   pageChangeCarnet(event: number){
     this.page1 = event
-    this.carnetState$ = this.carnetService.carnetsByStoreHouse$(this.storeHouse.internalReference,this.page1 - 1, this.size)
+    this.carnetState$ = this.carnetService.carnetsByStoreHouse$(aesUtil.encrypt(key, this.storeHouse.internalReference.toString()),this.page1 - 1, this.size)
       .pipe(
         map(response => {
-          this.datacarnetSubjects.next(response)
-          return {dataState: DataState.LOADED_STATE, appData: response}
+          this.datacarnetSubjects.next(JSON.parse(aesUtil.decrypt(key,response.key.toString())))
+          return {dataState: DataState.LOADED_STATE, appData: JSON.parse(aesUtil.decrypt(key,response.key.toString()))}
         }),
         startWith({dataState: DataState.LOADING_STATE, appData: null}),
         catchError((error: string) => {
@@ -167,11 +167,11 @@ export class DetailsEntrepotComponent implements OnInit {
 
   pageChangeCarton(event: number){
     this.page = event
-    this.cartonState$ = this.cartonService.cartonsByStoreHouse$(this.storeHouse.internalReference,this.page - 1, this.size)
+    this.cartonState$ = this.cartonService.cartonsByStoreHouse$(aesUtil.encrypt(key, this.storeHouse.internalReference.toString()),this.page - 1, this.size)
       .pipe(
         map(response => {
-          this.datacartonSubjects.next(response)
-          return {dataState: DataState.LOADED_STATE, appData: response}
+          this.datacartonSubjects.next(JSON.parse(aesUtil.decrypt(key,response.key.toString())))
+          return {dataState: DataState.LOADED_STATE, appData: JSON.parse(aesUtil.decrypt(key,response.key.toString()))}
         }),
         startWith({dataState: DataState.LOADING_STATE, appData: null}),
         catchError((error: string) => {

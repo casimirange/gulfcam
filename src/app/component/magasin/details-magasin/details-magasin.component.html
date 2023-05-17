@@ -43,7 +43,7 @@
           </tr>
           </thead>
           <tbody>
-          <tr style="cursor: pointer" *ngFor="let storeHouse of storeHouses" routerLink="/entrepots/details/{{storeHouse.internalReference}}">
+          <tr style="cursor: pointer" *ngFor="let storeHouse of storeHouses" (click)="showDetails(storeHouse.internalReference)">
             <td class="text-left">{{storeHouse.internalReference}}</td>
             <td class="text-left">{{storeHouse.createAt | date: 'dd/MM/yyyy'}}</td>
             <td class="text-left">{{storeHouse.name}}</td>

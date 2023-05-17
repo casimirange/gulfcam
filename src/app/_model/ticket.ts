@@ -10,4 +10,13 @@ export class Ticket{
   status?:	Status
   createdAt?:	string
   updateAt?:	string
+
+  serialNumber?: string;
+
+  nameClient?: string;
+
+  notebookNumber?: string;
+
+  amount?: number;
+
 }

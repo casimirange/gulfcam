@@ -17,7 +17,7 @@ export class ProductService {
     return this.http.post<any>(environment.product, product)
   }
 
-  getProducts(idOrder: number): Observable<any>{
+  getProducts(idOrder: string): Observable<any>{
     return this.http.get<any>(environment.product + `/order/${idOrder}`,)
   }
 

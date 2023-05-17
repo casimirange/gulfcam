@@ -62,16 +62,15 @@ export class DetailsComponent implements OnInit {
 
   ngOnInit(): void {
     this.getClientInfos()
-    this.getStores()
     this.getClientOrders()
   }
 
   getClientInfos(){
-    this.appState$ = this.clientService.showClient$(parseInt(this.IdParam))
+    this.appState$ = this.clientService.showClient$(this.IdParam)
       .pipe(
         map(response => {
-          this.dataSubjects.next(response)
-          return {dataState: DataState.LOADED_STATE, appData: response}
+          this.dataSubjects.next(JSON.parse(aesUtil.decrypt(key,response.key.toString())))
+          return {dataState: DataState.LOADED_STATE, appData: JSON.parse(aesUtil.decrypt(key,response.key.toString()))}
         }),
         startWith({dataState: DataState.LOADING_STATE, appData: null}),
         catchError((error: string) => {
@@ -91,12 +90,12 @@ export class DetailsComponent implements OnInit {
 
   getClientOrders(){
 
-    this.clientOrder$ = this.orderService.clientOrders$(this.page - 1, this.size, parseInt(this.IdParam))
+    this.clientOrder$ = this.orderService.clientOrders$(this.page - 1, this.size, this.IdParam)
       .pipe(
         map(response => {
-          console.log('client order', response)
-          this.dataSubjectsClientOrder.next(response)
-          return {dataState: DataState.LOADED_STATE, appData: response}
+          console.log('client order', JSON.parse(aesUtil.decrypt(key,response.key.toString())))
+          this.dataSubjectsClientOrder.next(JSON.parse(aesUtil.decrypt(key,response.key.toString())))
+          return {dataState: DataState.LOADED_STATE, appData: JSON.parse(aesUtil.decrypt(key,response.key.toString()))}
         }),
         startWith({dataState: DataState.LOADING_STATE, appData: null}),
         catchError((error: string) => {
@@ -118,7 +117,7 @@ export class DetailsComponent implements OnInit {
 
   sendClientOrders(){
     this.isLoading.next(true)
-    this.orderService.sendOrderByClient(parseInt(this.IdParam)).subscribe(
+    this.orderService.sendOrderByClient(this.IdParam).subscribe(
       res => {
         this.isLoading.next(false)
         this.notifService.onSuccess('Mail des commandes envoyé au client')
@@ -132,7 +131,7 @@ export class DetailsComponent implements OnInit {
 
   sendClientCoupons(){
     this.isSendding.next(true)
-      this.couponService.sendCouponByClient(parseInt(this.IdParam)).subscribe(
+      this.couponService.sendCouponByClient(this.IdParam).subscribe(
         res => {
           this.isSendding.next(false)
           this.notifService.onSuccess('Mail des coupons envoyé au client')
@@ -143,24 +142,13 @@ export class DetailsComponent implements OnInit {
       )
   }
 
-  getStores(){
-    this.storeService.getStore().subscribe(
-      resp => {
-        this.stores = resp.content
-      },
-      error => {
-        this.notifService.onError(error.error.message, 'échec chargement magasins')
-      }
-    )
-  }
-
   getStatuts(status: string): string {
     return this.statusService.allStatus(status)
   }
 
   pageChange(event: number){
     this.page = event
-    this.clientOrder$ = this.orderService.clientOrders$(this.page - 1, this.size, parseInt(this.IdParam))
+    this.clientOrder$ = this.orderService.clientOrders$(this.page - 1, this.size, this.IdParam)
       .pipe(
         map(response => {
           this.dataSubjectsClientOrder.next(response)

@@ -14,7 +14,7 @@ import {AppState} from "../../../_interfaces/app-state";
 import {CustomResponse} from "../../../_interfaces/custom-response";
 import {DataState} from "../../../_enum/data.state.enum";
 import {catchError, map, startWith} from "rxjs/operators";
-import {aesUtil, key} from "../../../_helpers/aes";
+import {AESUtil, aesUtil, key} from "../../../_helpers/aes";
 
 @Component({
   selector: 'app-index-users',
@@ -41,6 +41,8 @@ export class IndexUsersComponent implements OnInit {
   statusFilter? = ''
   nameFilter? = ''
   lastNameFilter? = ''
+  aes = aesUtil;
+  keys = key
   constructor(private modalService: NgbModal, private userService: UsersService, private notifsService: NotifsService,
               private storeService: StoreService, private statusAccountService: StatusAccountService,
               private statusUserService: StatusUserService, private router: Router,) {
@@ -58,9 +60,11 @@ export class IndexUsersComponent implements OnInit {
     this.appState$ = this.userService.users$(this.nameFilter, this.lastNameFilter, this.accountFilter, this.statusFilter, this.storeFilter, this.page - 1, this.size)
       .pipe(
         map(response => {
-          this.dataSubjects.next(response)
+          // console.log(JSON.parse(aesUtil.decrypt(key,response.key.toString())))
+          // console.log(aesUtil.decrypt(key, response.toString()) as Observable<CustomResponse<ISignup>>)
+          this.dataSubjects.next(JSON.parse(aesUtil.decrypt(key,response.key.toString())))
           // this.notifsService.onSuccess('chargement des utilisateurs')
-          return {dataState: DataState.LOADED_STATE, appData: response}
+          return {dataState: DataState.LOADED_STATE, appData: JSON.parse(aesUtil.decrypt(key,response.key.toString()))}
         }),
         startWith({dataState: DataState.LOADING_STATE, appData: null}),
         catchError((error: string) => {
@@ -134,6 +138,10 @@ export class IndexUsersComponent implements OnInit {
   }
 
   showDetails(user: ISignup) {
-    this.router.navigate(['/users/details', user.userId])
+    this.router.navigate(['/users/details', aesUtil.encrypt(key, user.userId.toString())])
+  }
+
+  decryptData(data: any) : string{
+    return aesUtil.decrypt(key, data.toString()) as string;
   }
 }

@@ -142,7 +142,7 @@
                       <div class="position-relative form-group">
                         <label for="exampleEmail" class="">Nom client</label>
                         <input name="email" id="exampleEmail" placeholder="with a placeholder" type="text"
-                               value="{{client.completeName}}" disabled
+                               value="{{order.completeName}}" disabled
                                class="form-control">
                       </div>
                     </div>
@@ -152,7 +152,7 @@
                       <div class="position-relative form-group">
                         <label for="exampleEmail" class="">Magasin</label>
                         <input name="email" id="exampleEmail" placeholder="with a placeholder" type="text"
-                               value="{{store.localization}}" disabled
+                               value="{{order.localisation}}" disabled
                                class="form-control">
                       </div>
                     </div>
@@ -276,7 +276,7 @@
                       <th>Quantité de carnets</th>
                       <th>Quantité de coupons</th>
                       <th>Montant Total</th>
-                      <th>Date création</th>
+<!--                      <th>Date création</th>-->
                     </tr>
                     </thead>
                     <tbody>
@@ -286,7 +286,7 @@
                       <td>{{prod.quantityNotebook}}</td>
                       <td>{{prod.quantityNotebook * 10}}</td>
                       <td>{{formatNumber(prod.amount * prod.quantityNotebook * 10)}}</td>
-                      <td>{{prod.createdAt | date: 'dd/MM/yyyy à hh:mm'}}</td>
+<!--                      <td>{{prod.createdAt | date: 'dd/MM/yyyy à hh:mm'}}</td>-->
                     </tr>
                     </tbody>
                     <tfoot>

@@ -30,6 +30,7 @@ export class DashboardMagasinComponent implements OnInit {
   storeFilter: Store[] = [];
   storeHouses: StoreHouse[] = [];
   store: Store = new Store ();
+  store1: Store = new Store ();
   unit: Unite = new Unite();
   typeVouchers: TypeVoucher[]
   private isLoading = new BehaviorSubject<boolean>(false);
@@ -68,20 +69,17 @@ export class DashboardMagasinComponent implements OnInit {
   }
 
   createStore(){
-    console.log(this.storeForm.value)
-    this.getVouchers()
-    this.store.localization = this.storeForm.value
+    this.store.localization = aesUtil.encrypt(key, this.storeForm.controls['localization'].value.toString())
     this.isLoading.next(true);
-    this.storeService.createStore(this.storeForm.value as Store).subscribe(
+    this.storeService.createStore(this.store).subscribe(
       resp => {
-        console.log(resp)
         // this.unit.idStore = resp.internalReference
         // this.unit.quantityNotebook = 0
         // this.typeVouchers.forEach(tv => {
         //   this.unit.idTypeVoucher = tv.internalReference
         //   this.unitService.createUnit(this.unit).subscribe()
         // })
-        this.stores.push(resp)
+        this.stores.push(JSON.parse(aesUtil.decrypt(key,resp.key.toString())))
         this.annuler()
         this.isLoading.next(false);
         this.notifService.onSuccess('enregistrement effectué')
@@ -94,26 +92,18 @@ export class DashboardMagasinComponent implements OnInit {
   }
 
   getStores(){
-    console.log(this.storeForm.value)
     this.storeService.getAllStoresWithPagination(this.page-1, this.size).subscribe(
       resp => {
-        this.stores = resp.content
-        this.storeFilter = resp.content.filter(sh => sh.internalReference === parseInt(aesUtil.decrypt(key, localStorage.getItem('store'))))
-        this.size = resp.size
-        this.totalPages = resp.totalPages
-        this.totalElements = resp.totalElements
+        this.stores = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content
+        this.storeFilter = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content.filter(sh => sh.internalReference === parseInt(aesUtil.decrypt(key, localStorage.getItem('store'))))
+        this.size = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).size
+        this.totalPages = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).totalPages
+        this.totalElements = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).totalElements
         this.notifService.onSuccess('Chargement des magasins')
       },
     )
   }
 
-  getVouchers(){
-    this.voucherService.getTypevoucher().subscribe(
-      resp => {
-        this.typeVouchers = resp.content
-      },
-    )
-  }
   annuler() {
     this.formStore();
     this.store = new Store()
@@ -124,9 +114,9 @@ export class DashboardMagasinComponent implements OnInit {
   delete(store: Store, index:number) {
     this.isLoading.next(true);
     //on supprime les entrepôts rattachés au magasin
-    this.storehouseService.getStoreHousesByStore(store.internalReference).subscribe(
+    this.storehouseService.getStoreHousesByStore(aesUtil.encrypt(key, store.internalReference.toString())).subscribe(
       resp => {
-        this.storeHouses = resp.content
+        this.storeHouses = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content
         this.deleteStoreHousesByStore(this.storeHouses);
       }
     )
@@ -174,12 +164,12 @@ export class DashboardMagasinComponent implements OnInit {
 
   updateStore() {
     this.isLoading.next(true);
-    console.log(this.storeForm.controls['localization'].value)
-    this.storeService.updateStore(this.storeForm.value, this.store.internalReference).subscribe(
+    this.store1.localization = aesUtil.encrypt(key, this.storeForm.controls['localization'].value.toString())
+    this.storeService.updateStore(this.store1, aesUtil.encrypt(key, this.store.internalReference.toString()) as number).subscribe(
       resp => {
         this.isLoading.next(false);
-        const index = this.stores.findIndex(store => store.internalReference === resp.internalReference);
-        this.stores[ index ] = resp;
+        const index = this.stores.findIndex(store => store.internalReference === JSON.parse(aesUtil.decrypt(key,resp.key.toString())).internalReference);
+        this.stores[ index ] = JSON.parse(aesUtil.decrypt(key,resp.key.toString()));
         this.notifService.onSuccess("magasin modifié avec succès!")
         this.modalTitle = 'Enregistrer nouveau magasin'
         this.annuler()
@@ -191,8 +181,7 @@ export class DashboardMagasinComponent implements OnInit {
   }
 
   showDetails(store: Store) {
-    this.router.navigate(['/magasins/details', store.internalReference])
-    // [routerLink]=""
+    this.router.navigate(['/magasins/details', aesUtil.encrypt(key, store.internalReference.toString())])
   }
 
   private deleteStoreHousesByStore(storeHouses: StoreHouse[]) {

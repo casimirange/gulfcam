@@ -47,22 +47,20 @@ export class DetailsMagasinComponent implements OnInit {
 
 
   getStoreInfos(){
-    console.log(this.router.url)
     this.activatedRoute.params.subscribe(params => {
       this.storeService.getStoreByInternalref(params['id']).subscribe(
         res => {
-          this.store = res;
+          this.store = JSON.parse(aesUtil.decrypt(key,res.key.toString()));
         }
       )
     })
   }
 
   getStoreHousesByStore(){
-    console.log(this.router.url)
     this.activatedRoute.params.subscribe(params => {
-      this.storeHouseService.getStoreHousesByStore(parseInt(params['id'].toString())).subscribe(
+      this.storeHouseService.getStoreHousesByStore(params['id']).subscribe(
         res => {
-          this.storeHouses = res.content;
+          this.storeHouses = JSON.parse(aesUtil.decrypt(key,res.key.toString())).content;
           this.notifService.onSuccess('chargement des espaces de stockage du magasin')
         }
       )
@@ -75,5 +73,9 @@ export class DetailsMagasinComponent implements OnInit {
 
   getStatuts(status: string): string {
     return this.statusService.allStatus(status)
+  }
+
+  showDetails(storeHouse: number) {
+    this.router.navigate(['/entrepots/details', aesUtil.encrypt(key, storeHouse.toString())])
   }
 }

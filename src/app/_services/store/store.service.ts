@@ -12,8 +12,8 @@ export class StoreService {
 
   constructor(private http: HttpClient) { }
 
-  createStore(store: Store): Observable<Store>{
-    return this.http.post<Store>(environment.store, store)
+  createStore(store: Store): Observable<any>{
+    return this.http.post<any>(environment.store, store)
   }
 
   getStore(): Observable<any>{
@@ -24,8 +24,8 @@ export class StoreService {
     return this.http.get<any>(environment.store+ `?page=${page}&size=${size}`)
   }
 
-  getStoreByInternalref(internalRef: number): Observable<Store>{
-    return this.http.get<Store>(environment.store + `/${internalRef}`)
+  getStoreByInternalref(internalRef: string): Observable<any>{
+    return this.http.get<any>(environment.store + `/${internalRef}`)
   }
 
   //liste des entrepots par magasin

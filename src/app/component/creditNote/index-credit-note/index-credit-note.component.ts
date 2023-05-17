@@ -66,6 +66,7 @@ export class IndexCreditNoteComponent implements OnInit, OnDestroy {
   statutFilter? = ''
   internalRef? = ''
   stationName? = ''
+  idmanager = aesUtil.decrypt(key, localStorage.getItem('uid').toString())
   constructor(private modalService: NgbModal, private fb: FormBuilder, private storeService: StoreService, private router: Router,
               private notifService: NotifsService, private unitService: UnitsService, private voucherService: VoucherService,
               private clientService: ClientService, private userService: UsersService, private creditNoteService: CreditNoteService,
@@ -105,7 +106,7 @@ export class IndexCreditNoteComponent implements OnInit, OnDestroy {
   }
 
   createCreditNote() {
-    this.creditNote.idStation = parseInt(this.creditForm.controls['idStation'].value)
+    this.creditNote.idStation = aesUtil.encrypt(key, this.creditForm.controls['idStation'].value.toString()) as number
     this.creditNote.serialCoupons = this.vouchers
     this.isLoading.next(true);
     this.creditNoteService.saveCreditNote(this.creditNote).subscribe(
@@ -130,9 +131,10 @@ export class IndexCreditNoteComponent implements OnInit, OnDestroy {
     this.appState$ = this.creditNoteService.filterCreditNote$(this.statutFilter, this.stationName, this.internalRef, this.dateFilter, this.page - 1, this.size)
       .pipe(
         map(response => {
-          this.dataSubjects.next(response)
+          console.log(JSON.parse(aesUtil.decrypt(key,response.key.toString())))
+          this.dataSubjects.next(JSON.parse(aesUtil.decrypt(key,response.key.toString())))
           // this.notifsService.onSuccess('Chargement des commandes')
-          return {dataState: DataState.LOADED_STATE, appData: response}
+          return {dataState: DataState.LOADED_STATE, appData: JSON.parse(aesUtil.decrypt(key,response.key.toString()))}
         }),
         startWith({dataState: DataState.LOADING_STATE, appData: null}),
         catchError((error: string) => {
@@ -140,13 +142,13 @@ export class IndexCreditNoteComponent implements OnInit, OnDestroy {
         })
       )
 
-    this.creditNoteService.getCreditNote(this.page - 1, this.size).subscribe(
-      resp => {
-        this.creditNotes = resp.content
-        console.log(resp)
-        this.totalElements = resp.totalElements
-      },
-    )
+    // this.creditNoteService.getCreditNote(this.page - 1, this.size).subscribe(
+    //   resp => {
+    //     this.creditNotes = resp.content
+    //     console.log(resp)
+    //     this.totalElements = resp.totalElements
+    //   },
+    // )
   }
 
   pageChange(event: number) {
@@ -157,7 +159,7 @@ export class IndexCreditNoteComponent implements OnInit, OnDestroy {
   getStations() {
     this.stationService.getStations().subscribe(
       resp => {
-        this.stations = resp.content
+        this.stations = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content
       },
     )
   }
@@ -280,7 +282,7 @@ export class IndexCreditNoteComponent implements OnInit, OnDestroy {
   }
 
   addCoupons(str: string) {
-    this.vouchers.push(parseInt(str));
+    this.vouchers.push(+str);
   }
 
   getCouponByStation() {
@@ -288,10 +290,10 @@ export class IndexCreditNoteComponent implements OnInit, OnDestroy {
     this.vouchers = []
     this.couponsFiltered = []
     if (stationId != 0) {
-      this.couponService.getCouponsByStation(stationId, 0, 13000000).subscribe(
+      this.couponService.getCouponsByStation(aesUtil.encrypt(key, stationId.toString()), 0, 13000000).subscribe(
         resp => {
           this.selectedStation = true
-          this.coupons = resp.content
+          this.coupons = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content
           this.couponsFiltered = this.coupons.filter(cp => cp.idCreditNote == null);
         },
       )
@@ -316,7 +318,7 @@ export class IndexCreditNoteComponent implements OnInit, OnDestroy {
   }
 
   creditNoteDetails(note: CreditNote) {
-    this.router.navigate(['/credit-note/details', note.internalReference])
+    this.router.navigate(['/credit-note/details', aesUtil.encrypt(key, note.internalReference.toString())])
   }
 
   formatNumber(amount: any): string {

@@ -75,12 +75,12 @@
               </div>
               <div class="position-relative form-group  mr-2">
                 <label for="nameFilter" class="text-dark font-weight-bold">Recherche par prénom</label>
-                <input type="text" name="nameFilter" id="nameFilter" placeholder="Rechercher prénom" [(ngModel)]="nameFilter" (ngModelChange)="getUsers()"
+                <input type="text" name="nameFilter" id="nameFilter" placeholder="Rechercher prénom" [(ngModel)]="lastNameFilter" (ngModelChange)="getUsers()"
                        class="form-control form-control-sm mr-3">
               </div>
               <div class="position-relative form-group  mr-2">
                 <label for="lastName" class="text-dark font-weight-bold">Recherche par nom</label>
-                <input type="text" name="lastName" id="lastName" placeholder="Rechercher nom" [(ngModel)]="lastNameFilter" (ngModelChange)="getUsers()"
+                <input type="text" name="lastName" id="lastName" placeholder="Rechercher nom" [(ngModel)]="nameFilter" (ngModelChange)="getUsers()"
                        class="form-control form-control-sm mr-3">
               </div>
               <!--            <button class="btn btn-sm mr-3 text-primary" (click)="filterOrders()"><i class="fa fa-search"></i></button>-->
@@ -118,8 +118,8 @@
           <tbody>
           <tr *ngFor="let user of appState.appData.content | paginate: { id: 'allusers0', itemsPerPage: appState.appData.size, currentPage: page, totalItems: appState.appData.totalElements }">
             <td class="text-left">{{user.internalReference}}</td>
-            <td class="text-left">{{user.lastName}}</td>
             <td class="text-left">{{user.firstName}}</td>
+            <td class="text-left">{{user.lastName}}</td>
             <td class="text-left">{{user.email}}</td>
             <td class="text-left">{{user.nameStore}}</td>
             <td class="text-left">{{user.pinCode }}</td>

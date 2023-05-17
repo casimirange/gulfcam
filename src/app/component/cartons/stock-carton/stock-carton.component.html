@@ -45,19 +45,27 @@
         <div class="menu-header-subtitle">
           <div role="group" class="btn-group-sm btn-group">
             <form class="form-row">
+              <div class="position-relative form-group mr-2" *ngIf="role.includes('ROLE_SUPERADMIN')">
+                <label for="mag" class="text-dark font-weight-bold">Magasin</label>
+                <select name="mag" id="mag" class="form-control form-control-sm mr-3" [(ngModel)]="storeFilter" (ngModelChange)="getStoreHouses(); filterCartons()" >
+                  <option value="" selected disabled hidden>Choix magasin</option>
+                  <option *ngFor="let store of stores" ngValue="{{store.internalReference}}">{{store.localization}}</option>
+                  <option value="">Tout afficher</option>
+                </select>
+              </div>
               <div class="position-relative form-group mr-2">
                 <label for="stats" class="text-dark font-weight-bold">Statut</label>
                 <select name="stat" id="stats" class="form-control form-control-sm mr-3" [(ngModel)]="statusFilter" (ngModelChange)="filterCartons()">
                   <option value="" selected disabled hidden>Choix statut</option>
-                  <option value="CREATED">DISPONIBLE</option>
-                  <option value="DISABLED">DESACTIVE</option>
+                  <option value="AVAILABLE">EN STOCK</option>
+                  <option value="DISABLED">UTILISE</option>
                   <option value="">Tout afficher</option>
                 </select>
               </div>
               <div class="position-relative form-group  mr-2 ">
                 <label for="typ" class="text-dark font-weight-bold">Type de coupon</label>
                 <select name="stat" id="typ" class="form-control form-control-sm mr-3" [(ngModel)]="typeFilter" (ngModelChange)="filterCartons()">
-                  <option value="" selected disabled hidden>Type</option>
+                  <option value="" selected disabled hidden>Sélectionner Type</option>
                   <option value="{{v.amount}}" *ngFor="let v of vouchers">{{v.amount}}</option>
                   <option value="">Tout afficher</option>
                 </select>
@@ -65,7 +73,7 @@
               <div class="position-relative form-group  mr-2">
                 <label for="storeHouseStockage" class="text-dark font-weight-bold">Recherche par espace de stockage</label>
                 <select name="storeHouse" id="storeHouseStockage" class="form-control form-control-sm mr-3" [(ngModel)]="idStoreHouse" (ngModelChange)="filterCartons()">
-                  <option value="" selected disabled hidden>Type</option>
+                  <option value="" selected disabled hidden>Choisir un espace</option>
                   <option value="{{v.internalReference}}" *ngFor="let v of storeHouses">{{v.name}}</option>
                   <option value="">Tout afficher</option>
                 </select>
@@ -73,7 +81,7 @@
               <div class="position-relative form-group  mr-2">
                 <label for="spacemanager" class="text-dark font-weight-bold">Recherche par gestionnaire d'espace 1</label>
                 <select name="spacemanager" id="spacemanager" class="form-control form-control-sm mr-3" [(ngModel)]="spaceManager" (ngModelChange)="filterCartons()">
-                  <option value="" selected disabled hidden>Type</option>
+                  <option value="" selected disabled hidden>Sélectionner </option>
                   <option value="{{v.internalReference}}" *ngFor="let v of users">{{v.lastName}} {{v.firstName}}</option>
                   <option value="">Tout afficher</option>
                 </select>
@@ -132,9 +140,14 @@
                   {{padWithZero(carton.serialFrom, 7)}}</td>
                 <td>{{carton.nameStoreHouse}}</td>
                 <td>{{carton.storeKeeper.firstName}}</td>
-                <td>{{getStatuts(carton.status.name)}}</td>
-                <td>{{carton.createdAt}}</td>
-                <td>{{carton.updateAt}}</td>
+                <td>
+                  <span class="mb-2 mr-2 badge " [ngClass]="carton.status.name == 'AVAILABLE' ? 'badge-success' : 'badge-danger'">
+                    {{getStatuts(carton.status.name) == 'DISPONIBLE' ? 'EN STOCK' : 'UTILISE'}}
+                  </span>
+<!--                  {{getStatuts(carton.status.name)}}-->
+                </td>
+                <td>{{carton.createdAt[2]+'/'+carton.createdAt[1]+'/'+carton.createdAt[0]}}</td>
+                <td>{{carton.updateAt ? (carton.updateAt[2]+'/'+carton.updateAt[1]+'/'+carton.updateAt[0]) : ''}}</td>
             </table>
             <div class="text-center">
               <p *ngIf="!appState.appData.content.length" style="color: grey; font-size: 1.8rem;" class="mx-auto">Aucun

@@ -70,9 +70,9 @@ export class IndexPaiementMethodComponent implements OnInit {
   getPaiements(){
     this.isLoading.next(true);
     this.paiementService.getPaymentMethods().subscribe(
-      resp => {
-        console.log(resp)
-        this.paiementMethods = resp.content
+      response => {
+        console.log(JSON.parse(aesUtil.decrypt(key,response.key.toString())))
+        this.paiementMethods = JSON.parse(aesUtil.decrypt(key,response.key.toString())).content
         this.isLoading.next(false);
         this.notifServices.onSuccess('liste des modes de paiement')
       },

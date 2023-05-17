@@ -92,7 +92,7 @@
                 <th>#</th>
                 <th>Ref. interne</th>
                 <th>Station</th>
-                <th>Coupon</th>
+<!--                <th>Coupon</th>-->
                 <th>Statut</th>
                 <th>Date creation</th>
                 <th>Date modification</th>
@@ -104,14 +104,15 @@
                 <td>{{i + 1}}</td>
                 <td>{{credit.internalReference}}</td>
                 <td>{{credit.station.designation}} </td>
-                <td>{{credit.coupon[0].serialNumber}} </td>
+<!--                <td>{{credit.coupon[0].serialNumber}} </td>-->
                 <td>
             <span class="mb-2 mr-2 badge " [ngClass]="getStatuts(credit.status.name) == 'ACTIVE(E)' ? 'badge-success' : 'badge-warning'">
             {{getStatuts(credit.status.name) == 'ACTIVE(E)' ? 'VALIDEE' : 'NON VALIDE'}}
             </span>
                 </td>
-                <td>{{credit.createdAt | date: 'dd/MM/yyyy'}}</td>
-                <td>{{credit.updateAt | date: 'dd/MM/yyyy'}}</td>
+                <td>{{credit.createdAt[2] +'/'+credit.createdAt[1] +'/'+credit.createdAt[0]}}</td>
+                <td>{{credit.updateAt ? credit.updateAt[2] +'/'+credit.updateAt[1] +'/'+credit.updateAt[0] : ''}}</td>
+<!--                <td>{{credit.updateAt | date: 'dd/MM/yyyy'}}</td>-->
                 <td>
                   <!--            <a  style="cursor: pointer" class=" text-success" data-toggle="tooltip" title="valider une note de crédit"-->
                   <!--               (click)="valid(credit.internalReference, i)">-->

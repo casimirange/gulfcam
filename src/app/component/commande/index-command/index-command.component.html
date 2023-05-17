@@ -144,13 +144,14 @@
               </tr>
               </thead>
               <tbody>
-              <tr style="cursor: pointer" routerLink="/commandes/complete-order/{{order.internalReference}}"
+              <tr style="cursor: pointer"  (click)="detailsOrder(order.internalReference)"
                   *ngFor="let order of orderState.appData.content | paginate: { id: 'orders', itemsPerPage: orderState.appData.size, currentPage: page, totalItems: orderState.appData.totalElements} ">
 <!--              <tr style="cursor: pointer" routerLink="/commandes/complete-order/{{order.internalReference}}"-->
 <!--                  *ngFor="let order of role.includes('ROLE_SUPERADMIN') ? orders : filtredOrders | clientNameFilter: name | clientRefFilter: refCli | orderRefFilter: internalRef-->
 <!--                 | orderDateFilter: date | paginate: { id: 'orders', itemsPerPage: orderState.appData.size, currentPage: page, totalItems: orderState.appData.totalElements} ">-->
                 <td>{{order.internalReference}}</td>
-                <td>{{order.createdAt | date: 'dd/MM/yyyy'}}</td>
+<!--                <td>{{order.createdAt | date: 'dd/MM/yyyy'}}</td>-->
+                <td>{{order.createdAt[2] + '/' + order.createdAt[1] + '/' +order.createdAt[0]}}</td>
                 <td>{{order.completeName }}</td>
                 <td>{{order.client.internalReference }}</td>
                 <td>{{order.channel }}</td>

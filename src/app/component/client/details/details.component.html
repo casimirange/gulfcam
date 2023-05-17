@@ -84,14 +84,14 @@
     <div class="main-card mb-3 card " id="htmlData">
       <div class="card-header">
         Liste de ses commandes
-        <div class="btn-actions-pane-right">
-          <div role="group" class="btn-group-sm btn-group">
-            <input type="date" placeholder="Rechercher date" [(ngModel)]="date"
-                   class="form-control form-control-sm mr-3">
-            <input type="text" placeholder="Rechercher ref commande" [(ngModel)]="internalRef"
-                   class="form-control form-control-sm mr-3">
-          </div>
-        </div>
+<!--        <div class="btn-actions-pane-right">-->
+<!--          <div role="group" class="btn-group-sm btn-group">-->
+<!--            <input type="date" placeholder="Rechercher date" [(ngModel)]="date"-->
+<!--                   class="form-control form-control-sm mr-3">-->
+<!--            <input type="text" placeholder="Rechercher ref commande" [(ngModel)]="internalRef"-->
+<!--                   class="form-control form-control-sm mr-3">-->
+<!--          </div>-->
+<!--        </div>-->
       </div>
       <ng-container *ngIf="(clientOrder$ | async) as clientOrder" [ngSwitch]="clientOrder.dataState">
         <ng-container *ngSwitchCase="DataState.LOADING_STATE">
@@ -119,7 +119,8 @@
               <tr style="cursor: pointer" routerLink="/commandes/complete-order/{{order.internalReference}}" *ngFor="let order of clientOrder.appData.content | orderRefFilter: internalRef | orderDateFilter: date
                     | paginate: { id: 'clientorder', itemsPerPage: size, currentPage: page, totalItems: clientOrder.appData.totalElements}">
                 <td class="text-left">{{order.internalReference}}</td>
-                <td class="text-left">{{order.createdAt | date: 'dd/MM/yyyy'}}</td>
+<!--                <td class="text-left">{{order.createdAt | date: 'dd/MM/yyyy'}}</td>-->
+                <td class="text-left">{{order.createdAt[2] + '/' + order.createdAt[1] +'/' + order.createdAt[0]}}</td>
                 <td class="text-left">{{order.store.localization }}</td>
                 <td class="text-left">{{order.channel }}</td>
                 <td class="text-left">{{order.paymentMethod.designation }}</td>

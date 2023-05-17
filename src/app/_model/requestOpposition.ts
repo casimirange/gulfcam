@@ -6,13 +6,13 @@ export class RequestOpposition{
     internalReference?: number
     idClient:	number
     idSalesManager?:	number
-    idCommercialAttache?:	number
+    idCommercialAttache?:	string
     status?:	Status
     reason?:	string
     description?:	string
     createdAt?:	string
     updateAt?:	string
-    serialCoupons: number[]
+    serialCoupons: string[]
     nameClient?: string
     nameSaleManager?: string
     nameCommercialAttache?: string

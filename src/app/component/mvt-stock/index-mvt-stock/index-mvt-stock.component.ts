@@ -89,11 +89,11 @@ export class IndexMvtStockComponent implements OnInit {
   getMvtStocks(){
     console.log(this.storeForm.value)
     this.mvtStockService.getStockMovement().subscribe(
-      resp => {
-        this.mvtStocks = resp.content
-        this.size = resp.size
-        this.totalPages = resp.totalPages
-        this.totalElements = resp.totalElements
+      response => {
+        this.mvtStocks = JSON.parse(aesUtil.decrypt(key,response.key.toString())).content
+        this.size = JSON.parse(aesUtil.decrypt(key,response.key.toString())).size
+        this.totalPages = JSON.parse(aesUtil.decrypt(key,response.key.toString())).totalPages
+        this.totalElements = JSON.parse(aesUtil.decrypt(key,response.key.toString())).totalElements
         console.log(this.mvtStocks)
         this.notifService.onSuccess('chargement des mouvements du stock')
       },

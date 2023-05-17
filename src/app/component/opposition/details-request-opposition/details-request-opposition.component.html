@@ -50,33 +50,25 @@
               <tr>
                 <th>#</th>
                 <th>Ref. interne</th>
-                <th>Numéro de série</th>
-                <th>Coupon</th>
+                <th>N° du coupon</th>
+                <th>Type de Coupon</th>
                 <th>Client</th>
-                <th>Ticket</th>
                 <th>Carnet</th>
-                <th>Station</th>
-                <th>Statut</th>
-                <th>Note credit</th>
-                <th>Dde Oppo.</th>
-                <th>Date</th>
+                <th>Statut du coupon</th>
+<!--                <th>Date</th>-->
               </tr>
               </thead>
-              <tbody *ngFor="let coupon of coupons | paginate: { id: 'ticket', itemsPerPage: size, currentPage: page, totalItems: totalElements } ; let i = index">
+              <tbody *ngFor="let coupon of tickets | paginate: { id: 'ticket', itemsPerPage: size, currentPage: page, totalItems: totalElements } ; let i = index">
 
               <tr>
                 <td>{{i + 1}}</td>
                 <td>{{coupon.internalReference}}</td>
                 <td>{{padWithZero(coupon.serialNumber, 7)}}</td>
-                <td>{{coupon.amount}}</td>
+                <td>{{formatNumber(coupon.amount.toString())}}</td>
                 <td>{{coupon.nameClient}}</td>
-                <td>{{coupon.idTicket}}</td>
-                <td>{{coupon.idNotebook}}</td>
-                <td>{{coupon.nameStation}}</td>
+                <td>{{coupon.notebookNumber}}</td>
                 <td>{{getStatuts(coupon.status.name)}}</td>
-                <td>{{coupon.idCreditNote}}</td>
-                <td>{{coupon.idRequestOpposition}}</td>
-                <td>{{coupon.createdAt | date: 'dd/MM/yyyy'}}</td>
+<!--                <td>{{coupon.createdAt | date: 'dd/MM/yyyy'}}</td>-->
               </tr>
               </tbody>
             </table>

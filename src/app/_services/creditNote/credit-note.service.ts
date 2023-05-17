@@ -46,8 +46,8 @@ export class CreditNoteService {
     return this.http.get<any>(environment.creditNote + `/export/${noteInternalReference}`, httpOptions)
   }
 
-  filterCreditNote$ = (status?: string, station?: string, internalRef?: string, date?: string, page?: number, size?: number) => <Observable<CustomResponse<CreditNote>>>
-    this.http.get<CustomResponse<CreditNote>>(environment.creditNote + `/filter?page=${page}&size=${size}&status=${status}&date=${date}&station=${station}&internalRef=${internalRef}`,)
+  filterCreditNote$ = (status?: string, station?: string, internalRef?: string, date?: string, page?: number, size?: number) => <Observable<any>>
+    this.http.get<any>(environment.creditNote + `/filter?page=${page}&size=${size}&status=${status}&date=${date}&station=${station}&internalRef=${internalRef}`,)
       .pipe(catchError(this.handleError));
 
   handleError(error: HttpErrorResponse): Observable<never>{

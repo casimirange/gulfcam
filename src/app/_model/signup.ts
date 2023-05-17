@@ -3,8 +3,8 @@ import {Status} from "./status";
 export class ICredentialsSignup{
   email?: string;
   telephone?: string;
-  pinCode?: number;
-  idStore?: number;
+  pinCode?: string;
+  idStore?: string;
   // username?: string,
   password?: string;
   firstName?: string;

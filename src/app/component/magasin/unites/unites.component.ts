@@ -3,6 +3,7 @@ import {Unite} from "../../../_model/unite";
 import {UnitsService} from "../../../_services/units/units.service";
 import {ActivatedRoute} from "@angular/router";
 import {StoreService} from "../../../_services/store/store.service";
+import {aesUtil, key} from "../../../_helpers/aes";
 
 @Component({
   selector: 'app-unites',
@@ -20,7 +21,7 @@ export class UnitesComponent implements OnInit {
 
   getUnitByStore(){
     this.activatedRoute.params.subscribe(params => {
-      this.storeService.getUnitByStore(parseInt(params['id'].toString())).subscribe(
+      this.storeService.getUnitByStore(aesUtil.decrypt(key, params['id']) as number).subscribe(
         resp => {
           this.units = resp;
         }

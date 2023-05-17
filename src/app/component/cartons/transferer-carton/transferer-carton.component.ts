@@ -34,6 +34,7 @@ export class TransfererCartonComponent implements OnInit {
   storeHouses1: StoreHouse[] = [];
   roleUser = aesUtil.decrypt(key, localStorage.getItem('userAccount').toString())
   role: string[] = []
+  idmanager = aesUtil.decrypt(key, localStorage.getItem('uid').toString())
   constructor(private notifsService: NotifsService, private storeHouseService: StoreHouseService, private fb: FormBuilder,
               private cartonService: CartonService, private mvtService: MvtStockService) {
     this.formTransfert()
@@ -59,7 +60,7 @@ export class TransfererCartonComponent implements OnInit {
   getCartons(): void{
     this.cartonService.getAllCartonWithPagination(0, 500).subscribe(
       resp => {
-        this.cartons = resp.content.filter((carton: Carton) => carton.status.name === 'AVAILABLE' && carton.storeHouse.idStore == parseInt(aesUtil.decrypt(key, localStorage.getItem('store'))))
+        this.cartons = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content.filter((carton: Carton) => carton.status.name === 'AVAILABLE' && carton.storeHouse.idStore == (aesUtil.decrypt(key, localStorage.getItem('store').toString()) as number))
       }
     )
   }
@@ -67,7 +68,7 @@ export class TransfererCartonComponent implements OnInit {
   getStoreHouses(){
     this.storeHouseService.getAllStoreHousesWithPagination(0, 500).subscribe(
       resp => {
-        this.storeHouses1 = resp.content.filter(st => st.type == 'stockage' && st.store.internalReference != parseInt(aesUtil.decrypt(key, localStorage.getItem('store'))))
+        this.storeHouses1 = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content.filter(st => st.type == 'stockage' && st.store.internalReference != (aesUtil.decrypt(key, localStorage.getItem('store').toString()) as number))
       },
     )
   }
@@ -75,15 +76,16 @@ export class TransfererCartonComponent implements OnInit {
   //save carton
   transfertCarton(){
     this.isLoading.next(true);
-    this.stock.idSpaceManager1 = parseInt(aesUtil.decrypt(key, localStorage.getItem('uid').toString()))
-    this.stock.idStoreHouseStockage = parseInt(this.tranfertForm.controls['idStoreHouseStockage'].value)
+    this.stock.idSpaceManager1 = aesUtil.encrypt(key, this.idmanager.toString()) as number
+    this.stock.idStoreHouseStockage = aesUtil.encrypt(key, this.tranfertForm.controls['idStoreHouseStockage'].value.toString()) as number
     let cartons =[]
-    cartons.push(this.tranfertForm.controls['idCarton'].value)
+    cartons.push(aesUtil.encrypt(key, this.tranfertForm.controls['idCarton'].value.toString()) as number)
     this.stock.listCartons = cartons
 
     this.mvtService.createStockMovement(this.stock).subscribe(
       resp => {
         this.isLoading.next(false);
+        this.getCartons()
         this.notifsService.onSuccess('Transfert effectué')
         this.annuler()
       },

@@ -71,9 +71,9 @@ export class IndexCarnetComponent implements OnInit {
     this.appState$ = this.carnetService.carnets$(this.page - 1, this.size)
       .pipe(
         map(response => {
-          this.dataSubjects.next(response)
+          this.dataSubjects.next(JSON.parse(aesUtil.decrypt(key,response.key.toString())))
           this.notifService.onSuccess('chargement des carnets')
-          return {dataState: DataState.LOADED_STATE, appData: response}
+          return {dataState: DataState.LOADED_STATE, appData: JSON.parse(aesUtil.decrypt(key,response.key.toString()))}
         }),
         startWith({dataState: DataState.LOADING_STATE, appData: null}),
         catchError((error: string) => {
@@ -84,17 +84,7 @@ export class IndexCarnetComponent implements OnInit {
 
   pageChange(event: number){
     this.page = event
-    this.appState$ = this.carnetService.carnets$(this.page - 1, this.size)
-      .pipe(
-        map(response => {
-          this.dataSubjects.next(response)
-          return {dataState: DataState.LOADED_STATE, appData: response}
-        }),
-        startWith({dataState: DataState.LOADING_STATE, appData: null}),
-        catchError((error: string) => {
-          return of({dataState: DataState.ERROR_STATE, error: error})
-        })
-      )
+    this.getCarnets()
   }
 
   getStatuts(status: string): string {

@@ -22,11 +22,11 @@ export class StoreHouseService {
     return this.http.get<any>(environment.storeHouse+ `?page=${page}&size=${size}`)
   }
 
-  getStoreHouseByInternalRef(internalRef: number): Observable<any>{
+  getStoreHouseByInternalRef(internalRef: string): Observable<any>{
     return this.http.get<any>(environment.storeHouse + `/${internalRef}`)
   }
 
-  getStoreHousesByStore(internalRef: number): Observable<any>{
+  getStoreHousesByStore(internalRef: string): Observable<any>{
     return this.http.get<any>(environment.storeHouse + `/store/${internalRef}`)
   }
 
@@ -39,7 +39,7 @@ export class StoreHouseService {
   }
 
   //liste des unités par magasin
-  getItemByStoreHouse(internalRef: number): Observable<any>{
+  getItemByStoreHouse(internalRef: string): Observable<any>{
     return this.http.get<any>(environment.storeHouse + `/group/${internalRef}`)
   }
 }

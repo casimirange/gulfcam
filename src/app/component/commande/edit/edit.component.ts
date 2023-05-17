@@ -49,6 +49,9 @@ export class EditComponent implements OnInit {
   paymentMethods: PaiementMethod[] = []
   paymentMethod: PaiementMethod = new PaiementMethod()
   statut: string;
+  clientid: string;
+  storeid: string;
+  payid: string;
   editForm: FormGroup;
   selectPdfForm: FormGroup;
   selectedFiles: FileList;
@@ -70,29 +73,32 @@ export class EditComponent implements OnInit {
   orderState$: Observable<AppState<Order>>;
   readonly DataState = DataState;
   private dataSubjects = new BehaviorSubject<Order>(null);
-
+  idmanager = aesUtil.decrypt(key, localStorage.getItem('uid').toString())
   constructor(private orderService: OrderService, private notifsService: NotifsService, private route: ActivatedRoute,
               private clientService: ClientService, private storeService: StoreService, private productService: ProductService,
               private voucherService: VoucherService, private paymentService: PaiementService, private fb: FormBuilder,
               private statusService: StatusOrderService, private couponService: CouponService, private router: Router,
-              private modalService: NgbModal, public global: ConfigOptions) {
+              private modalService: NgbModal, public global: ConfigOptions, private activatedRoute: ActivatedRoute) {
     this.formOrder()
     this.formAddCarnet()
     this.orF = this.addCouponClientForm.controls;
     this.selectPdfForm = this.fb.group({
       pdf: ['']
     });
-    this.IdParam = this.route.snapshot.paramMap.get('id');
+    this.IdParam = aesUtil.encrypt(key, aesUtil.decrypt(key, this.route.snapshot.paramMap.get('id')));
     JSON.parse(localStorage.getItem('Roles').toString()).forEach(authority => {
       this.role.push(aesUtil.decrypt(key,authority));
     });
   }
 
   ngOnInit(): void {
-    this.getOrder()
     // this.getVouchers()
     this.getProductsByOrder()
     this.getPaymentMethods()
+    // this.getClientByOrder()
+    // this.getStoreByOrder()
+    // this.getPaymentMethodByOrder()
+    this.getOrder()
   }
 
   formOrder() {
@@ -112,24 +118,34 @@ export class EditComponent implements OnInit {
   }
 
   getOrder() {
+    this.activatedRoute.params.subscribe(params => {
+      this.orderState$ = this.orderService.showOrder$(params['id'])
+        .pipe(
+          map((response) => {
+            console.log(JSON.parse(aesUtil.decrypt(key, response.key.toString())))
+            this.dataSubjects.next(JSON.parse(aesUtil.decrypt(key, response.key.toString())))
+            this.order = JSON.parse(aesUtil.decrypt(key, response.key.toString()) )as Order
+            this.statut = JSON.parse(aesUtil.decrypt(key, response.key.toString())).status.name
+            // this.clientid = JSON.parse(aesUtil.decrypt(key, response.key.toString())).idClient
+            // this.storeid = JSON.parse(aesUtil.decrypt(key, response.key.toString())).idStore
+            // this.payid = JSON.parse(aesUtil.decrypt(key, response.key.toString())).idPaymentMethod
 
-    this.orderState$ = this.orderService.showOrder$(parseInt(this.IdParam))
-      .pipe(
-        map((response) => {
-          console.log(response)
-          this.dataSubjects.next(response)
-          this.order = response
-          this.statut = response.status.name
-          this.getClientByOrder(response.idClient)
-          this.getStoreByOrder(response.idStore)
-          this.getPaymentMethodByOrder(response.idPaymentMethod)
-          return {dataState: DataState.LOADED_STATE, appData: response}
-        }),
-        startWith({dataState: DataState.LOADING_STATE, appData: null}),
-        catchError((error: string) => {
-          return of({dataState: DataState.ERROR_STATE, error: error})
-        })
-      )
+            // this.getClientByOrder(JSON.parse(aesUtil.decrypt(key, response.key.toString())).idClient.toString())
+            // this.getStoreByOrder(JSON.parse(aesUtil.decrypt(key, response.key.toString())).idClient.toString())
+            // if (this.payid.toString() != ''){
+            //   this.getPaymentMethodByOrder(JSON.parse(aesUtil.decrypt(key, response.key.toString())).idClient.toString())
+            // }
+            return {
+              dataState: DataState.LOADED_STATE,
+              appData: JSON.parse(aesUtil.decrypt(key, response.key.toString()))
+            }
+          }),
+          startWith({dataState: DataState.LOADING_STATE, appData: null}),
+          catchError((error: string) => {
+            return of({dataState: DataState.ERROR_STATE, error: error})
+          })
+        )
+    })
 
     // this.loadingData.next(true)
     //   this.orderService.getOrderByRef(parseInt(this.IdParam)).subscribe(
@@ -152,41 +168,52 @@ export class EditComponent implements OnInit {
   }
 
   getProductsByOrder() {
-    this.productService.getProducts(parseInt(this.IdParam)).subscribe(
-      resp => {
-        this.products = resp.content
-      }
-    )
+    this.activatedRoute.params.subscribe(params => {
+      this.productService.getProducts(params['id']).subscribe(
+        resp => {
+          this.products = JSON.parse(aesUtil.decrypt(key, resp.key.toString())).content
+        }
+      )
+    })
   }
 
-  getClientByOrder(internalRefClient: number) {
-    this.clientService.findClient(internalRefClient).subscribe(
-      resp => {
-        this.client = resp;
-      }
-    )
+  getClientByOrder(id: string) {
+    if (id != ''){
+      this.clientService.findClient(aesUtil.encrypt(key, id.toString())).subscribe(
+        resp => {
+          this.client = JSON.parse(aesUtil.decrypt(key,resp.key.toString()));
+        }
+      )
+    }
+
   }
 
-  getStoreByOrder(internalRefClient: number) {
-    this.storeService.getStoreByInternalref(internalRefClient).subscribe(
-      resp => {
-        this.store = resp;
-      }
-    )
+  getStoreByOrder(id: string) {
+    if(id != ''){
+      this.storeService.getStoreByInternalref(aesUtil.encrypt(key, id.toString())).subscribe(
+        resp => {
+          this.store = JSON.parse(aesUtil.decrypt(key,resp.key.toString()));
+        }
+      )
+    }
+
   }
 
-  getPaymentMethodByOrder(internalRefClient: number) {
-    this.paymentService.getPaiementMethodByInternalRef(internalRefClient).subscribe(
-      resp => {
-        this.paymentMethod = resp;
-      }
-    )
+  getPaymentMethodByOrder(id: string) {
+    if (id != ''){
+      this.paymentService.getPaiementMethodByInternalRef(aesUtil.encrypt(key, id.toString())).subscribe(
+        resp => {
+          this.paymentMethod = JSON.parse(aesUtil.decrypt(key,resp.key.toString()));
+        }
+      )
+    }
+
   }
 
   getPaymentMethods() {
     this.paymentService.getPaymentMethods().subscribe(
       resp => {
-        this.paymentMethods = resp.content
+        this.paymentMethods = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content
       },
     )
   }
@@ -199,7 +226,7 @@ export class EditComponent implements OnInit {
       this.order.paymentReference = this.editForm.controls['peimentRef'].value
       const docType = 'pdf'
       this.currentFileUpload = this.selectedFiles.item(0);
-      this.orderService.acceptOrder(this.order.internalReference, this.order.idFund, this.order.idPaymentMethod, this.order.paymentReference,
+      this.orderService.acceptOrder(this.IdParam, aesUtil.encrypt(key, this.order.idFund.toString()), aesUtil.encrypt(key, this.order.idPaymentMethod.toString()), this.order.paymentReference,
         docType, this.currentFileUpload).subscribe(
         resp => {
           this.isLoading.next(false);
@@ -222,7 +249,7 @@ export class EditComponent implements OnInit {
       this.isLoading.next(true);
       this.order.idSalesManager = parseInt(aesUtil.decrypt(key, localStorage.getItem('uid')))
       this.currentFileUpload = this.selectedFiles.item(0);
-      this.orderService.validOrder(this.order.internalReference, this.order.idSalesManager, this.currentFileUpload).subscribe(
+      this.orderService.validOrder(this.IdParam, aesUtil.encrypt(key, this.order.idSalesManager.toString()), this.currentFileUpload).subscribe(
         resp => {
           this.isLoading.next(false);
           this.notifsService.onSuccess('Commande Terminée')
@@ -240,7 +267,7 @@ export class EditComponent implements OnInit {
   payOrder() {
     this.order.idSalesManager = parseInt(aesUtil.decrypt(key, localStorage.getItem('uid')))
     this.isLoading.next(true);
-    this.orderService.payOrder(this.order.internalReference, this.order.idSalesManager).subscribe(
+    this.orderService.payOrder(this.IdParam, aesUtil.encrypt(key, this.order.idSalesManager.toString())).subscribe(
       resp => {
         this.isLoading.next(false);
         this.refreshOrder()
@@ -253,10 +280,10 @@ export class EditComponent implements OnInit {
   generateBoredereau() {
     if (this.statut == "PAID") {
       this.isLoading.next(true);
-      this.orderService.deliveryOrder(this.order.internalReference, this.order.idSalesManager).subscribe(
-        respProd => {
+      this.orderService.deliveryOrder(this.IdParam, aesUtil.encrypt(key, this.order.idSalesManager.toString())).subscribe(
+        response => {
           // console.log('delivery', respProd)
-          const file = new Blob([respProd], {type: 'application/pdf'});
+          const file = new Blob([JSON.parse(aesUtil.decrypt(key,response.key.toString()))], {type: 'application/pdf'});
           const fileURL = URL.createObjectURL(file);
           window.open(fileURL);
           this.isLoading.next(false);
@@ -273,9 +300,9 @@ export class EditComponent implements OnInit {
 
   getBoredereau() {
     const type = 'DELIVERY'
-    this.orderService.getReçu(this.order.internalReference, type).subscribe(
-      respProd => {
-        const file = new Blob([respProd], {type: 'application/pdf'});
+    this.orderService.getReçu(this.IdParam, type).subscribe(
+      response=> {
+        const file = new Blob([JSON.parse(aesUtil.decrypt(key,response.key.toString()))], {type: 'application/pdf'});
         const fileURL = URL.createObjectURL(file);
         window.open(fileURL);
         // this.isLoading.next(false);
@@ -298,14 +325,14 @@ export class EditComponent implements OnInit {
     //     })
     //   )
 
-    this.orderState$ = this.orderService.showOrder$(parseInt(this.IdParam))
+    this.orderState$ = this.orderService.showOrder$(this.IdParam)
       .pipe(
         map((response) => {
-          console.log(response)
-          this.dataSubjects.next(response)
-          this.order = response
-          this.statut = response.status.name
-          return {dataState: DataState.LOADED_STATE, appData: response}
+          console.log(JSON.parse(aesUtil.decrypt(key,response.key.toString())))
+          this.dataSubjects.next(JSON.parse(aesUtil.decrypt(key,response.key.toString())))
+          this.order = JSON.parse(aesUtil.decrypt(key,response.key.toString()))
+          this.statut = JSON.parse(aesUtil.decrypt(key,response.key.toString())).status.name
+          return {dataState: DataState.LOADED_STATE, appData: JSON.parse(aesUtil.decrypt(key,response.key.toString()))}
         }),
         startWith({dataState: DataState.LOADING_STATE, appData: null}),
         catchError((error: string) => {
@@ -320,10 +347,10 @@ export class EditComponent implements OnInit {
 
   getProforma() {
     this.openLoader()
-    this.orderService.getProforma(this.order.internalReference).subscribe(
-      respProd => {
+    this.orderService.getProforma(this.IdParam).subscribe(
+      response => {
         this.closeLoader()
-        const file = new Blob([respProd], {type: 'application/pdf'});
+        const file = new Blob([JSON.parse(aesUtil.decrypt(key,response.key.toString()))], {type: 'application/pdf'});
         const fileURL = URL.createObjectURL(file);
         window.open(fileURL);
       }, error => {
@@ -336,10 +363,10 @@ export class EditComponent implements OnInit {
     const docType = 'pdf'
     const type = 'INVOICE'
     this.openLoader()
-    this.orderService.getFile(this.order.internalReference, type, docType).subscribe(
-      respProd => {
+    this.orderService.getFile(this.IdParam, type, docType).subscribe(
+      response => {
         this.closeLoader()
-        const file = new Blob([respProd], {type: 'application/pdf'});
+        const file = new Blob([JSON.parse(aesUtil.decrypt(key,response.key.toString()))], {type: 'application/pdf'});
         const fileURL = URL.createObjectURL(file);
         window.open(fileURL);
       }, error => {
@@ -352,11 +379,11 @@ export class EditComponent implements OnInit {
     this.loadingFile.next(true)
     this.openLoader()
     const type = 'INVOICE'
-    this.orderService.getReçu(this.order.internalReference, type).subscribe(
-      respProd => {
+    this.orderService.getReçu(this.IdParam, type).subscribe(
+      response => {
         this.loadingFile.next(false)
         this.closeLoader()
-        const file = new Blob([respProd], {type: 'application/pdf'});
+        const file = new Blob([JSON.parse(aesUtil.decrypt(key,response.key.toString()))], {type: 'application/pdf'});
         const fileURL = URL.createObjectURL(file);
         window.open(fileURL);
       }, error => {
@@ -369,10 +396,10 @@ export class EditComponent implements OnInit {
   generateBonLivraison() {
     const type = 'DELIVERY'
     this.openLoader()
-    this.orderService.getReçu(this.order.internalReference, type).subscribe(
-      respProd => {
+    this.orderService.getReçu(this.IdParam, type).subscribe(
+      response => {
         this.closeLoader()
-        const file = new Blob([respProd], {type: 'application/pdf'});
+        const file = new Blob([JSON.parse(aesUtil.decrypt(key,response.key.toString()))], {type: 'application/pdf'});
         const fileURL = URL.createObjectURL(file);
         window.open(fileURL);
       }, error => {
@@ -384,10 +411,10 @@ export class EditComponent implements OnInit {
   generateBonCommande() {
     const docType = 'pdf'
     const type = 'DELIVERY'
-    this.orderService.getFile(this.order.internalReference, type, docType).subscribe(
-      respProd => {
+    this.orderService.getFile(aesUtil.encrypt(key, this.order.internalReference.toString()), type, docType).subscribe(
+      response => {
 
-        const file = new Blob([respProd], {type: 'application/pdf'});
+        const file = new Blob([JSON.parse(aesUtil.decrypt(key,response.key.toString()))], {type: 'application/pdf'});
         const fileURL = URL.createObjectURL(file);
         window.open(fileURL);
         // this.isLoading.next(false);
@@ -427,7 +454,7 @@ export class EditComponent implements OnInit {
       this.isCanceling.next(true)
       this.order.idCommercialAttache = parseInt(aesUtil.decrypt(key, localStorage.getItem('uid')))
       this.order.reasonForCancellation = this.editForm.controls['reason'].value
-      this.orderService.denyOrder(this.order.internalReference, this.order.idCommercialAttache, this.order.reasonForCancellation).subscribe(
+      this.orderService.denyOrder(this.IdParam, aesUtil.encrypt(key, this.order.idCommercialAttache.toString()), this.order.reasonForCancellation).subscribe(
         res => {
           this.isCanceling.next(false)
           this.notifsService.onSuccess('commande annulée avec succès')
@@ -446,7 +473,7 @@ export class EditComponent implements OnInit {
     this.listVouchers.forEach(coupon => {
       let cp = coupon.toString()
       let cps = parseInt(cp)
-      this.couponService.affectCouponClient(cps.toString(), this.order.idClient).subscribe();
+      this.couponService.affectCouponClient(cps.toString(), aesUtil.encrypt(key, this.order.idClient.toString())).subscribe();
     })
     this.notifsService.onSuccess('carnet(s) attribué(s) avec succès')
     this.orF['coupon'].reset();
