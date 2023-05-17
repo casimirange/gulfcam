@@ -280,7 +280,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr *ngFor="let prod of products; let i = index">
+                    <tr *ngFor="let prod of order.products  ; let i = index">
                       <th scope="row">{{i + 1}}</th>
                       <td>{{formatNumber(prod.amount)}}</td>
                       <td>{{prod.quantityNotebook}}</td>

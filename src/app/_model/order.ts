@@ -37,5 +37,6 @@ export class Order{
     ttcaggregateAmount?:	number
     localisation?:	string
     completeName?:	string
+    products?:	any[]
   }
 

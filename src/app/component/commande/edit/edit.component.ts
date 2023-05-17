@@ -85,7 +85,10 @@ export class EditComponent implements OnInit {
     this.selectPdfForm = this.fb.group({
       pdf: ['']
     });
-    this.IdParam = aesUtil.encrypt(key, aesUtil.decrypt(key, this.route.snapshot.paramMap.get('id')));
+    this.activatedRoute.params.subscribe(params => {
+      this.IdParam = params['id'];
+    })
+
     JSON.parse(localStorage.getItem('Roles').toString()).forEach(authority => {
       this.role.push(aesUtil.decrypt(key,authority));
     });
@@ -93,7 +96,7 @@ export class EditComponent implements OnInit {
 
   ngOnInit(): void {
     // this.getVouchers()
-    this.getProductsByOrder()
+    // this.getProductsByOrder()
     this.getPaymentMethods()
     // this.getClientByOrder()
     // this.getStoreByOrder()
@@ -169,7 +172,7 @@ export class EditComponent implements OnInit {
 
   getProductsByOrder() {
     this.activatedRoute.params.subscribe(params => {
-      this.productService.getProducts(params['id']).subscribe(
+      this.productService.getProducts(aesUtil.decrypt(key, params['id'].toString())).subscribe(
         resp => {
           this.products = JSON.parse(aesUtil.decrypt(key, resp.key.toString())).content
         }
@@ -221,7 +224,7 @@ export class EditComponent implements OnInit {
   acceptOrder() {
     if (this.selectedFiles.item(0).type == 'application/pdf') {
       this.isLoading.next(true);
-      this.order.idFund = parseInt(aesUtil.decrypt(key, localStorage.getItem('uid')))
+      this.order.idFund = this.idmanager
       this.order.idPaymentMethod = this.editForm.controls['method'].value
       this.order.paymentReference = this.editForm.controls['peimentRef'].value
       const docType = 'pdf'
@@ -247,7 +250,7 @@ export class EditComponent implements OnInit {
   endOrder() {
     if (this.selectedFiles.item(0).type == 'application/pdf') {
       this.isLoading.next(true);
-      this.order.idSalesManager = parseInt(aesUtil.decrypt(key, localStorage.getItem('uid')))
+      this.order.idSalesManager = this.idmanager
       this.currentFileUpload = this.selectedFiles.item(0);
       this.orderService.validOrder(this.IdParam, aesUtil.encrypt(key, this.order.idSalesManager.toString()), this.currentFileUpload).subscribe(
         resp => {
@@ -265,7 +268,7 @@ export class EditComponent implements OnInit {
   }
 
   payOrder() {
-    this.order.idSalesManager = parseInt(aesUtil.decrypt(key, localStorage.getItem('uid')))
+    this.order.idSalesManager = this.idmanager
     this.isLoading.next(true);
     this.orderService.payOrder(this.IdParam, aesUtil.encrypt(key, this.order.idSalesManager.toString())).subscribe(
       resp => {
@@ -280,10 +283,11 @@ export class EditComponent implements OnInit {
   generateBoredereau() {
     if (this.statut == "PAID") {
       this.isLoading.next(true);
+      this.order.idSalesManager = this.idmanager
       this.orderService.deliveryOrder(this.IdParam, aesUtil.encrypt(key, this.order.idSalesManager.toString())).subscribe(
         response => {
           // console.log('delivery', respProd)
-          const file = new Blob([JSON.parse(aesUtil.decrypt(key,response.key.toString()))], {type: 'application/pdf'});
+          const file = new Blob([response], {type: 'application/pdf'});
           const fileURL = URL.createObjectURL(file);
           window.open(fileURL);
           this.isLoading.next(false);
@@ -302,7 +306,7 @@ export class EditComponent implements OnInit {
     const type = 'DELIVERY'
     this.orderService.getReçu(this.IdParam, type).subscribe(
       response=> {
-        const file = new Blob([JSON.parse(aesUtil.decrypt(key,response.key.toString()))], {type: 'application/pdf'});
+        const file = new Blob([response], {type: 'application/pdf'});
         const fileURL = URL.createObjectURL(file);
         window.open(fileURL);
         // this.isLoading.next(false);
@@ -350,7 +354,7 @@ export class EditComponent implements OnInit {
     this.orderService.getProforma(this.IdParam).subscribe(
       response => {
         this.closeLoader()
-        const file = new Blob([JSON.parse(aesUtil.decrypt(key,response.key.toString()))], {type: 'application/pdf'});
+        const file = new Blob([response], {type: 'application/pdf'});
         const fileURL = URL.createObjectURL(file);
         window.open(fileURL);
       }, error => {
@@ -366,7 +370,7 @@ export class EditComponent implements OnInit {
     this.orderService.getFile(this.IdParam, type, docType).subscribe(
       response => {
         this.closeLoader()
-        const file = new Blob([JSON.parse(aesUtil.decrypt(key,response.key.toString()))], {type: 'application/pdf'});
+        const file = new Blob([response], {type: 'application/pdf'});
         const fileURL = URL.createObjectURL(file);
         window.open(fileURL);
       }, error => {
@@ -383,7 +387,7 @@ export class EditComponent implements OnInit {
       response => {
         this.loadingFile.next(false)
         this.closeLoader()
-        const file = new Blob([JSON.parse(aesUtil.decrypt(key,response.key.toString()))], {type: 'application/pdf'});
+        const file = new Blob([response], {type: 'application/pdf'});
         const fileURL = URL.createObjectURL(file);
         window.open(fileURL);
       }, error => {
@@ -399,7 +403,7 @@ export class EditComponent implements OnInit {
     this.orderService.getReçu(this.IdParam, type).subscribe(
       response => {
         this.closeLoader()
-        const file = new Blob([JSON.parse(aesUtil.decrypt(key,response.key.toString()))], {type: 'application/pdf'});
+        const file = new Blob([response], {type: 'application/pdf'});
         const fileURL = URL.createObjectURL(file);
         window.open(fileURL);
       }, error => {
@@ -414,7 +418,7 @@ export class EditComponent implements OnInit {
     this.orderService.getFile(aesUtil.encrypt(key, this.order.internalReference.toString()), type, docType).subscribe(
       response => {
 
-        const file = new Blob([JSON.parse(aesUtil.decrypt(key,response.key.toString()))], {type: 'application/pdf'});
+        const file = new Blob([response], {type: 'application/pdf'});
         const fileURL = URL.createObjectURL(file);
         window.open(fileURL);
         // this.isLoading.next(false);
