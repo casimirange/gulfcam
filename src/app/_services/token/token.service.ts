@@ -20,7 +20,7 @@ export class TokenService {
   constructor(private router: Router, private bnIdle: BnNgIdleService, private modalService: NgbModal) { }
 
   saveToken(token: IToken){
-    localStorage.setItem('bearerToken', <string>token.access_token);
+    localStorage.setItem('bearerToken', aesUtil.encrypt(key, <string>token.access_token));
     const date = new Date();
     date.setMinutes(date.getMinutes() + 5);
     localStorage.setItem('exp', date.toString())
@@ -36,19 +36,20 @@ export class TokenService {
   }
 
   public saveAuthorities(authorities: string[]) {
+    console.log("authoritties", authorities)
     localStorage.setItem('Roles', JSON.stringify(authorities))
   }
 
   saveUserInfo(user: ISignup){
-    localStorage.setItem('firstName', user.firstName)
-    localStorage.setItem('lastName', user.lastName)
-    localStorage.setItem('uid', user.internalReference.toString())
-    localStorage.setItem('id', user.userId.toString())
-    localStorage.setItem('store', user.iStore)
+    localStorage.setItem('firstName', aesUtil.encrypt(key, user.firstName))
+    localStorage.setItem('lastName', aesUtil.encrypt(key, user.lastName))
+    localStorage.setItem('uid', aesUtil.encrypt(key, user.internalReference.toString()))
+    localStorage.setItem('id', aesUtil.encrypt(key, user.userId.toString()))
+    localStorage.setItem('store', aesUtil.encrypt(key, user.iStore))
   }
 
   saveUserAccount(account: any){
-    localStorage.setItem('userAccount', account.toString())
+    localStorage.setItem('userAccount', aesUtil.encrypt(key, account.toString()))
   }
 
   userInactivity(){
@@ -62,7 +63,8 @@ export class TokenService {
 
   saveRefreshToken(token: string){
     // localStorage.removeItem('bearerToken');
-    localStorage.setItem('bearerToken', <string>token);
+    localStorage.setItem('bearerToken', aesUtil.encrypt(key, token));
+
     new IdleTimer({
       timeout: 600, //expired after 600 secs
       onTimeout: () => {
@@ -87,7 +89,8 @@ export class TokenService {
     }).startInterval();
     if (this.isRedirect()){
       this.modalService.dismissAll()
-      this.router.navigate([localStorage.getItem('url').toString()])
+      this.router.navigate(['/dashboard'])
+      // this.router.navigate([localStorage.getItem('url').toString()])
       localStorage.removeItem('url')
       this.userInactivity()
     }else {
@@ -120,9 +123,10 @@ export class TokenService {
     localStorage.removeItem('uid')
     localStorage.removeItem('store')
     localStorage.removeItem('id')
+    localStorage.removeItem('_expiredTime')
     // localStorage.setItem('roles', <string>token.roles);
     this.router.navigate(['auth']);
-    this.bnIdle.stopTimer()
+    // this.bnIdle.stopTimer()
   }
 
   clearTokenExpired(): void{
@@ -138,7 +142,7 @@ export class TokenService {
     localStorage.removeItem('store')
     localStorage.removeItem('_expiredTime')
     this.router.navigate(['auth']);
-    this.bnIdle.stopTimer()
+    // this.bnIdle.stopTimer()
   }
 
   isLogged(): boolean{

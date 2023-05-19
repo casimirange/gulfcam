@@ -77,24 +77,32 @@ export class OtpComponent implements OnInit {
 
   verifyOtp(){
 
-      this.authService.verifyOtp(aesUtil.encrypt(key,this.otp)).subscribe(
-        (resp) => {
-          this.token.saveRefreshToken(resp.refreshToken);
-          console.log('roles crypté', resp.roles)
+      // this.authService.verifyOtp(aesUtil.encrypt(key,this.otp)).subscribe(
+      this.authService.verifyOtp(this.otp).subscribe(
+        (response) => {
+          this.token.saveRefreshToken(JSON.parse(aesUtil.decrypt(key,response.key.toString())).refreshToken);
+          // console.log('roles ', JSON.parse(aesUtil.decrypt(key,response.key.toString())).roles)
+          // console.log('resp ', JSON.parse(aesUtil.decrypt(key,response.key.toString())))
+          const tab = JSON.parse(aesUtil.decrypt(key,response.key.toString())).roles
+          const tab2 = []
+          // console.log(tab)
+          tab.forEach(w => tab2.push(aesUtil.encrypt(key, w)))
+          // console.log(tab2)
           // console.log('roles décrypté', aesUtil.decrypt(key, resp.roles))
-          this.token.saveAuthorities(resp.roles)
-          this.user.iStore =  resp.idStore
-          this.user.firstName =  resp.firstname
-          this.user.lastName =  resp.lastname
-          this.user.internalReference =  resp.uid
-          this.user.userId =  resp.id
+          this.token.saveAuthorities(tab2)
+          this.user.iStore =  JSON.parse(aesUtil.decrypt(key,response.key.toString())).idStore
+          this.user.firstName =  JSON.parse(aesUtil.decrypt(key,response.key.toString())).firstname
+          this.user.lastName =  JSON.parse(aesUtil.decrypt(key,response.key.toString())).lastname
+          this.user.internalReference =  JSON.parse(aesUtil.decrypt(key,response.key.toString())).uid
+          this.user.userId =  JSON.parse(aesUtil.decrypt(key,response.key.toString())).id
+          // console.log('user', this.user)
 
           this.token.saveUserInfo(this.user)
-          this.token.saveUserAccount(resp.account)
-          this.firstName = aesUtil.decrypt(key, localStorage.getItem('firstName')).toString()
+          this.token.saveUserAccount(JSON.parse(aesUtil.decrypt(key,response.key.toString())).account)
+          this.firstName = JSON.parse(aesUtil.decrypt(key,response.key.toString())).firstname
           this.notifService.onSuccess(`Bienvenue ${this.firstName}`)
           // this.bnIdle.stopTimer()
-          this.bnIdle.resetTimer()
+          // this.bnIdle.resetTimer()
 
         }, (error) => {
           // this.inputDigitLeft = "Reéssayer";
