@@ -13,7 +13,7 @@ export class Order{
     idManagerStore?:	number
     idManagerCoupon?:	number
     idManagerOrder?:	number
-    idCommercialAttache?:	number
+    idCommercialAttache?:	any
     idSalesManager?:	number
     idSpaceManager2?:	number
     idSpaceManager1?:	number
@@ -21,7 +21,7 @@ export class Order{
     linkInvoice?: string
     linkDelivery?: string
     tax?:	number
-    idStore?: number
+    idStore?: any
     store?: Store
     status?:	Status
     channel?:	string

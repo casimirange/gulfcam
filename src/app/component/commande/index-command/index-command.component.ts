@@ -183,7 +183,7 @@ export class IndexCommandComponent implements OnInit {
     for (let prod of this.tabProducts) {
       this.totalOrder = this.totalOrder + prod.total
     }
-    this.totalTTC = this.totalOrder * this.global.tax + this.totalOrder
+    this.totalTTC = this.totalOrder
     this.orF['quantity'].reset();
     this.orF['voucherType'].reset();
   }
@@ -196,7 +196,7 @@ export class IndexCommandComponent implements OnInit {
     for (let prod of this.tabProducts) {
       this.totalOrder = this.totalOrder + prod.total
     }
-    this.totalTTC = this.totalOrder * this.global.tax + this.totalOrder
+    this.totalTTC = this.totalOrder
   }
 
   showClientForms() {
@@ -282,17 +282,17 @@ export class IndexCommandComponent implements OnInit {
     // this.store = this.findStore(this.orF['store'].value)[0]
 
     // this.order.idStore = this.store.internalReference
-    this.order.idStore = parseInt(aesUtil.decrypt(key, localStorage.getItem("store")))
-    this.order.idClient = this.client.internalReference
-    this.order.channel = this.orF['chanel'].value
-    this.order.description = this.orF['description'].value
-    this.order.deliveryTime = this.orF['delais'].value.toString()
-    this.order.clientReference = this.orF['refCli'].value
-    this.order.idCommercialAttache = parseInt(aesUtil.decrypt(key, localStorage.getItem('uid')))
-    this.order.tax = this.global.tax;
-    this.order.ttcaggregateAmount = this.totalOrder;
-    this.order.netAggregateAmount = this.totalOrder;
-
+    this.order.idStore = localStorage.getItem("store").toString()
+    this.order.idClient = aesUtil.encrypt(key, this.client.internalReference.toString()) as number
+    this.order.channel = aesUtil.encrypt(key, this.orF['chanel'].value.toString())
+    this.order.description = this.orF['description'].value != '' ? aesUtil.encrypt(key, this.orF['description'].value.toString()) : ''
+    this.order.deliveryTime = this.orF['delais'].value != '' ? aesUtil.encrypt(key, this.orF['delais'].value.toString()) : ''
+    this.order.clientReference = this.orF['refCli'].value != '' ? aesUtil.encrypt(key, this.orF['refCli'].value.toString()) as number : this.orF['refCli'].value
+    this.order.idCommercialAttache = localStorage.getItem('uid').toString()
+    this.order.tax = aesUtil.encrypt(key, this.global.tax.toString()) as number;
+    this.order.ttcaggregateAmount = aesUtil.encrypt(key, this.totalTTC.toString()) as number;
+    this.order.netAggregateAmount = aesUtil.encrypt(key,  this.totalOrder.toString()) as number;
+    console.log(this.order)
     if (this.client.completeName) {
       this.orderState$ = this.orderService.addOrder$(this.order)
         .pipe(
@@ -302,7 +302,7 @@ export class IndexCommandComponent implements OnInit {
             // )
             this.isLoading.next(false)
             this.saveProductsOrder(JSON.parse(aesUtil.decrypt(key,response.key.toString())))
-            // this.getProforma(response);
+            // this.getProforma(JSON.parse(aesUtil.decrypt(key, response.key.toString())));
             this.annuler()
             this.getOrders()
             return {dataState: DataState.LOADED_STATE, appData: this.dataSubjects.value}

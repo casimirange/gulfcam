@@ -212,7 +212,7 @@
             </div>
             <div class="col-md-6">
               <div class="position-relative form-group">
-                <label for="name" class="">Nom complet</label>
+                <label for="name" class="">Nom complet <span class="text-danger">*</span></label>
                 <input id="name" ngModel="{{client.completeName}}" placeholder="nom du client" type="text"
                        class="form-control" formControlName="completeName">
               </div>
@@ -239,7 +239,7 @@
             </div>
             <div class="col-md-6">
               <div class="position-relative form-group">
-                <label for="address" class="">Adresse</label>
+                <label for="address" class="">Adresse <span class="text-danger">*</span></label>
                 <input name="email" id="address" ngModel="{{client.address}}" placeholder="adresse" type="text"
                        class="form-control" formControlName="address">
               </div>
@@ -259,7 +259,7 @@
           <div class="row">
             <div class="col-md-4">
               <div class="position-relative form-group">
-                <label for="phone" class="">Numéro de téléphone</label>
+                <label for="phone" class="">Numéro de téléphone <span class="text-danger">*</span></label>
                 <input name="email" id="phone" ngModel="{{client.phone}}"  type="text" placeholder="6937542108"
                        class="form-control" formControlName="phone">
               </div>
@@ -293,7 +293,7 @@
           <div class="row">
             <div class="col-md-6">
               <div class="position-relative form-group">
-                <label for="comptnumber" class="">Numéro de compte Gulfcam</label>
+                <label for="comptnumber" class="">Numéro de compte Gulfcam <span class="text-danger">*</span></label>
                 <input name="email" ngModel="{{client.gulfcamAccountNumber}}" id="comptnumber"
                        placeholder="Numéro de compte" type="text" class="form-control"
                        formControlName="gulfcamAccountNumber">
@@ -312,7 +312,7 @@
             </div>
             <div class="col-md-6">
               <div class="position-relative form-group">
-                <label for="typeClient" class="">Type de client</label>
+                <label for="typeClient" class="">Type de client <span class="text-danger">*</span></label>
                 <select name="select" ngModel="{{clientType}}" id="typeClient" class="form-control"
                         formControlName="typeClient">
                   <option value="" selected disabled hidden>Sélectionner un type de client</option>

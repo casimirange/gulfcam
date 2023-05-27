@@ -210,7 +210,7 @@
               <div class="card">
                 <div class="col-md-12">
                   <div class="position-relative form-group">
-                    <label for="clientref" class="">Client</label>
+                    <label for="clientref" class="">Client <span class="text-danger">*</span></label>
                     <input type="text" id="clientref" (ngModelChange)="findClients($event)" autocomplete="off"
                            class="form-control" formControlName="client" list="clientsListOption"
                            placeholder="cherchez un client">
@@ -242,7 +242,7 @@
 
                 <div class="col-md-12">
                   <div class="position-relative form-group">
-                    <label for="canal" class="">Canal</label>
+                    <label for="canal" class="">Canal <span class="text-danger">*</span></label>
                     <select name="select" id="canal" class="form-control" formControlName="chanel">
                       <option value="" selected disabled hidden>Sélectionner un canal</option>
                       <option *ngFor="let can of canaux">{{can}}</option>
@@ -341,7 +341,7 @@
                   <div class="row col-md-12">
                     <div class="col-md-5">
                       <div class="position-relative form-group">
-                        <label for="tb" class="">Type de coupon</label>
+                        <label for="tb" class="">Type de coupon <span class="text-danger">*</span></label>
                         <select name="select" id="tb" class="form-control" formControlName="voucherType">
                           <option value="" selected disabled hidden>Sélectionner un coupon</option>
                           <option *ngFor="let tVoucher of vouchers">{{tVoucher.amount}}</option>
@@ -350,7 +350,7 @@
                     </div>
                     <div class="col-md-5">
                       <div class="position-relative form-group">
-                        <label for="qte" class="">Quantité de carnet</label>
+                        <label for="qte" class="">Quantité de carnet <span class="text-danger">*</span></label>
                         <input name="email" min="1" id="qte" placeholder="entrer une quantité" type="text"
                                autocomplete="off"
                                class="form-control" formControlName="quantity">

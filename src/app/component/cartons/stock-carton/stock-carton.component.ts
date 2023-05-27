@@ -36,6 +36,7 @@ import {aesUtil, key} from "../../../_helpers/aes";
 export class StockCartonComponent implements OnInit {
 
   storeHouses: StoreHouse[] = [];
+  storeHousesAdmin: StoreHouse[] = [];
   storeHouse: StoreHouse = new StoreHouse();
   cartons: Carton[] = [];
   carton: Carton = new Carton();
@@ -100,6 +101,7 @@ export class StockCartonComponent implements OnInit {
     this.getUsers();
     this.getStores();
     this.getStoreHouses();
+    this.getStoreHousesAdmin();
     this.getCartons();
     console.log(localStorage.getItem('uid').toString())
     console.log(aesUtil.decrypt(key, localStorage.getItem('uid').toString()))
@@ -134,6 +136,17 @@ export class StockCartonComponent implements OnInit {
   getCartons() {
     this.filterCartons()
     this.notifService.onSuccess('chargement des cartons')
+  }
+
+  //récupération de la liste des entrepots
+  getStoreHousesAdmin() {
+    this.idStoreHouse = ''
+    this.storeHouseService.getStoreHouses().subscribe(
+      resp => {
+        this.isLoading.next(false);
+        this.storeHousesAdmin = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content.filter(sth => sth.type == 'stockage')
+      },
+    )
   }
 
   //récupération de la liste des entrepots

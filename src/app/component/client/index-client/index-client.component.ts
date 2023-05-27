@@ -97,7 +97,7 @@ export class IndexClientComponent implements OnInit {
       companyName: [''],
       email: ['', [Validators.email]],
       phone: ['', [Validators.required,]],
-      address: ['', [Validators.required, Validators.minLength(5)]],
+      address: ['', [Validators.required, Validators.minLength(3)]],
       gulfcamAccountNumber: ['', [Validators.required, Validators.pattern('^[0-9 ]*$')]],
       rccm: [''],
       niu: [''],

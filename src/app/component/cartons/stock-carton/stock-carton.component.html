@@ -224,7 +224,7 @@
 <!--            </datalist>-->
             <select name="select" id="storeHouse" class="form-control" formControlName="idStoreHouse">
               <option value="" selected disabled hidden>Sélectionner un espace de stockage</option>
-              <option *ngFor="let storeHouse of storeHouses" [value]="storeHouse.internalReference">{{storeHouse.name}}</option>
+              <option *ngFor="let storeHouse of role.includes('ROLE_SUPERADMIN') ? storeHousesAdmin : storeHouses" [value]="storeHouse.internalReference">{{storeHouse.name}}</option>
             </select>
           </div>
           <div
