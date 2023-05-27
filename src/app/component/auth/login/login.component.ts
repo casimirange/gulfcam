@@ -101,14 +101,6 @@ export class LoginComponent implements OnInit {
     // this.credentials.password = this.loginForm.controls['password'].value;
     this.authService.login(this.credentials).subscribe(
       (response) => {
-        // this.user = aesUtil.decrypt(key, data.key.toString()) as IToken;
-        // console.log('hum')
-        // console.log('premières données', data)
-        // console.log('deuxième données', this.user)
-        // console.log('deuxièmelllllllllll données', this.user.authenticated)
-        // console.log('deuxièmelllllllllll données', aaa)
-        // console.log('troisième données', aesUtil.decrypt(key, data.key.toString()))
-        // console.log('quatrième données', aesUtil.decrypt(key, data.key.toString()) as IToken)
         this.tokenService.saveToken(JSON.parse(aesUtil.decrypt(key,response.key.toString())) as IToken);
         this.tokenService.saveEmail(this.credentials.login);
         this.isLoading.next(false);
@@ -116,11 +108,7 @@ export class LoginComponent implements OnInit {
         this.isLoggedIn = true;
       },
       (error: any) => {
-        console.log(error)
         this.errorMessage = error.error.error[0];
-        this.count += this.count
-        console.log(this.count)
-        // this.notifsService.onError(error.error.error[0], 'Echec de connexioon')
         this.isLoginFailed = true;
         this.isLoading.next(false);
       }

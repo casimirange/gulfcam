@@ -129,7 +129,7 @@ export class IndexUsersComponent implements OnInit {
   getStores(){
     this.storeService.getStore().subscribe(
       resp => {
-        this.stores = resp.content
+        this.stores = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content
       },
       error => {
         // this.notifsService.onError(error.error.message, 'échec chargement magasins')

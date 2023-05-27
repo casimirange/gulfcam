@@ -64,7 +64,7 @@ export class DetailsUserComponent implements OnInit {
     this.storeService.getStore().subscribe(
       resp => {
         console.log(resp)
-        this.stores = resp.content
+        this.stores = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content
       },
       error => {
 

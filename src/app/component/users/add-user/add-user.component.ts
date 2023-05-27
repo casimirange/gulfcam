@@ -62,7 +62,7 @@ export class AddUserComponent implements OnInit {
     this.storeService.getStore().subscribe(
       resp => {
         console.log(resp)
-        this.stores = resp.content
+        this.stores = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content
       },
       error => {
 
@@ -88,6 +88,7 @@ export class AddUserComponent implements OnInit {
 
     const store = this.stores.find(store => store.localization === this.signup.controls['idStore'].value)
     this.credentials.idStore = aesUtil.encrypt(key, store.internalReference.toString());
+    // this.credentials.idStore = aesUtil.encrypt(key, '123456789');
     console.log('user2', this.credentials)
     this.authService.signup(this.credentials).subscribe(
       resp => {

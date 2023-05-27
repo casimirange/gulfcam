@@ -125,7 +125,7 @@ export class EditComponent implements OnInit {
       this.orderState$ = this.orderService.showOrder$(params['id'])
         .pipe(
           map((response) => {
-            console.log(JSON.parse(aesUtil.decrypt(key, response.key.toString())))
+            // console.log(JSON.parse(aesUtil.decrypt(key, response.key.toString())))
             this.dataSubjects.next(JSON.parse(aesUtil.decrypt(key, response.key.toString())))
             this.order = JSON.parse(aesUtil.decrypt(key, response.key.toString()) )as Order
             this.statut = JSON.parse(aesUtil.decrypt(key, response.key.toString())).status.name
@@ -332,7 +332,7 @@ export class EditComponent implements OnInit {
     this.orderState$ = this.orderService.showOrder$(this.IdParam)
       .pipe(
         map((response) => {
-          console.log(JSON.parse(aesUtil.decrypt(key,response.key.toString())))
+          // console.log(JSON.parse(aesUtil.decrypt(key,response.key.toString())))
           this.dataSubjects.next(JSON.parse(aesUtil.decrypt(key,response.key.toString())))
           this.order = JSON.parse(aesUtil.decrypt(key,response.key.toString()))
           this.statut = JSON.parse(aesUtil.decrypt(key,response.key.toString())).status.name

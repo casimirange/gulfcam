@@ -22,6 +22,7 @@ export class IndexEntrepotComponent implements OnInit {
   storeHouses: StoreHouse[] = [];
   storeHousesByStore: StoreHouse[] = [];
   storeHouse: StoreHouse = new StoreHouse();
+  storeHouse2: StoreHouse = new StoreHouse();
   @ViewChild('mymodal', { static: false }) viewMe?: ElementRef<HTMLElement>;
   storeHouseForm: FormGroup ;
   storeHouseType = ['stockage', 'vente']
@@ -95,19 +96,19 @@ export class IndexEntrepotComponent implements OnInit {
   saveStoreHouse(){
     this.isLoading.next(true);
     this.store = this.stores.find(store => store.localization === this.storeHouseForm.controls['store'].value)
-    this.storeHouse.idStore = aesUtil.encrypt(key, this.store.internalReference.toString())
-    this.storeHouse.type = aesUtil.encrypt(key, this.storeHouseForm.controls['type'].value.toString())
-    this.storeHouse.name = aesUtil.encrypt(key, this.storeHouseForm.controls['name'].value.toString())
-    this.storeHouseService.createStoreHouse(this.storeHouse).subscribe(
+    this.storeHouse2.idStore = aesUtil.encrypt(key, this.store.internalReference.toString())
+    this.storeHouse2.type = aesUtil.encrypt(key, this.storeHouseForm.controls['type'].value.toString())
+    this.storeHouse2.name = aesUtil.encrypt(key, this.storeHouseForm.controls['name'].value.toString())
+    this.storeHouseService.createStoreHouse(this.storeHouse2).subscribe(
       resp => {
         /**
          * je dois gérer cette partie
          */
         // this.storeHouses.push(resp)
+        this.annuler()
         this.getStoreHouses()
         this.isLoading.next(false);
         this.notifService.onSuccess('enregistrement effectué')
-        this.annuler()
       },
       error => {
         this.isLoading.next(false);

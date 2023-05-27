@@ -30,6 +30,7 @@ export class DashboardComponent implements OnInit {
     JSON.parse(localStorage.getItem('Roles').toString()).forEach(authority => {
       this.role.push(aesUtil.decrypt(key,authority));
     });
+    // console.log(this.role)
   }
 
 }

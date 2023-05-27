@@ -139,10 +139,10 @@ export class StockCartonComponent implements OnInit {
   //récupération de la liste des entrepots
   getStoreHouses() {
     this.idStoreHouse = ''
-    this.storeHouseService.getStoreHousesByStore(this.storeFilter).subscribe(
+    this.storeHouseService.getStoreHousesByStore(aesUtil.encrypt(key, this.storeFilter.toString())).subscribe(
       resp => {
         this.isLoading.next(false);
-        this.storeHouses = resp.content.filter(sth => sth.type == 'stockage')
+        this.storeHouses = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content.filter(sth => sth.type == 'stockage')
       },
     )
   }

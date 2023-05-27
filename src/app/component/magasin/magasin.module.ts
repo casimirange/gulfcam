@@ -9,6 +9,7 @@ import {ReactiveFormsModule} from "@angular/forms";
 import { UnitesComponent } from './unites/unites.component';
 import { DetailsMagasinComponent } from './details-magasin/details-magasin.component';
 import {NgxPaginationModule} from "ngx-pagination";
+import {ClientModule} from "../client/client.module";
 
 
 @NgModule({
@@ -23,7 +24,8 @@ import {NgxPaginationModule} from "ngx-pagination";
         MagasinRoutingModule,
         ReactiveFormsModule,
         SharedModule,
-        NgxPaginationModule
+        NgxPaginationModule,
+        ClientModule
     ]
 })
 export class MagasinModule { }

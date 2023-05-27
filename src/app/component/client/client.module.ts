@@ -19,6 +19,7 @@ import {NgxPaginationModule} from "ngx-pagination";
 import {CommandeModule} from "../commande/commande.module";
 import {AppModule} from "../../app.module";
 import {FormatNumberPipe} from "../../pipes/formatNumber/format-number.pipe";
+import {FormatDatePipe} from "../../pipes/formatDate/format-date.pipe";
 
 @NgModule({
   declarations: [
@@ -30,6 +31,7 @@ import {FormatNumberPipe} from "../../pipes/formatNumber/format-number.pipe";
     ClientDateFilterPipe,
     ClientCompagnyFilterPipe,
     FormatNumberPipe,
+    FormatDatePipe
   ],
     imports: [
         CommonModule,
@@ -48,10 +50,12 @@ import {FormatNumberPipe} from "../../pipes/formatNumber/format-number.pipe";
     ],
     providers: [
         ClientService,
-        FormatNumberPipe
+        FormatNumberPipe,
     ],
     exports: [
-        ClientNameFilterPipe
+        ClientNameFilterPipe,
+        FormatNumberPipe,
+      FormatDatePipe
     ]
 })
 export class ClientModule { }

@@ -92,8 +92,8 @@
                 <td>{{storeHouse.name}}</td>
                 <td>{{storeHouse.type}}</td>
                 <td>{{getStatuts(storeHouse.status.name)}}</td>
-                <td>{{storeHouse.createAt}}</td>
-                <td>{{storeHouse.updateAt}}</td>
+                <td>{{storeHouse.createAt | formatDate }}</td>
+                <td>{{storeHouse.updateAt ? (storeHouse.updateAt | formatDate) : ''}}</td>
                 <td >
                   <button class="btn btn-sm btn-secondary mr-2" (click)="showDetails(storeHouse)"
                   *ngIf="role.includes('ROLE_SUPERADMIN') || (storeHouse.type == 'vente' ? roleUser == 'MANAGER_SPACES_2' : roleUser =='MANAGER_SPACES_1') "

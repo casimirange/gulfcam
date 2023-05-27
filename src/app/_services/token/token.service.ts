@@ -36,7 +36,7 @@ export class TokenService {
   }
 
   public saveAuthorities(authorities: string[]) {
-    console.log("authoritties", authorities)
+    // console.log("authoritties", authorities)
     localStorage.setItem('Roles', JSON.stringify(authorities))
   }
 
