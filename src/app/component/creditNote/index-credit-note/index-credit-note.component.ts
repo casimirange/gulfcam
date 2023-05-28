@@ -301,7 +301,7 @@ export class IndexCreditNoteComponent implements OnInit, OnDestroy {
   }
 
   removeCoupon(coupon: number) {
-    console.log(this.vouchers.indexOf(coupon))
+    // console.log(this.vouchers.indexOf(coupon))
     const prodIndex = this.vouchers.indexOf(coupon)
     this.vouchers.splice(prodIndex, 1)
   }
