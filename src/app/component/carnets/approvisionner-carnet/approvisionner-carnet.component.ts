@@ -55,7 +55,7 @@ export class ApprovisionnerCarnetComponent implements OnInit {
 
   ngOnInit() {
     this.getStoreHouses()
-    this.getStoreHousesAdmin()
+    // this.getStoreHousesAdmin()
     this.getCartons()
   }
 
@@ -70,14 +70,14 @@ export class ApprovisionnerCarnetComponent implements OnInit {
   }
 
   //récupération de la liste des entrepots
-  getStoreHousesAdmin() {
-    this.storeHouseService.getStoreHouses().subscribe(
-      resp => {
-        this.isLoading.next(false);
-        this.storeHousesAdmin = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content.filter(sth => sth.type == 'stockage')
-      },
-    )
-  }
+  // getStoreHousesAdmin() {
+  //   this.storeHouseService.getStoreHouses().subscribe(
+  //     resp => {
+  //       this.isLoading.next(false);
+  //       this.storeHousesAdmin = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content.filter(sth => sth.type == 'vente')
+  //     },
+  //   )
+  // }
 
   getStoreHouses(){
     this.storeHouseService.getAllStoreHousesWithPagination(0, 500).subscribe(

@@ -59,7 +59,7 @@
                   <label>Espace de vente</label>
                   <select formControlName="idStoreHouseSell" class="form-control">
                     <option disabled selected hidden value="">Sélectionner un espace</option>
-                    <option *ngFor="let store of role.includes('ROLE_SUPERADMIN') ? storeHousesAdmin : storeHouses2" [value]="store.internalReference">{{store.name}}</option>
+                    <option *ngFor="let store of storeHouses2" [value]="store.internalReference">{{store.name}}</option>
                   </select>
                 </div>
                 <div *ngIf="form['idStoreHouseSell'].invalid && (form['idStoreHouseSell'].dirty || form['idStoreHouseSell'].touched)"
