@@ -16,7 +16,7 @@ import {Router} from "@angular/router";
 import {StoreHouseService} from "../../../_services/storeHouse/store-house.service";
 import {environment} from "../../../../environments/environment";
 import {StatusService} from "../../../_services/status/status.service";
-import {aesUtil, key} from "../../../_helpers/aes";
+import {aesUtil, key} from "../../../_helpers/aes.js";
 
 @Component({
   selector: 'app-dashboard-magasin',

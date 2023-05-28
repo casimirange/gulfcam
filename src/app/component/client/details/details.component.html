@@ -116,11 +116,10 @@
               </tr>
               </thead>
               <tbody>
-              <tr style="cursor: pointer" routerLink="/commandes/complete-order/{{order.internalReference}}" *ngFor="let order of clientOrder.appData.content | orderRefFilter: internalRef | orderDateFilter: date
-                    | paginate: { id: 'clientorder', itemsPerPage: size, currentPage: page, totalItems: clientOrder.appData.totalElements}">
+              <tr style="cursor: pointer" routerLink="/commandes/complete-order/{{order.internalReference}}" *ngFor="let order of clientOrder.appData.content | paginate: { id: 'clientorder', itemsPerPage: size, currentPage: page, totalItems: clientOrder.appData.totalElements}">
                 <td class="text-left">{{order.internalReference}}</td>
 <!--                <td class="text-left">{{order.createdAt | date: 'dd/MM/yyyy'}}</td>-->
-                <td class="text-left">{{order.createdAt[2] + '/' + order.createdAt[1] +'/' + order.createdAt[0]}}</td>
+                <td class="text-left">{{order.createdAt | formatDate}}</td>
                 <td class="text-left">{{order.store.localization }}</td>
                 <td class="text-left">{{order.channel }}</td>
                 <td class="text-left">{{order.paymentMethod.designation }}</td>
@@ -132,8 +131,7 @@
 
             </table>
             <div class="text-center">
-              <p *ngIf="(clientOrder.appData.content | clientNameFilter: name | clientRefFilter: refCli | orderRefFilter: internalRef
-                 | orderDateFilter: date).length == 0" style="color: grey; font-size: 1.8rem;" class="mx-auto">Aucune
+              <p *ngIf="clientOrder.appData.content.length == 0" style="color: grey; font-size: 1.8rem;" class="mx-auto">Aucune
                 commande trouvée !</p>
             </div>
             <div class="card-footer">

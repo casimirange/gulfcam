@@ -16,7 +16,7 @@ import {CartonService} from "../../../_services/cartons/carton.service";
 import {MvtStockService} from "../../../_services/stock/mvt-stock.service";
 import {Stock} from "../../../_model/stock";
 import {Carton} from "../../../_model/carton";
-import {aesUtil, key} from "../../../_helpers/aes";
+import {aesUtil, key} from "../../../_helpers/aes.js";
 
 @Component({
   selector: 'app-transferer-carton',
@@ -32,6 +32,7 @@ export class TransfererCartonComponent implements OnInit {
   isLoading$ = this.isLoading.asObservable();
   cartons: Carton[] = [];
   storeHouses1: StoreHouse[] = [];
+  storeHousesAdmin: StoreHouse[] = [];
   roleUser = aesUtil.decrypt(key, localStorage.getItem('userAccount').toString())
   role: string[] = []
   idmanager = aesUtil.decrypt(key, localStorage.getItem('uid').toString())
@@ -54,6 +55,7 @@ export class TransfererCartonComponent implements OnInit {
   ngOnInit() {
     this.getCartons()
     this.getStoreHouses()
+    this.getStoreHousesAdmin()
   }
 
   //on récupère la liste des types de coupon
@@ -62,6 +64,16 @@ export class TransfererCartonComponent implements OnInit {
       resp => {
         this.cartons = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content.filter((carton: Carton) => carton.status.name === 'AVAILABLE' && carton.storeHouse.idStore == (aesUtil.decrypt(key, localStorage.getItem('store').toString()) as number))
       }
+    )
+  }
+
+  //récupération de la liste des entrepots
+  getStoreHousesAdmin() {
+    this.storeHouseService.getStoreHouses().subscribe(
+      resp => {
+        this.isLoading.next(false);
+        this.storeHousesAdmin = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content.filter(sth => sth.type == 'stockage')
+      },
     )
   }
 

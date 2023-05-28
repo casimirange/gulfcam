@@ -28,7 +28,7 @@ import {Coupon} from "../../../_model/coupon";
 import {AppState} from "../../../_interfaces/app-state";
 import {CustomResponse} from "../../../_interfaces/custom-response";
 import {DataState} from "../../../_enum/data.state.enum";
-import {aesUtil, key} from "../../../_helpers/aes";
+import {aesUtil, key} from "../../../_helpers/aes.js";
 
 @Component({
   selector: 'app-index-credit-note',
@@ -49,7 +49,7 @@ export class IndexCreditNoteComponent implements OnInit, OnDestroy {
   selectedStation: boolean = false
   clients: Client[]
   stations: Station[]
-  vouchers: number[] = []
+  vouchers: any[] = []
   appState$: Observable<AppState<CustomResponse<CreditNote>>>;
   readonly DataState = DataState;
   private dataSubjects = new BehaviorSubject<CustomResponse<CreditNote>>(null);
@@ -106,7 +106,7 @@ export class IndexCreditNoteComponent implements OnInit, OnDestroy {
   }
 
   createCreditNote() {
-    this.creditNote.idStation = aesUtil.encrypt(key, this.creditForm.controls['idStation'].value.toString()) as number
+    this.creditNote.idStation = aesUtil.encrypt(key, this.creditForm.controls['idStation'].value.toString())
     this.creditNote.serialCoupons = this.vouchers
     this.isLoading.next(true);
     this.creditNoteService.saveCreditNote(this.creditNote).subscribe(
@@ -282,7 +282,7 @@ export class IndexCreditNoteComponent implements OnInit, OnDestroy {
   }
 
   addCoupons(str: string) {
-    this.vouchers.push(+str);
+    this.vouchers.push(aesUtil.encrypt(key, str));
   }
 
   getCouponByStation() {

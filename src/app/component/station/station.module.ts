@@ -8,6 +8,7 @@ import {SharedModule} from "../shared/shared.module";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {NgxPaginationModule} from "ngx-pagination";
 import { DetailsStationComponent } from './details-station/details-station.component';
+import {ClientModule} from "../client/client.module";
 
 
 @NgModule({
@@ -22,7 +23,8 @@ import { DetailsStationComponent } from './details-station/details-station.compo
         SharedModule,
         ReactiveFormsModule,
         FormsModule,
-        NgxPaginationModule
+        NgxPaginationModule,
+        ClientModule
     ]
 })
 export class StationModule { }

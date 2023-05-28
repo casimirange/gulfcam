@@ -25,7 +25,7 @@ import {DataState} from "../../../_enum/data.state.enum";
 import {LoaderComponent} from "../../../preloader/loader/loader.component";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {ConfigOptions} from "../../../configOptions/config-options";
-import {aesUtil, key} from "../../../_helpers/aes";
+import {aesUtil, key} from "../../../_helpers/aes.js";
 
 export class Product {
   coupon: number;
@@ -275,6 +275,9 @@ export class EditComponent implements OnInit {
         this.isLoading.next(false);
         this.refreshOrder()
         this.notifsService.onSuccess('Commande Payée')
+      },
+      error => {
+        this.isLoading.next(false);
       }
     )
 
@@ -475,9 +478,11 @@ export class EditComponent implements OnInit {
   affectCouponClient() {
     this.isLoading.next(true)
     this.listVouchers.forEach(coupon => {
+      console.log(coupon)
+      console.log(this.order.idClient)
       let cp = coupon.toString()
-      let cps = parseInt(cp)
-      this.couponService.affectCouponClient(cps.toString(), aesUtil.encrypt(key, this.order.idClient.toString())).subscribe();
+      // let cps = parseInt(cp)
+      this.couponService.affectCouponClient(aesUtil.encrypt(key, cp.toString()), aesUtil.encrypt(key, this.order.client.internalReference.toString())).subscribe();
     })
     this.notifsService.onSuccess('carnet(s) attribué(s) avec succès')
     this.orF['coupon'].reset();
@@ -535,9 +540,9 @@ export class EditComponent implements OnInit {
 
   addCoupon() {
     let str = parseInt(this.addCouponClientForm.controls['coupon'].value).toString();
-    this.couponService.getCouponsBySerialNumber(str).subscribe(
+    this.couponService.getCouponsBySerialNumber(aesUtil.encrypt(key, str)).subscribe(
       res => {
-        if (res.status.name !== 'AVAILABLE') {
+        if (JSON.parse(aesUtil.decrypt(key,res.key.toString())).status.name !== 'AVAILABLE') {
           this.notifsService.onWarning('Ce coupon n\'une plus dans notre espace de stockage')
         } else {
           this.listVouchers.push(this.addCouponClientForm.controls['coupon'].value)

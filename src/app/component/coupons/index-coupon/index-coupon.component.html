@@ -119,13 +119,14 @@
                 <th>Numéro de série</th>
                 <th>Coupon</th>
                 <th>Client</th>
-                <th>Ticket</th>
+<!--                <th>Ticket</th>-->
                 <th>Carnet</th>
                 <th>Station</th>
                 <th>Statut</th>
                 <th>Note credit</th>
                 <th>Dde Oppo.</th>
-<!--                <th>Date</th>-->
+                <th>Date Cr.</th>
+                <th>Date Mod.</th>
                 <!--                <th>Actions</th>-->
               </tr>
               </thead>
@@ -138,13 +139,14 @@
                 <td>{{padWithZero(coupon.serialNumber, 7)}}</td>
                 <td>{{formatNumber(coupon.amount)}}</td>
                 <td>{{coupon.nameClient}}</td>
-                <td>{{coupon.idTicket}}</td>
+<!--                <td>{{coupon.idTicket}}</td>-->
                 <td>{{coupon.idNotebook}}</td>
                 <td>{{coupon.nameStation}}</td>
                 <td>{{getStatuts(coupon.status.name)}}</td>
                 <td>{{coupon.idCreditNote}}</td>
                 <td>{{coupon.idRequestOpposition}}</td>
-<!--                <td>{{coupon.createdAt | date: 'dd/MM/yyyy'}}</td>-->
+                <td>{{coupon.createdAt | formatDateHour}}</td>
+                <td>{{coupon.updateAt | formatDateHour}}</td>
               </tr>
             </table>
             <div class="text-center">

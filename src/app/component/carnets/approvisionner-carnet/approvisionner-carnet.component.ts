@@ -15,7 +15,7 @@ import {StoreHouseService} from "../../../_services/storeHouse/store-house.servi
 import {CartonService} from "../../../_services/cartons/carton.service";
 import {Carton} from "../../../_model/carton";
 import Swal from "sweetalert2";
-import {aesUtil, key} from "../../../_helpers/aes";
+import {aesUtil, key} from "../../../_helpers/aes.js";
 
 @Component({
   selector: 'app-approvisionner-carnet',
@@ -33,6 +33,7 @@ export class ApprovisionnerCarnetComponent implements OnInit {
   isLoading$ = this.isLoading.asObservable();
   sn: any;
   storeHouses2: StoreHouse[] = [];
+  storeHousesAdmin: StoreHouse[] = [];
   roleUser = aesUtil.decrypt(key,localStorage.getItem('userAccount').toString())
   role: string[] = []
   constructor(private userService: UsersService,  private notifsService: NotifsService, private route: ActivatedRoute,
@@ -54,6 +55,7 @@ export class ApprovisionnerCarnetComponent implements OnInit {
 
   ngOnInit() {
     this.getStoreHouses()
+    this.getStoreHousesAdmin()
     this.getCartons()
   }
 
@@ -64,6 +66,16 @@ export class ApprovisionnerCarnetComponent implements OnInit {
       resp => {
         this.cartons = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content.filter((carton: Carton) => carton.status.name === 'AVAILABLE' && carton.storeHouse.idStore == (aesUtil.decrypt(key, localStorage.getItem('store').toString()) as number))
       }
+    )
+  }
+
+  //récupération de la liste des entrepots
+  getStoreHousesAdmin() {
+    this.storeHouseService.getStoreHouses().subscribe(
+      resp => {
+        this.isLoading.next(false);
+        this.storeHousesAdmin = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content.filter(sth => sth.type == 'stockage')
+      },
     )
   }
 

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {log} from "util";
-import {aesUtil, key} from "../../../_helpers/aes";
+import {aesUtil, key} from "../../../_helpers/aes.js";
 
 @Component({
   selector: 'app-dashboard',

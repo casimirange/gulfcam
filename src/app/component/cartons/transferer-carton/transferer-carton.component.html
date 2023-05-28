@@ -43,7 +43,7 @@
                   <label>Espace de stockage d'arrivé</label>
                   <select formControlName="idStoreHouseStockage" class="form-control">
                     <option disabled selected hidden value="">Sélectionner un espace de stockage</option>
-                    <option *ngFor="let store of storeHouses1" [value]="store.internalReference">{{store.name}}</option>
+                    <option *ngFor="let store of role.includes('ROLE_SUPERADMIN') ? storeHousesAdmin : storeHouses1" [value]="store.internalReference">{{store.name}}</option>
                   </select>
                   <div
                     *ngIf="form['idStoreHouseStockage'].invalid && (form['idStoreHouseStockage'].dirty || form['idStoreHouseStockage'].touched)"

@@ -50,7 +50,7 @@
                 <select name="mag" id="mag" class="form-control form-control-sm mr-3" [(ngModel)]="storeFilter" (ngModelChange)="getStoreHouses(); filterCartons()" >
                   <option value="" selected disabled hidden>Choix magasin</option>
                   <option *ngFor="let store of stores" ngValue="{{store.internalReference}}">{{store.localization}}</option>
-                  <option value="">Tout afficher</option>
+<!--                  <option value="">Tout afficher</option>-->
                 </select>
               </div>
               <div class="position-relative form-group mr-2">
@@ -146,8 +146,8 @@
                   </span>
 <!--                  {{getStatuts(carton.status.name)}}-->
                 </td>
-                <td>{{carton.createdAt[2]+'/'+carton.createdAt[1]+'/'+carton.createdAt[0]}}</td>
-                <td>{{carton.updateAt ? (carton.updateAt[2]+'/'+carton.updateAt[1]+'/'+carton.updateAt[0]) : ''}}</td>
+                <td>{{carton.createdAt | formatDateHour}}</td>
+                <td>{{carton.updateAt | formatDateHour}}</td>
             </table>
             <div class="text-center">
               <p *ngIf="!appState.appData.content.length" style="color: grey; font-size: 1.8rem;" class="mx-auto">Aucun

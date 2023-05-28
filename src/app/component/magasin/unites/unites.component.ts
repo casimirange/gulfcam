@@ -3,7 +3,7 @@ import {Unite} from "../../../_model/unite";
 import {UnitsService} from "../../../_services/units/units.service";
 import {ActivatedRoute} from "@angular/router";
 import {StoreService} from "../../../_services/store/store.service";
-import {aesUtil, key} from "../../../_helpers/aes";
+import {aesUtil, key} from "../../../_helpers/aes.js";
 
 @Component({
   selector: 'app-unites',

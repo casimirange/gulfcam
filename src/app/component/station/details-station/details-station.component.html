@@ -71,7 +71,7 @@
                     <td>{{i + 1}}</td>
                     <td>{{credit.internalReference}}</td>
                     <td>{{getStatuts(credit.status.name)}}</td>
-                    <td> {{credit.createdAt | date: 'dd/MM/yyyy'}}</td>
+                    <td> {{credit.createdAt | formatDateHour}}</td>
                     <td>
                       <button class="btn btn-sm btn-secondary mr-2" (click)="creditNoteDetails(credit)">
                         <i class="pe-7s-look" title="consulter"></i>
@@ -151,8 +151,8 @@
                     <td>{{coupon.idNotebook}}</td>
                     <td>{{coupon.idStation}}</td>
                     <td>{{getStatutsCoupon(coupon.status.name)}}</td>
-                    <td>{{coupon.createdAt}}</td>
-                    <td>{{coupon.updateAt}}</td>
+                    <td>{{coupon.createdAt | formatDateHour}}</td>
+                    <td>{{coupon.updateAt | formatDateHour}}</td>
                   </tr>
                 </table>
                 <div class="text-center">

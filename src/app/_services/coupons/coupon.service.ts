@@ -38,7 +38,7 @@ export class CouponService {
     return this.http.put<any>(environment.coupon+`/accept/serial/${serialNumber}`, stationId)
   }
 
-  affectCouponClient(serialNumber: string, idClient: number): Observable<any>{
+  affectCouponClient(serialNumber: string, idClient: string): Observable<any>{
     return this.http.post<any>(environment.coupon+`/affect/serial/${serialNumber}?idClient=${idClient}`, null)
   }
 

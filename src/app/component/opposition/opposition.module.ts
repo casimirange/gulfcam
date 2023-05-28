@@ -8,6 +8,7 @@ import {SharedModule} from "../shared/shared.module";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import { DetailsRequestOppositionComponent } from './details-request-opposition/details-request-opposition.component';
 import {NgxPaginationModule} from "ngx-pagination";
+import {ClientModule} from "../client/client.module";
 
 
 @NgModule({
@@ -22,7 +23,8 @@ import {NgxPaginationModule} from "ngx-pagination";
         SharedModule,
         ReactiveFormsModule,
         FormsModule,
-        NgxPaginationModule
+        NgxPaginationModule,
+        ClientModule
     ]
 })
 export class OppositionModule { }

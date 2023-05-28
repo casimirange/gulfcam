@@ -11,7 +11,7 @@ import {Router} from "@angular/router";
 import Swal from "sweetalert2";
 import {AppState} from "../../../_interfaces/app-state";
 import {DataState} from "../../../_enum/data.state.enum";
-import {aesUtil, key} from "../../../_helpers/aes";
+import {aesUtil, key} from "../../../_helpers/aes.js";
 
 @Component({
   selector: 'app-index-client',

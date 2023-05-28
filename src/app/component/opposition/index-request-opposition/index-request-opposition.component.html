@@ -141,8 +141,8 @@
                     {{getStatuts(request.status.name) == 'ACTIVE(E)' ? 'VALIDEE' : 'NON VALIDE'}}
                   </span>
                 </td>
-                <td>{{request.createdAt | date: 'dd/MM/yyyy HH:mm'}}</td>
-                <td>{{request.updateAt | date: 'dd/MM/yyyy à HH:mm'}}</td>
+                <td>{{request.createdAt | formatDateHour}}</td>
+                <td>{{request.updateAt | formatDateHour}}</td>
                 <td>
                   <button class="btn btn-sm btn-secondary mr-2" (click)="requestDetails(request)">
                     <i class="pe-7s-look" title="consulter"></i>

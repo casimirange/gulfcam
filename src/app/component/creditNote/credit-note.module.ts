@@ -6,6 +6,7 @@ import { IndexCreditNoteComponent } from './index-credit-note/index-credit-note.
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {NgxPaginationModule} from "ngx-pagination";
 import { DetailsCreditNoteComponent } from './details-credit-note/details-credit-note.component';
+import {ClientModule} from "../client/client.module";
 
 
 @NgModule({
@@ -18,7 +19,8 @@ import { DetailsCreditNoteComponent } from './details-credit-note/details-credit
         CreditNoteRoutingModule,
         ReactiveFormsModule,
         NgxPaginationModule,
-        FormsModule
+        FormsModule,
+        ClientModule
     ]
 })
 export class CreditNoteModule { }

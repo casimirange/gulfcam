@@ -8,6 +8,7 @@ import { CarnetLayoutComponent } from './carnet-layout/carnet-layout.component';
 import {SharedModule} from "../shared/shared.module";
 import {NgxPaginationModule} from "ngx-pagination";
 import {ReactiveFormsModule} from "@angular/forms";
+import {ClientModule} from "../client/client.module";
 
 
 @NgModule({
@@ -21,7 +22,8 @@ import {ReactiveFormsModule} from "@angular/forms";
         CarnetsRoutingModule,
         SharedModule,
         NgxPaginationModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        ClientModule
     ]
 })
 export class CarnetsModule { }

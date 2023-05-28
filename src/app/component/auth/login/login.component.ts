@@ -11,7 +11,7 @@ import {catchError, count, map, startWith} from "rxjs/operators";
 import {DataState} from "../../../_enum/data.state.enum";
 import {NotifsService} from "../../../_services/notifications/notifs.service";
 import * as CryptoJS from 'crypto-js';
-import {aesUtil, AESUtil, key} from "../../../_helpers/aes";
+import {aesUtil, AESUtil, key} from "../../../_helpers/aes.js";
 
 @Component({
   selector: 'app-login',

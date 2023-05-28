@@ -9,7 +9,6 @@ import {HttpClientModule} from "@angular/common/http";
 import {SharedModule} from "./component/shared/shared.module";
 import {Erreur404Component} from "./component/erreur404/erreur404.component";
 import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
-// import {SweetAlert2Module} from "@sweetalert2/ngx-sweetalert2";
 import {TokenInterceptorProvider} from "./_helpers/token.interceptor";
 import {CopyAndPasteDirective} from './directive/copy-and-paste.directive';
 import {NgOtpInputModule} from "ng-otp-input";
@@ -23,6 +22,7 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {LoaderComponent} from './preloader/loader/loader.component';
 import {ConnectionServiceModule} from "ng-connection-service";
 import {TokenService} from "./_services/token/token.service";
+import {ClientModule} from "./component/client/client.module";
 
 @NgModule({
   declarations: [
@@ -47,6 +47,8 @@ import {TokenService} from "./_services/token/token.service";
     ReactiveFormsModule,
     ConnectionServiceModule,
     FormsModule,
+    ClientModule,
+    // ClientModule,
     // FormatDatePipe
     // SweetAlert2Module.forRoot(),
     // Ng2SearchPipeModule,

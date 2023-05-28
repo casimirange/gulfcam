@@ -10,7 +10,7 @@ import {BehaviorSubject} from "rxjs";
 import Swal from "sweetalert2";
 import {Router} from "@angular/router";
 import {StatusService} from "../../../_services/status/status.service";
-import {aesUtil, key} from "../../../_helpers/aes";
+import {aesUtil, key} from "../../../_helpers/aes.js";
 
 @Component({
   selector: 'app-index-entrepot',

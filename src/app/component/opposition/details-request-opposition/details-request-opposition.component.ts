@@ -10,7 +10,7 @@ import {BehaviorSubject} from "rxjs";
 import {Location} from "@angular/common";
 import {CouponService} from "../../../_services/coupons/coupon.service";
 import {Coupon} from "../../../_model/coupon";
-import {aesUtil, key} from "../../../_helpers/aes";
+import {aesUtil, key} from "../../../_helpers/aes.js";
 
 @Component({
   selector: 'app-details-request-opposition',

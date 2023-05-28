@@ -9,7 +9,7 @@ import IdleTimer from "../../_helpers/idleTimer.js";
 import {NotifsService} from "../notifications/notifs.service";
 import Swal from "sweetalert2";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
-import {aesUtil, key} from "../../_helpers/aes";
+import {aesUtil, key} from "../../_helpers/aes.js";
 
 @Injectable({
   providedIn: 'root'

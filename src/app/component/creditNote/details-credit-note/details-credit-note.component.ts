@@ -11,7 +11,7 @@ import {Location} from "@angular/common";
 import {CreditNote} from "../../../_model/creditNote";
 import {CreditNoteService} from "../../../_services/creditNote/credit-note.service";
 import {Coupon} from "../../../_model/coupon";
-import {aesUtil, key} from "../../../_helpers/aes";
+import {aesUtil, key} from "../../../_helpers/aes.js";
 
 @Component({
   selector: 'app-details-credit-note',
@@ -46,7 +46,7 @@ export class DetailsCreditNoteComponent implements OnInit {
     this.activatedRoute.params.subscribe(params => {
       this.noteService.getCreditNoteByInternqlRef(params['id'] as number).subscribe(
         res => {
-          console.log(JSON.parse(aesUtil.decrypt(key, res.key.toString())))
+          // console.log(JSON.parse(aesUtil.decrypt(key, res.key.toString())))
           this.creditNote = JSON.parse(aesUtil.decrypt(key, res.key.toString()));
           this.statut = this.creditNote.status.name
           this.coupons = this.creditNote.coupon

@@ -39,8 +39,8 @@
           <td>{{i + 1}}</td>
           <td>{{payment.internalReference}}</td>
           <td>{{payment.designation}} </td>
-          <td> {{payment.createdAt | date: 'dd/MM/yyyy HH:mm'}}</td>
-          <td> {{payment.updateAt | date: 'dd/MM/yyyy HH:mm'}}</td>
+          <td> {{payment.createdAt | formatDateHour}}</td>
+          <td> {{payment.updateAt | formatDateHour}}</td>
           <td>
 <!--            <a style="cursor: pointer"  class="delete text-danger" (click)="deletePayment(payment, i)" >-->
 <!--              <i class="pe-7s-trash" title="supprimer"></i>-->

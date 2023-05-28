@@ -2,7 +2,7 @@ import {Component, HostListener, OnInit} from '@angular/core';
 import {ConfigOptions} from "../../../configOptions/config-options";
 import {Observable} from "rxjs";
 import {ActivatedRoute} from "@angular/router";
-import {aesUtil, key} from "../../../_helpers/aes";
+import {aesUtil, key} from "../../../_helpers/aes.js";
 
 @Component({
   selector: 'app-sidebar',

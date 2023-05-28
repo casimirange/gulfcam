@@ -54,8 +54,8 @@
                   <td>{{voucher.designation}} </td>
                   <td>{{voucher.amount}} <small>Fcfa</small></td>
                   <td> {{getStatuts(voucher.status.name)}}</td>
-                  <td> {{voucher.createdAt | date: 'dd/MM/yyyy hh:mm'}}</td>
-                  <td> {{voucher.updateAt | date: 'dd/MM/yyyy hh:mm'}}</td>
+                  <td> {{voucher.createdAt | formatDateHour}}</td>
+                  <td> {{voucher.updateAt | formatDateHour}}</td>
                   <td>
 <!--                    <a style="cursor: pointer"  class="delete text-danger" (click)="deleteTypeVoucher(voucher, i)" >-->
 <!--                    <i class="pe-7s-trash" title="supprimer"></i>-->

@@ -9,7 +9,8 @@ import {AuthService} from "../../../_services/auth.service";
 import {Router} from "@angular/router";
 import {StoreService} from "../../../_services/store/store.service";
 import {NotifsService} from "../../../_services/notifications/notifs.service";
-import {aesUtil, key} from "../../../_helpers/aes";
+import {aesUtil, key} from "../../../_helpers/aes.js";
+import {Location} from "@angular/common";
 
 @Component({
   selector: 'app-add-user',
@@ -30,7 +31,7 @@ export class AddUserComponent implements OnInit {
   form: any;
   role: string[] = []
   constructor(
-    private fb: FormBuilder, private authService: AuthService, private router: Router, private storeService: StoreService,
+    private fb: FormBuilder, private authService: AuthService, private router: Router, private storeService: StoreService, private _location: Location,
     private notifService: NotifsService) {
     this.signup = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -104,4 +105,7 @@ export class AddUserComponent implements OnInit {
     )
   }
 
+  back() {
+    this._location.back()
+  }
 }

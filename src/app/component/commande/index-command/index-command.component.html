@@ -151,7 +151,7 @@
 <!--                 | orderDateFilter: date | paginate: { id: 'orders', itemsPerPage: orderState.appData.size, currentPage: page, totalItems: orderState.appData.totalElements} ">-->
                 <td>{{order.internalReference}}</td>
 <!--                <td>{{order.createdAt | date: 'dd/MM/yyyy'}}</td>-->
-                <td>{{order.createdAt[2] + '/' + order.createdAt[1] + '/' +order.createdAt[0]}}</td>
+                <td>{{order.createdAt | formatDate}}</td>
                 <td>{{order.completeName }}</td>
                 <td>{{order.client.internalReference }}</td>
                 <td>{{order.channel }}</td>

@@ -8,7 +8,7 @@ import {NotifsService} from "../../_services/notifications/notifs.service";
 import {StoreHouse} from "../../_model/storehouse";
 import Swal from "sweetalert2";
 import {StatusService} from "../../_services/status/status.service";
-import {aesUtil, key} from "../../_helpers/aes";
+import {aesUtil, key} from "../../_helpers/aes.js";
 
 @Component({
   selector: 'app-type-bon',

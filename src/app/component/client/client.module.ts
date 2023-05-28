@@ -20,6 +20,7 @@ import {CommandeModule} from "../commande/commande.module";
 import {AppModule} from "../../app.module";
 import {FormatNumberPipe} from "../../pipes/formatNumber/format-number.pipe";
 import {FormatDatePipe} from "../../pipes/formatDate/format-date.pipe";
+import {FormatDateHourPipe} from "../../pipes/formatDateHour/format-date-hour.pipe";
 
 @NgModule({
   declarations: [
@@ -31,7 +32,8 @@ import {FormatDatePipe} from "../../pipes/formatDate/format-date.pipe";
     ClientDateFilterPipe,
     ClientCompagnyFilterPipe,
     FormatNumberPipe,
-    FormatDatePipe
+    FormatDatePipe,
+    FormatDateHourPipe,
   ],
     imports: [
         CommonModule,
@@ -40,7 +42,7 @@ import {FormatDatePipe} from "../../pipes/formatDate/format-date.pipe";
         FormsModule,
         ReactiveFormsModule,
         NgxPaginationModule,
-        CommandeModule,
+        // CommandeModule,
 
         // Ng2TelInputModule,
         // NgxIntlTelInputModule,
@@ -55,7 +57,8 @@ import {FormatDatePipe} from "../../pipes/formatDate/format-date.pipe";
     exports: [
         ClientNameFilterPipe,
         FormatNumberPipe,
-      FormatDatePipe
+      FormatDatePipe,
+      FormatDateHourPipe,
     ]
 })
 export class ClientModule { }

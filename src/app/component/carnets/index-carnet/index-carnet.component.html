@@ -57,8 +57,8 @@
                 <td>{{carnet.nameStoreHouse}}</td>
                 <td>{{carnet.nameStoreKeeper}}</td>
                 <td>{{getStatuts(carnet.status.name)}}</td>
-                <td>{{carnet.createdAt | date: 'dd/MM/yyyy à HH:mm'}}</td>
-                <td>{{carnet.updateAt | date: 'dd/MM/yyyy à HH:mm'}}</td>
+                <td>{{carnet.createdAt | formatDateHour}}</td>
+                <td>{{carnet.updateAt | formatDateHour}}</td>
               </tr>
             </table>
             <div class="text-center">

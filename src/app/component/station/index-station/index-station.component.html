@@ -108,8 +108,8 @@
               <td>{{station.nameManagerStation}}</td>
               <td>{{station.balance}}</td>
               <td>{{getStatuts(station.status.name)}}</td>
-              <td>{{station.createdAt}}</td>
-              <td>{{station.updateAt}}</td>
+              <td>{{station.createdAt | formatDateHour}}</td>
+              <td>{{station.updateAt | formatDateHour}}</td>
               <td>
                 <!--                  <a style="cursor: pointer"  class="delete text-danger" (click)="deleteStation(station, i)" >-->
                 <!--                    <i class="pe-7s-trash" title="supprimer"></i>-->

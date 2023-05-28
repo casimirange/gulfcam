@@ -110,8 +110,8 @@
             {{getStatuts(credit.status.name) == 'ACTIVE(E)' ? 'VALIDEE' : 'NON VALIDE'}}
             </span>
                 </td>
-                <td>{{credit.createdAt[2] +'/'+credit.createdAt[1] +'/'+credit.createdAt[0]}}</td>
-                <td>{{credit.updateAt ? credit.updateAt[2] +'/'+credit.updateAt[1] +'/'+credit.updateAt[0] : ''}}</td>
+                <td>{{credit.createdAt | formatDateHour}}</td>
+                <td>{{credit.updateAt | formatDateHour}}</td>
 <!--                <td>{{credit.updateAt | date: 'dd/MM/yyyy'}}</td>-->
                 <td>
                   <!--            <a  style="cursor: pointer" class=" text-success" data-toggle="tooltip" title="valider une note de crédit"-->

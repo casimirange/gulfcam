@@ -6,6 +6,7 @@ import {SharedModule} from "../shared/shared.module";
 import {PmLayoutComponent} from "./paiementMethod/pm-layout/pm-layout.component";
 import {IndexPaiementMethodComponent} from "./paiementMethod/index-paiement-method/index-paiement-method.component";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
+import {ClientModule} from "../client/client.module";
 
 
 @NgModule({
@@ -13,12 +14,13 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
     PmLayoutComponent,
     IndexPaiementMethodComponent
   ],
-  imports: [
-    CommonModule,
-    PaiementMethodRoutingModule,
-    SharedModule,
-    ReactiveFormsModule,
-    FormsModule
-  ]
+    imports: [
+        CommonModule,
+        PaiementMethodRoutingModule,
+        SharedModule,
+        ReactiveFormsModule,
+        FormsModule,
+        ClientModule
+    ]
 })
 export class PaiementMethodModule { }

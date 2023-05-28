@@ -8,7 +8,7 @@ import {PaiementService} from "../../../../_services/paiement/paiement.service";
 import {NotifsService} from "../../../../_services/notifications/notifs.service";
 import {BehaviorSubject} from "rxjs";
 import Swal from "sweetalert2";
-import {aesUtil, key} from "../../../../_helpers/aes";
+import {aesUtil, key} from "../../../../_helpers/aes.js";
 
 @Component({
   selector: 'app-index-paiement-method',
@@ -20,6 +20,7 @@ export class IndexPaiementMethodComponent implements OnInit {
   buyForm: FormGroup;
   paiementMethods: PaiementMethod[] = [];
   paiementMethod: PaiementMethod = new PaiementMethod();
+  paiementMethod2: PaiementMethod = new PaiementMethod();
   private isLoading = new BehaviorSubject<boolean>(false);
   isLoading$ = this.isLoading.asObservable();
   modalTitle = 'Enregistrer mode de paiement';
@@ -46,11 +47,11 @@ export class IndexPaiementMethodComponent implements OnInit {
   createPaiementMethod(){
     // console.log(this.storeForm.value)
     this.isLoading.next(true);
-    this.paiementMethod.designation = this.buyForm.value
-    this.paiementService.createPaymentMethod(this.buyForm.value).subscribe(
+    this.paiementMethod.designation = aesUtil.encrypt(key, this.buyForm.controls['designation'].value.toString()) as string
+    this.paiementService.createPaymentMethod(this.paiementMethod).subscribe(
       resp => {
         // console.log(resp)
-        this.paiementMethods.push(resp)
+        this.paiementMethods.push( JSON.parse(aesUtil.decrypt(key,resp.key.toString())))
         this.isLoading.next(false);
         this.notifServices.onSuccess("nouvelle méthode de paiement créée")
         this.annuler()
@@ -71,7 +72,6 @@ export class IndexPaiementMethodComponent implements OnInit {
     this.isLoading.next(true);
     this.paiementService.getPaymentMethods().subscribe(
       response => {
-        console.log(JSON.parse(aesUtil.decrypt(key,response.key.toString())))
         this.paiementMethods = JSON.parse(aesUtil.decrypt(key,response.key.toString())).content
         this.isLoading.next(false);
         this.notifServices.onSuccess('liste des modes de paiement')
@@ -135,11 +135,12 @@ export class IndexPaiementMethodComponent implements OnInit {
 
   updatePayment() {
     this.isLoading.next(true);
-    this.paiementService.updatePaiementMethod(this.buyForm.value, this.paiementMethod.internalReference).subscribe(
+    this.paiementMethod2.designation = aesUtil.encrypt(key, this.buyForm.controls['designation'].value.toString()) as string
+    this.paiementService.updatePaiementMethod(this.paiementMethod2, aesUtil.encrypt(key, this.paiementMethod.internalReference.toString()) as number).subscribe(
       resp => {
         this.isLoading.next(false);
-        const index = this.paiementMethods.findIndex(store => store.internalReference === resp.internalReference);
-        this.paiementMethods[ index ] = resp;
+        const index = this.paiementMethods.findIndex(pm => pm.internalReference ===  JSON.parse(aesUtil.decrypt(key,resp.key.toString())).internalReference);
+        this.paiementMethods[ index ] =  JSON.parse(aesUtil.decrypt(key,resp.key.toString()));
         this.notifServices.onSuccess("mode de paiement modifié avec succès!")
         this.modalTitle = 'Enregistrer mode de paiement'
         this.annuler()

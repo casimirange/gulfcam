@@ -4,8 +4,9 @@ import {TokenService} from "../../../_services/token/token.service";
 import {NotifsService} from "../../../_services/notifications/notifs.service";
 import {Router} from "@angular/router";
 import {BnNgIdleService} from "bn-ng-idle";
-import {aesUtil, key} from "../../../_helpers/aes";
+import {aesUtil, key} from "../../../_helpers/aes.js";
 import {ISignup} from "../../../_model/signup";
+import {BehaviorSubject} from "rxjs";
 
 @Component({
   selector: 'app-otp',
@@ -15,7 +16,7 @@ import {ISignup} from "../../../_model/signup";
 export class OtpComponent implements OnInit {
 
   otp!: string;
-  inputDigitLeft: string = "Verifier le code";
+  inputDigitLeft: string = "Entrer le code";
   btnStatus: string = "btn-light";
   timer: number = 0;
   minutes: number = 0;
@@ -29,7 +30,8 @@ export class OtpComponent implements OnInit {
   }
 
   firstName: string | null = '';
-
+  private isLoading = new BehaviorSubject<boolean>(false);
+  isLoading$ = this.isLoading.asObservable();
   public configOptions = {
     length: 4,
     inputClass: 'digit-otp',
@@ -70,16 +72,17 @@ export class OtpComponent implements OnInit {
     }
 
     if(this.otp.length == this.configOptions.length) {
-      this.inputDigitLeft = "Vérifier";
+      this.inputDigitLeft = "Vérifier le code";
       this.btnStatus = 'btn-primary';
     }
   }
 
   verifyOtp(){
-
+    this.isLoading.next(true);
       // this.authService.verifyOtp(aesUtil.encrypt(key,this.otp)).subscribe(
       this.authService.verifyOtp(this.otp).subscribe(
         (response) => {
+          this.isLoading.next(false);
           this.token.saveRefreshToken(JSON.parse(aesUtil.decrypt(key,response.key.toString())).refreshToken);
           // console.log('roles ', JSON.parse(aesUtil.decrypt(key,response.key.toString())).roles)
           // console.log('resp ', JSON.parse(aesUtil.decrypt(key,response.key.toString())))
@@ -105,6 +108,7 @@ export class OtpComponent implements OnInit {
           // this.bnIdle.resetTimer()
 
         }, (error) => {
+          this.isLoading.next(false);
           // this.inputDigitLeft = "Reéssayer";
           // this.btnStatus = 'btn-danger';
           this.token.clearTokenExpired()

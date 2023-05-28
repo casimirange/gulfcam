@@ -12,7 +12,8 @@ import {BehaviorSubject} from "rxjs";
 import {StatusAccountService} from "../../../_services/status/status-account.service";
 import {StatusUserService} from "../../../_services/status/status-user.service";
 import {RoleUserService} from "../../../_services/role/role-user.service";
-import {aesUtil, key} from "../../../_helpers/aes";
+import {aesUtil, key} from "../../../_helpers/aes.js";
+import {Location} from "@angular/common";
 
 @Component({
   selector: 'app-details-user',
@@ -36,7 +37,7 @@ export class DetailsUserComponent implements OnInit {
   role: string[] = []
   constructor(private userService: UsersService,  private notifsService: NotifsService, private route: ActivatedRoute,
               private storeService: StoreService, private fb: FormBuilder, private statusAccountService: StatusAccountService,
-              private statusUserService: StatusUserService, private roleUserService: RoleUserService) {
+              private statusUserService: StatusUserService, private roleUserService: RoleUserService, private _location: Location) {
     this.updateUser = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       telephone: ['', [Validators.required, Validators.pattern('^[2,6][0-9]{8}'), Validators.minLength(9), Validators.maxLength(9) ]],
@@ -139,6 +140,10 @@ export class DetailsUserComponent implements OnInit {
 
   getRole(status: string): string {
     return this.roleUserService.allRole(status)
+  }
+
+  back() {
+    this._location.back()
   }
 
 }

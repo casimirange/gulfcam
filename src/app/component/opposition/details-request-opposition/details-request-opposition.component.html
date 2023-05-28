@@ -55,20 +55,20 @@
                 <th>Client</th>
                 <th>Carnet</th>
                 <th>Statut du coupon</th>
-<!--                <th>Date</th>-->
+                <th>Date</th>
               </tr>
               </thead>
-              <tbody *ngFor="let coupon of tickets | paginate: { id: 'ticket', itemsPerPage: size, currentPage: page, totalItems: totalElements } ; let i = index">
+              <tbody *ngFor="let ticket of tickets | paginate: { id: 'ticket', itemsPerPage: size, currentPage: page, totalItems: totalElements } ; let i = index">
 
               <tr>
                 <td>{{i + 1}}</td>
-                <td>{{coupon.internalReference}}</td>
-                <td>{{padWithZero(coupon.serialNumber, 7)}}</td>
-                <td>{{formatNumber(coupon.amount.toString())}}</td>
-                <td>{{coupon.nameClient}}</td>
-                <td>{{coupon.notebookNumber}}</td>
-                <td>{{getStatuts(coupon.status.name)}}</td>
-<!--                <td>{{coupon.createdAt | date: 'dd/MM/yyyy'}}</td>-->
+                <td>{{ticket.internalReference}}</td>
+                <td>{{padWithZero(ticket.serialNumber, 7)}}</td>
+                <td>{{formatNumber(ticket.amount.toString())}}</td>
+                <td>{{ticket.nameClient}}</td>
+                <td>{{ticket.notebookNumber}}</td>
+                <td>{{getStatuts(ticket.status.name)}}</td>
+                <td>{{ticket.createdAt | formatDateHour}}</td>
               </tr>
               </tbody>
             </table>

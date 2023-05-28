@@ -124,7 +124,7 @@
                 <tr>
                   <td>{{i + 1}}</td>
                   <td>{{client.internalReference}}</td>
-                  <td>{{padWithZero(client.createdAt[2], 2) +'/'+padWithZero(client.createdAt[1], 2) +'/'+client.createdAt[0]}}</td>
+                  <td>{{client.createdAt | formatDate}}</td>
                   <td>{{client.completeName}}</td>
                   <td>{{client.companyName}}</td>
                   <td>{{client.address}}</td>

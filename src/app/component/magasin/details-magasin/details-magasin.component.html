@@ -45,7 +45,7 @@
           <tbody>
           <tr style="cursor: pointer" *ngFor="let storeHouse of storeHouses" (click)="showDetails(storeHouse.internalReference)">
             <td class="text-left">{{storeHouse.internalReference}}</td>
-            <td class="text-left">{{storeHouse.createAt | date: 'dd/MM/yyyy'}}</td>
+            <td class="text-left">{{storeHouse.createAt | formatDate}}</td>
             <td class="text-left">{{storeHouse.name}}</td>
             <td class="text-left" >{{storeHouse.type}}</td>
             <td class="text-left" > <span class="text-focus">{{getStatuts(storeHouse.status.name)}}</span> </td>

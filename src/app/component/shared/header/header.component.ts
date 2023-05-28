@@ -6,7 +6,7 @@ import {Observable} from "rxjs";
 import {ConfigOptions} from "../../../configOptions/config-options";
 import {Store} from "../../../_model/store";
 import {Router} from "@angular/router";
-import {aesUtil, key} from "../../../_helpers/aes";
+import {aesUtil, key} from "../../../_helpers/aes.js";
 
 @Component({
   selector: 'app-header',

@@ -26,7 +26,7 @@ import {Client} from "../../../_model/client";
 import {DataState} from "../../../_enum/data.state.enum";
 import {UsersService} from "../../../_services/users/users.service";
 import {ISignup} from "../../../_model/signup";
-import {aesUtil, key} from "../../../_helpers/aes";
+import {aesUtil, key} from "../../../_helpers/aes.js";
 
 @Component({
   selector: 'app-stock-carton',

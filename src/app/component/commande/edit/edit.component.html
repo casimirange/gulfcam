@@ -187,7 +187,7 @@
                         </select>
                         <input *ngIf="roleUser != 'TREASURY' && statut != 'CREATED'"
                                placeholder="Sélecyionner un mode de paiement" type="text"
-                               value="{{paymentMethod.designation}}" disabled
+                               value="{{order.paymentMethod.designation}}" disabled
                                class="form-control">
                       </div>
                     </div>

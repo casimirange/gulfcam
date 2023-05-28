@@ -66,8 +66,8 @@
           <td>{{store.internalReference}}</td>
           <td>{{store.localization}} </td>
           <td>{{getStatuts(store.status.name)}}</td>
-          <td> {{store.createdAt | formatDate}}</td>
-          <td> {{store.updateAt ? (store.updateAt | formatDate) : ''}}</td>
+          <td> {{store.createdAt | formatDateHour}}</td>
+          <td> {{store.updateAt | formatDateHour}}</td>
           <td>
 <!--            <a style="cursor: pointer" class=" text-success" data-toggle="modal"-->
 <!--               (click)="showDetails(store)">-->

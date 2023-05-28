@@ -4,6 +4,7 @@ import {TypeBonRoutingModule} from "./type-bon-routing.module";
 import {SharedModule} from "../shared/shared.module";
 import {TypeBonComponent} from "./type-bon.component";
 import {ReactiveFormsModule} from "@angular/forms";
+import {ClientModule} from "../client/client.module";
 
 
 
@@ -11,11 +12,12 @@ import {ReactiveFormsModule} from "@angular/forms";
   declarations: [
     TypeBonComponent
   ],
-  imports: [
-    CommonModule,
-    TypeBonRoutingModule,
-    SharedModule,
-    ReactiveFormsModule
-  ]
+    imports: [
+        CommonModule,
+        TypeBonRoutingModule,
+        SharedModule,
+        ReactiveFormsModule,
+        ClientModule
+    ]
 })
 export class TypeBonModule { }

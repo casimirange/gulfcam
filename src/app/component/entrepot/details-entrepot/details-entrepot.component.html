@@ -213,8 +213,8 @@
                 {{getStatuts(carton.status.name)}}
               </span>
                 </td>
-                <td>{{carton.createdAt}}</td>
-                <td>{{carton.updateAt}}</td>
+                <td>{{carton.createdAt | formatDateHour}}</td>
+                <td>{{carton.updateAt | formatDateHour}}</td>
               </tr>
             </table>
             <div class="text-center">
@@ -358,8 +358,8 @@
                     {{getStatuts(carnet.status.name)}}
                   </span>
                 </td>
-                <td>{{carnet.createdAt | date: 'dd/MM/yyyy à hh:mm'}}</td>
-                <td>{{carnet.updateAt | date: 'dd/MM/yyyy à hh:mm'}}</td>
+                <td>{{carnet.createdAt | formatDateHour}}</td>
+                <td>{{carnet.updateAt | formatDateHour}}</td>
               </tr>
             </table>
             <div class="text-center">

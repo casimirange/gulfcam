@@ -8,6 +8,7 @@ import {SharedModule} from "../shared/shared.module";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {NgxPaginationModule} from "ngx-pagination";
 import {CommandeModule} from "../commande/commande.module";
+import {ClientModule} from "../client/client.module";
 
 
 @NgModule({
@@ -22,7 +23,8 @@ import {CommandeModule} from "../commande/commande.module";
         SharedModule,
         NgxPaginationModule,
         CommandeModule,
-        FormsModule
+        FormsModule,
+        ClientModule
     ]
 })
 export class CaisseModule { }

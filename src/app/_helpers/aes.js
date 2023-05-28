@@ -4,9 +4,9 @@ import * as CryptoJS from 'crypto-js'
 
 export class AESUtil {
 
-  _keySize: any;
-  _ivSize: any;
-  _iterationCount: any;
+  // _keySize: any;
+  // _ivSize: any;
+  // _iterationCount: any;
 
   constructor() {
     this._keySize = 256;
@@ -56,14 +56,14 @@ export class AESUtil {
     return decrypted.toString(CryptoJS.enc.Utf8);
   }
 
-  encrypt(passPhrase, plainText) : any{
+  encrypt(passPhrase, plainText) {
     let iv = CryptoJS.lib.WordArray.random(this._ivSize / 8).toString(CryptoJS.enc.Hex);
     let salt = CryptoJS.lib.WordArray.random(this.keySize / 8).toString(CryptoJS.enc.Hex);
     let ciphertext = this.encryptWithIvSalt(salt, iv, passPhrase, plainText);
     return salt + iv + ciphertext;
   }
 
-  decrypt(passPhrase, cipherText) : any{
+  decrypt(passPhrase, cipherText) {
     let ivLength = this._ivSize / 4;
     let saltLength = this.keySize / 4;
     let salt = cipherText.substr(0, saltLength);
