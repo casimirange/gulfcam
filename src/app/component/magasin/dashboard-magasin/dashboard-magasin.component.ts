@@ -181,7 +181,11 @@ export class DashboardMagasinComponent implements OnInit {
   }
 
   showDetails(store: Store) {
-    this.router.navigate(['/magasins/details', aesUtil.encrypt(key, store.internalReference.toString())])
+    let rout = aesUtil.encrypt(key, store.internalReference.toString())
+    while (rout.includes('/')){
+      rout = aesUtil.encrypt(key, store.internalReference.toString())
+    }
+    this.router.navigate(['/magasins/details', rout])
   }
 
   private deleteStoreHousesByStore(storeHouses: StoreHouse[]) {

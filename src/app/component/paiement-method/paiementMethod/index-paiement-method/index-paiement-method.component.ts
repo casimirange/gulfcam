@@ -47,8 +47,8 @@ export class IndexPaiementMethodComponent implements OnInit {
   createPaiementMethod(){
     // console.log(this.storeForm.value)
     this.isLoading.next(true);
-    this.paiementMethod.designation = aesUtil.encrypt(key, this.buyForm.controls['designation'].value.toString()) as string
-    this.paiementService.createPaymentMethod(this.paiementMethod).subscribe(
+    this.paiementMethod2.designation = aesUtil.encrypt(key, this.buyForm.controls['designation'].value.toString()) as string
+    this.paiementService.createPaymentMethod(this.paiementMethod2).subscribe(
       resp => {
         // console.log(resp)
         this.paiementMethods.push( JSON.parse(aesUtil.decrypt(key,resp.key.toString())))

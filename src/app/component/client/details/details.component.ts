@@ -52,7 +52,7 @@ export class DetailsComponent implements OnInit {
   size: number = 10;
   constructor(private clientService: ClientService, private activatedRoute: ActivatedRoute, private route: ActivatedRoute,
               private orderService: OrderService, private notifService: NotifsService, private storeService: StoreService,
-              private couponService: CouponService, private statusService: StatusOrderService) {
+              private couponService: CouponService, private statusService: StatusOrderService, private router: Router) {
     this.client = new Client()
     this.IdParam = this.route.snapshot.paramMap.get('id');
     JSON.parse(localStorage.getItem('Roles').toString()).forEach(authority => {
@@ -159,5 +159,13 @@ export class DetailsComponent implements OnInit {
           return of({dataState: DataState.ERROR_STATE, error: error})
         })
       )
+  }
+
+  detailsOrder(id: number) {
+    let rout = aesUtil.encrypt(key, id.toString())
+    while (rout.includes('/')){
+      rout = aesUtil.encrypt(key, id.toString())
+    }
+    this.router.navigate(['/commandes/complete-order/', rout])
   }
 }

@@ -18,7 +18,7 @@ export class CouponService {
     return this.http.get<any>(environment.coupon+`?page=${page}&size=${size}`)
   }
 
-  getCouponsByStation(idStation: number, page: number, size: number): Observable<any>{
+  getCouponsByStation(idStation: string, page: number, size: number): Observable<any>{
     return this.http.get<any>(environment.coupon+`/station/${idStation}?page=${page}&size=${size}`)
   }
 

@@ -65,7 +65,7 @@ export class IndexRequestOppositionComponent implements OnInit {
   date = '';
   private clientNotFound: boolean;
   onFilter = false;
-  idmanager = aesUtil.decrypt(key, localStorage.getItem('uid').toString())
+  idmanager = localStorage.getItem('uid')
   constructor(private modalService: NgbModal, private fb: FormBuilder, private storeService: StoreService, private router: Router,
               private notifService: NotifsService, private unitService: UnitsService, private voucherService: VoucherService,
               private clientService: ClientService, private userService: UsersService, private requestService: OppositionService,
@@ -103,7 +103,7 @@ export class IndexRequestOppositionComponent implements OnInit {
   createRequest() {
     this.requestOpposition.reason = aesUtil.encrypt(key, this.requestForm.controls['reason'].value.toString())
     this.requestOpposition.description = aesUtil.encrypt(key, this.requestForm.controls['description'].value.toString())
-    this.requestOpposition.idCommercialAttache = aesUtil.encrypt(key, this.idmanager.toString())
+    this.requestOpposition.idCommercialAttache = this.idmanager
     this.requestOpposition.idClient = aesUtil.encrypt(key, this.clients.find(client => client.completeName === this.requestForm.controls['idClient'].value).internalReference.toString())
     // this.requestOpposition.idSalesManager = parseInt(this.requestForm.controls['idManagerCoupon'].value)
     // console.log("vouchers", this.vouchers)
@@ -263,16 +263,21 @@ export class IndexRequestOppositionComponent implements OnInit {
 
   addCoupon() {
     // let str= this.requestForm.controls['serialNumber'].value.toString();
-    let str = parseInt(this.requestForm.controls['serialNumber'].value).toString();
+    let str = parseInt(this.requestForm.controls['serialNumber'].value.toString());
+    let rout = aesUtil.encrypt(key, str.toString())
+    while (rout.includes('/')){
+      rout = aesUtil.encrypt(key, str.toString())
+    }
     let client;
     if (this.requestForm.controls['idClient'].value) {
       client = this.clients.find(client => client.completeName === this.requestForm.controls['idClient'].value)
-      this.couponService.getCouponsBySerialNumber(aesUtil.encrypt(key, this.requestForm.controls['serialNumber'].value.toString()) as string).subscribe(
+      this.couponService.getCouponsBySerialNumber(rout).subscribe(
         res => {
           if (JSON.parse(aesUtil.decrypt(key,res.key.toString())).status.name === 'ACTIVATED') {
             if (JSON.parse(aesUtil.decrypt(key,res.key.toString())).idClient === client.internalReference) {
               this.vouchers.push(this.requestForm.controls['serialNumber'].value)
-              this.vouchers1.push(aesUtil.encrypt(key, this.requestForm.controls['serialNumber'].value.toString()))
+              this.vouchers1.push(rout)
+              console.log('coupons', this.vouchers1)
               this.requestForm.controls['serialNumber'].reset()
             } else {
               this.notifService.onWarning('Ce coupon n\'appartient pas à ce client')
@@ -297,7 +302,11 @@ export class IndexRequestOppositionComponent implements OnInit {
   }
 
   requestDetails(request: RequestOpposition) {
-    this.router.navigate(['/request-opposition/details', aesUtil.encrypt(key, request.internalReference.toString())])
+    let rout = aesUtil.encrypt(key, request.internalReference.toString())
+    while (rout.includes('/')){
+      rout = aesUtil.encrypt(key, request.internalReference.toString())
+    }
+    this.router.navigate(['/request-opposition/details', rout])
   }
 
   getStatuts(status: string): string {

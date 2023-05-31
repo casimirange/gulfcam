@@ -178,7 +178,11 @@ export class IndexClientComponent implements OnInit {
   }
 
   detailsClient(client: Client) {
-    this.router.navigate(['/clients/', aesUtil.encrypt(key, client.internalReference.toString())])
+    let rout = aesUtil.encrypt(key, client.internalReference.toString())
+    while (rout.includes('/')){
+      rout = aesUtil.encrypt(key, client.internalReference.toString())
+    }
+    this.router.navigate(['/clients/', rout])
   }
 
   updateClientModal(mymodal: TemplateRef<any>, client: Client) {
@@ -199,7 +203,11 @@ export class IndexClientComponent implements OnInit {
     this.client2.rccm = this.clientForm.controls['rccm'].value != '' ? aesUtil.encrypt(key, this.clientForm.controls['rccm'].value.toString()) : ''
     this.client2.niu = this.clientForm.controls['niu'].value != '' ? aesUtil.encrypt(key, this.clientForm.controls['niu'].value.toString()) : ''
     this.client2.typeClient = aesUtil.encrypt(key, this.clientForm.controls['typeClient'].value.toString())
-    this.appState$ = this.clientService.updateClient$(this.client2, aesUtil.encrypt(key, this.client.internalReference.toString()) as number)
+    let rout = aesUtil.encrypt(key, this.client.internalReference.toString())
+    while (rout.includes('/')){
+      rout = aesUtil.encrypt(key, this.client.internalReference.toString())
+    }
+    this.appState$ = this.clientService.updateClient$(this.client2, rout as number)
       .pipe(
         map(response => {
           const index = this.dataSubjects.value.content.findIndex(client => client.internalReference === JSON.parse(aesUtil.decrypt(key,response.key.toString())).internalReference)

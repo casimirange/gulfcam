@@ -175,12 +175,16 @@ export class IndexStationComponent implements OnInit, OnDestroy {
   updateStation() {
     this.isLoading.next(true);
     const balance = 0;
+    let rout = aesUtil.encrypt(key, this.station.internalReference.toString())
+    while (rout.includes('/')){
+      rout = aesUtil.encrypt(key, this.station.internalReference.toString())
+    }
     this.station1.managerStagion = aesUtil.encrypt(key, this.stationForm.controls['managerStagion'].value.toString())
     this.station1.pinCode = aesUtil.encrypt(key, this.stationForm.controls['pinCode'].value.toString())
     this.station1.designation = aesUtil.encrypt(key, this.stationForm.controls['designation'].value.toString())
     this.station1.localization = aesUtil.encrypt(key, this.stationForm.controls['localization'].value.toString())
     this.station1.balance = aesUtil.encrypt(key, balance.toString());
-    this.stationService.updateStation(this.station1, aesUtil.encrypt(key, this.station.internalReference.toString()) as number).subscribe(
+    this.stationService.updateStation(this.station1, rout).subscribe(
       resp => {
         this.isLoading.next(false);
         // on recherche l'index du client dont on veut faire la modification dans liste des clients
@@ -207,7 +211,11 @@ export class IndexStationComponent implements OnInit, OnDestroy {
   }
 
   showDetails(station: Station) {
-    this.router.navigate(['/stations/details', aesUtil.encrypt(key, station.internalReference.toString())])
+    let rout = aesUtil.encrypt(key, station.internalReference.toString())
+    while (rout.includes('/')){
+      rout = aesUtil.encrypt(key, station.internalReference.toString())
+    }
+    this.router.navigate(['/stations/details', rout])
   }
 
   ngOnDestroy(): void {

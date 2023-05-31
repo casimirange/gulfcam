@@ -84,11 +84,11 @@ export class IndexCreditNoteComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.creditNoteService.saveCreditNote(this.creditNote).subscribe().unsubscribe();
-    this.creditNoteService.getCreditNote(this.page - 1, this.size).subscribe().unsubscribe();
-    this.stationService.getStations().subscribe().unsubscribe();
-    this.creditNoteService.validCreditNote(0).subscribe().unsubscribe();
-    this.couponService.getCouponsBySerialNumber("str").subscribe().unsubscribe();
+    // this.creditNoteService.saveCreditNote(this.creditNote).subscribe().unsubscribe();
+    // this.creditNoteService.getCreditNote(this.page - 1, this.size).subscribe().unsubscribe();
+    // this.stationService.getStations().subscribe().unsubscribe();
+    // this.creditNoteService.validCreditNote(0).subscribe().unsubscribe();
+    // this.couponService.getCouponsBySerialNumber("str").subscribe().unsubscribe();
   }
 
   //initialisation du formulaire de création type de bon
@@ -131,7 +131,7 @@ export class IndexCreditNoteComponent implements OnInit, OnDestroy {
     this.appState$ = this.creditNoteService.filterCreditNote$(this.statutFilter, this.stationName, this.internalRef, this.dateFilter, this.page - 1, this.size)
       .pipe(
         map(response => {
-          console.log(JSON.parse(aesUtil.decrypt(key,response.key.toString())))
+          // console.log(JSON.parse(aesUtil.decrypt(key,response.key.toString())))
           this.dataSubjects.next(JSON.parse(aesUtil.decrypt(key,response.key.toString())))
           // this.notifsService.onSuccess('Chargement des commandes')
           return {dataState: DataState.LOADED_STATE, appData: JSON.parse(aesUtil.decrypt(key,response.key.toString()))}
@@ -286,11 +286,16 @@ export class IndexCreditNoteComponent implements OnInit, OnDestroy {
   }
 
   getCouponByStation() {
-    const stationId = this.creditForm.controls['idStation'].value
+    let stationId = this.creditForm.controls['idStation'].value
+    let rout = aesUtil.encrypt(key, stationId.toString())
+    while (rout.includes('/')){
+      rout = aesUtil.encrypt(key, stationId.toString())
+    }
+    // console.log(stationId)
     this.vouchers = []
     this.couponsFiltered = []
     if (stationId != 0) {
-      this.couponService.getCouponsByStation(aesUtil.encrypt(key, stationId.toString()), 0, 13000000).subscribe(
+      this.couponService.getCouponsByStation(rout, 0, 13000000).subscribe(
         resp => {
           this.selectedStation = true
           this.coupons = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content
@@ -308,7 +313,7 @@ export class IndexCreditNoteComponent implements OnInit, OnDestroy {
 
 
   removeCoupons(coupon: string) {
-    console.log(this.vouchers.indexOf(+coupon))
+    // console.log(this.vouchers.indexOf(+coupon))
     const prodIndex = this.vouchers.indexOf(+coupon)
     this.vouchers.splice(prodIndex, 1)
   }
@@ -318,7 +323,11 @@ export class IndexCreditNoteComponent implements OnInit, OnDestroy {
   }
 
   creditNoteDetails(note: CreditNote) {
-    this.router.navigate(['/credit-note/details', aesUtil.encrypt(key, note.internalReference.toString())])
+    let rout = aesUtil.encrypt(key, note.internalReference.toString())
+    while (rout.includes('/')){
+      rout = aesUtil.encrypt(key, note.internalReference.toString())
+    }
+    this.router.navigate(['/credit-note/details', rout])
   }
 
   formatNumber(amount: any): string {

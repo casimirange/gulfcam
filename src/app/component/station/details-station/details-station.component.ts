@@ -131,7 +131,7 @@ export class DetailsStationComponent implements OnInit {
 
   getCouponByStation(){
     // this.activatedRoute.params.subscribe(params => {
-      this.couponService.getCouponsByStation(this.idParam as number, this.pageCoupon -1, this.size).subscribe(
+      this.couponService.getCouponsByStation(this.idParam.toString(), this.pageCoupon -1, this.size).subscribe(
         resp => {
           this.coupons = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content
           this.totalElementsCoupon = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).totalElements
@@ -146,7 +146,11 @@ export class DetailsStationComponent implements OnInit {
   }
 
   creditNoteDetails(note: CreditNote) {
-    this.router.navigate(['/credit-note/details', aesUtil.encrypt(key,note.internalReference.toString())])
+    let rout = aesUtil.encrypt(key, note.internalReference.toString())
+    while (rout.includes('/')){
+      rout = aesUtil.encrypt(key, note.internalReference.toString())
+    }
+    this.router.navigate(['/credit-note/details', rout])
   }
 
   open(content: any){
@@ -155,7 +159,11 @@ export class DetailsStationComponent implements OnInit {
 
   accepterCoupon() {
     let str= parseInt(this.couponForm.controls['coupon'].value).toString();
-    this.coupon.serialNumber = aesUtil.encrypt(key, str.toString())
+    let rout = aesUtil.encrypt(key, str.toString())
+    while (rout.includes('/')){
+      rout = aesUtil.encrypt(key, str.toString())
+    }
+    this.coupon.serialNumber = rout
     const body = {
       "idStation": 0,
       "modulo": 0,

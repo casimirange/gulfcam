@@ -138,7 +138,11 @@ export class IndexUsersComponent implements OnInit {
   }
 
   showDetails(user: ISignup) {
-    this.router.navigate(['/users/details', aesUtil.encrypt(key, user.userId.toString())])
+    let rout = aesUtil.encrypt(key, user.userId.toString())
+    while (rout.includes('/')){
+      rout = aesUtil.encrypt(key, user.userId.toString())
+    }
+    this.router.navigate(['/users/details', rout])
   }
 
   decryptData(data: any) : string{

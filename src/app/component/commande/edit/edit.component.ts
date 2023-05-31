@@ -73,7 +73,7 @@ export class EditComponent implements OnInit {
   orderState$: Observable<AppState<Order>>;
   readonly DataState = DataState;
   private dataSubjects = new BehaviorSubject<Order>(null);
-  idmanager = aesUtil.decrypt(key, localStorage.getItem('uid').toString())
+  idmanager = localStorage.getItem('uid')
   constructor(private orderService: OrderService, private notifsService: NotifsService, private route: ActivatedRoute,
               private clientService: ClientService, private storeService: StoreService, private productService: ProductService,
               private voucherService: VoucherService, private paymentService: PaiementService, private fb: FormBuilder,
@@ -225,11 +225,15 @@ export class EditComponent implements OnInit {
     if (this.selectedFiles.item(0).type == 'application/pdf') {
       this.isLoading.next(true);
       this.order.idFund = this.idmanager
-      this.order.idPaymentMethod = this.editForm.controls['method'].value
+      let rout = aesUtil.encrypt(key, this.editForm.controls['method'].value.toString())
+      while (rout.includes('/') || rout.includes('&')){
+        rout = aesUtil.encrypt(key, this.editForm.controls['method'].value.toString())
+      }
+      this.order.idPaymentMethod = rout
       this.order.paymentReference = this.editForm.controls['peimentRef'].value
       const docType = 'pdf'
       this.currentFileUpload = this.selectedFiles.item(0);
-      this.orderService.acceptOrder(this.IdParam, aesUtil.encrypt(key, this.order.idFund.toString()), aesUtil.encrypt(key, this.order.idPaymentMethod.toString()), this.order.paymentReference,
+      this.orderService.acceptOrder(this.IdParam, this.order.idFund, this.order.idPaymentMethod, this.order.paymentReference,
         docType, this.currentFileUpload).subscribe(
         resp => {
           this.isLoading.next(false);
@@ -252,7 +256,7 @@ export class EditComponent implements OnInit {
       this.isLoading.next(true);
       this.order.idSalesManager = this.idmanager
       this.currentFileUpload = this.selectedFiles.item(0);
-      this.orderService.validOrder(this.IdParam, aesUtil.encrypt(key, this.order.idSalesManager.toString()), this.currentFileUpload).subscribe(
+      this.orderService.validOrder(this.IdParam, this.order.idSalesManager, this.currentFileUpload).subscribe(
         resp => {
           this.isLoading.next(false);
           this.notifsService.onSuccess('Commande Terminée')
@@ -270,7 +274,7 @@ export class EditComponent implements OnInit {
   payOrder() {
     this.order.idSalesManager = this.idmanager
     this.isLoading.next(true);
-    this.orderService.payOrder(this.IdParam, aesUtil.encrypt(key, this.order.idSalesManager.toString())).subscribe(
+    this.orderService.payOrder(this.IdParam, this.order.idSalesManager).subscribe(
       resp => {
         this.isLoading.next(false);
         this.refreshOrder()
@@ -287,7 +291,7 @@ export class EditComponent implements OnInit {
     if (this.statut == "PAID") {
       this.isLoading.next(true);
       this.order.idSalesManager = this.idmanager
-      this.orderService.deliveryOrder(this.IdParam, aesUtil.encrypt(key, this.order.idSalesManager.toString())).subscribe(
+      this.orderService.deliveryOrder(this.IdParam, this.order.idSalesManager).subscribe(
         response => {
           // console.log('delivery', respProd)
           const file = new Blob([response], {type: 'application/pdf'});
@@ -418,7 +422,11 @@ export class EditComponent implements OnInit {
   generateBonCommande() {
     const docType = 'pdf'
     const type = 'DELIVERY'
-    this.orderService.getFile(aesUtil.encrypt(key, this.order.internalReference.toString()), type, docType).subscribe(
+    let rout = aesUtil.encrypt(key, this.order.internalReference.toString())
+    while (rout.includes('/')){
+      rout = aesUtil.encrypt(key, this.order.internalReference.toString())
+    }
+    this.orderService.getFile(rout, type, docType).subscribe(
       response => {
 
         const file = new Blob([response], {type: 'application/pdf'});
@@ -459,9 +467,9 @@ export class EditComponent implements OnInit {
       this.notifsService.onError('veuillez préciser la raison d\'annulation de la commande', '')
     } else {
       this.isCanceling.next(true)
-      this.order.idCommercialAttache = parseInt(aesUtil.decrypt(key, localStorage.getItem('uid')))
+      this.order.idCommercialAttache = localStorage.getItem('uid')
       this.order.reasonForCancellation = this.editForm.controls['reason'].value
-      this.orderService.denyOrder(this.IdParam, aesUtil.encrypt(key, this.order.idCommercialAttache.toString()), this.order.reasonForCancellation).subscribe(
+      this.orderService.denyOrder(this.IdParam, this.order.idCommercialAttache, this.order.reasonForCancellation).subscribe(
         res => {
           this.isCanceling.next(false)
           this.notifsService.onSuccess('commande annulée avec succès')
@@ -478,11 +486,16 @@ export class EditComponent implements OnInit {
   affectCouponClient() {
     this.isLoading.next(true)
     this.listVouchers.forEach(coupon => {
-      console.log(coupon)
-      console.log(this.order.idClient)
       let cp = coupon.toString()
-      // let cps = parseInt(cp)
-      this.couponService.affectCouponClient(aesUtil.encrypt(key, cp.toString()), aesUtil.encrypt(key, this.order.client.internalReference.toString())).subscribe();
+      let rout = aesUtil.encrypt(key, cp.toString())
+      while (rout.includes('/')){
+        rout = aesUtil.encrypt(key, cp.toString())
+      }
+      let rout2 = aesUtil.encrypt(key, this.order.client.internalReference.toString())
+      while (rout2.includes('/') || rout2.includes('&')){
+        rout2 = aesUtil.encrypt(key, this.order.client.internalReference.toString())
+      }
+      this.couponService.affectCouponClient(rout, rout2).subscribe();
     })
     this.notifsService.onSuccess('carnet(s) attribué(s) avec succès')
     this.orF['coupon'].reset();
@@ -540,7 +553,11 @@ export class EditComponent implements OnInit {
 
   addCoupon() {
     let str = parseInt(this.addCouponClientForm.controls['coupon'].value).toString();
-    this.couponService.getCouponsBySerialNumber(aesUtil.encrypt(key, str)).subscribe(
+    let rout = aesUtil.encrypt(key, this.addCouponClientForm.controls['coupon'].value.toString())
+    while (rout.includes('/')){
+      rout = aesUtil.encrypt(key, this.addCouponClientForm.controls['coupon'].value.toString())
+    }
+    this.couponService.getCouponsBySerialNumber(rout.toString()).subscribe(
       res => {
         if (JSON.parse(aesUtil.decrypt(key,res.key.toString())).status.name !== 'AVAILABLE') {
           this.notifsService.onWarning('Ce coupon n\'une plus dans notre espace de stockage')

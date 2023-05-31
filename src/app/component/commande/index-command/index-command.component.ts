@@ -431,6 +431,10 @@ export class IndexCommandComponent implements OnInit {
   }
 
   detailsOrder(id: number) {
-    this.router.navigate(['/commandes/complete-order/', aesUtil.encrypt(key, id.toString())])
+    let rout = aesUtil.encrypt(key, id.toString())
+    while (rout.includes('/')){
+      rout = aesUtil.encrypt(key, id.toString())
+    }
+    this.router.navigate(['/commandes/complete-order/', rout])
   }
 }

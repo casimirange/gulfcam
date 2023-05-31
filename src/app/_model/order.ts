@@ -9,12 +9,12 @@ export class Order{
     clientReference?:	number
     idClient?:	number
     client?:	Client
-    idFund?:	number
+    idFund?:	string
     idManagerStore?:	number
     idManagerCoupon?:	number
     idManagerOrder?:	number
     idCommercialAttache?:	any
-    idSalesManager?:	number
+    idSalesManager?:	string
     idSpaceManager2?:	number
     idSpaceManager1?:	number
     idStorekeeper?:	number
@@ -31,7 +31,7 @@ export class Order{
     description?:	string
     createdAt?:	string
     updateAt?:	string
-    idPaymentMethod?:	number
+    idPaymentMethod?:	string
     paymentMethod?:	PaiementMethod
     netAggregateAmount?:	number
     ttcaggregateAmount?:	number

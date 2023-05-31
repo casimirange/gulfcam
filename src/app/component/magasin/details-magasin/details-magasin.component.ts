@@ -50,6 +50,7 @@ export class DetailsMagasinComponent implements OnInit {
     this.activatedRoute.params.subscribe(params => {
       this.storeService.getStoreByInternalref(params['id']).subscribe(
         res => {
+          console.log(JSON.parse(aesUtil.decrypt(key,res.key.toString())))
           this.store = JSON.parse(aesUtil.decrypt(key,res.key.toString()));
         }
       )
@@ -76,6 +77,10 @@ export class DetailsMagasinComponent implements OnInit {
   }
 
   showDetails(storeHouse: number) {
-    this.router.navigate(['/entrepots/details', aesUtil.encrypt(key, storeHouse.toString())])
+    let rout = aesUtil.encrypt(key, storeHouse.toString())
+    while (rout.includes('/')){
+      rout = aesUtil.encrypt(key, storeHouse.toString())
+    }
+    this.router.navigate(['/entrepots/details', rout])
   }
 }

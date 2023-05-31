@@ -21,12 +21,12 @@
 <span class="d-inline-block pr-2">
 <i class="lnr-user icon-gradient bg-danger"></i>
 </span>
-              <span class="d-inline-block">{{appState.appData.completeName}}</span>
+              <span class="d-inline-block">{{appState.appData.completeName | titlecase}}</span>
             </div>
             <div class="page-title-subheading opacity-10">
               <nav class="" aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                  <li class="breadcrumb-item">
+                  <li class="breadcrumb-item" *ngIf="appState.appData.companyName">
                     <a>
                       <i aria-hidden="true" class="fa fa-home"></i>: &nbsp; {{appState.appData.companyName}}
                     </a>
@@ -116,7 +116,7 @@
               </tr>
               </thead>
               <tbody>
-              <tr style="cursor: pointer" routerLink="/commandes/complete-order/{{order.internalReference}}" *ngFor="let order of clientOrder.appData.content | paginate: { id: 'clientorder', itemsPerPage: size, currentPage: page, totalItems: clientOrder.appData.totalElements}">
+              <tr style="cursor: pointer" (click)="detailsOrder(order.internalReference)" *ngFor="let order of clientOrder.appData.content | paginate: { id: 'clientorder', itemsPerPage: size, currentPage: page, totalItems: clientOrder.appData.totalElements}">
                 <td class="text-left">{{order.internalReference}}</td>
 <!--                <td class="text-left">{{order.createdAt | date: 'dd/MM/yyyy'}}</td>-->
                 <td class="text-left">{{order.createdAt | formatDate}}</td>

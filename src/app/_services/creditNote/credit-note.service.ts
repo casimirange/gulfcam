@@ -26,7 +26,7 @@ export class CreditNoteService {
     return this.http.get<any>(environment.creditNote + `?page=${page}&size=${size}`,)
   }
 
-  getCreditNoteByInternqlRef(internalRef: number): Observable<any>{
+  getCreditNoteByInternalRef(internalRef: string): Observable<any>{
     return this.http.get<any>(environment.creditNote+`/${internalRef}`,)
   }
 

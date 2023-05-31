@@ -215,7 +215,11 @@ export class IndexEntrepotComponent implements OnInit {
   }
 
   showDetails(storeHouse: StoreHouse) {
-    this.router.navigate(['/entrepots/details', aesUtil.encrypt(key, storeHouse.internalReference.toString())])
+    let rout = aesUtil.encrypt(key, storeHouse.internalReference.toString())
+    while (rout.includes('/')){
+      rout = aesUtil.encrypt(key, storeHouse.internalReference.toString())
+    }
+    this.router.navigate(['/entrepots/details', rout])
   }
 
   getStatuts(status: string): string {

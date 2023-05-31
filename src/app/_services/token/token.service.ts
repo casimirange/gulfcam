@@ -20,7 +20,11 @@ export class TokenService {
   constructor(private router: Router, private bnIdle: BnNgIdleService, private modalService: NgbModal) { }
 
   saveToken(token: IToken){
-    localStorage.setItem('bearerToken', aesUtil.encrypt(key, <string>token.access_token));
+    let rout = aesUtil.encrypt(key, <string>token.access_token)
+    while (rout.includes('/')){
+      rout = aesUtil.encrypt(key,  <string>token.access_token)
+    }
+    localStorage.setItem('bearerToken', rout);
     const date = new Date();
     date.setMinutes(date.getMinutes() + 5);
     localStorage.setItem('exp', date.toString())
@@ -41,11 +45,23 @@ export class TokenService {
   }
 
   saveUserInfo(user: ISignup){
+    let uid = aesUtil.encrypt(key, user.internalReference.toString())
+    while (uid.includes('/')){
+      uid = aesUtil.encrypt(key, user.internalReference.toString())
+    }
+    let id = aesUtil.encrypt(key, user.userId.toString())
+    while (id.includes('/')){
+      id = aesUtil.encrypt(key, user.userId.toString())
+    }
+    let store = aesUtil.encrypt(key, user.iStore)
+    while (store.includes('/')){
+      store = aesUtil.encrypt(key, user.iStore)
+    }
     localStorage.setItem('firstName', aesUtil.encrypt(key, user.firstName))
     localStorage.setItem('lastName', aesUtil.encrypt(key, user.lastName))
-    localStorage.setItem('uid', aesUtil.encrypt(key, user.internalReference.toString()))
-    localStorage.setItem('id', aesUtil.encrypt(key, user.userId.toString()))
-    localStorage.setItem('store', aesUtil.encrypt(key, user.iStore))
+    localStorage.setItem('uid', uid)
+    localStorage.setItem('id', id)
+    localStorage.setItem('store', store)
   }
 
   saveUserAccount(account: any){
@@ -62,8 +78,11 @@ export class TokenService {
   }
 
   saveRefreshToken(token: string){
-    // localStorage.removeItem('bearerToken');
-    localStorage.setItem('bearerToken', aesUtil.encrypt(key, token));
+    let rout = aesUtil.encrypt(key, token)
+    while (rout.includes('/')){
+      rout = aesUtil.encrypt(key, token)
+    }
+    localStorage.setItem('bearerToken', rout);
 
     new IdleTimer({
       timeout: 600, //expired after 600 secs

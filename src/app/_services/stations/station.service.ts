@@ -36,7 +36,7 @@ export class StationService {
     return this.http.get<any>(environment.station+ `?page=${page}&size=${size}`)
   }
 
-  updateStation(storeHouse: any, internalRef: number): Observable<any>{
+  updateStation(storeHouse: any, internalRef: string): Observable<any>{
     return this.http.put<any>(environment.station+`/${internalRef}`, storeHouse)
   }
 

@@ -21,9 +21,10 @@ export class UnitesComponent implements OnInit {
 
   getUnitByStore(){
     this.activatedRoute.params.subscribe(params => {
-      this.storeService.getUnitByStore(aesUtil.decrypt(key, params['id']) as number).subscribe(
+      this.storeService.getUnitByStore(params['id'] as number).subscribe(
         resp => {
-          this.units = resp;
+          console.log(JSON.parse(aesUtil.decrypt(key, resp.key.toString())))
+          this.units = JSON.parse(aesUtil.decrypt(key,resp.key.toString()));
         }
       )
     })

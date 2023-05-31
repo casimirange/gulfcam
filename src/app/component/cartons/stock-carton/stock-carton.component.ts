@@ -84,7 +84,7 @@ export class StockCartonComponent implements OnInit {
   spaceManager = '';
   dateFilter = '';
   idStoreHouse = '';
-  storeFilter = aesUtil.decrypt(key,localStorage.getItem('store'))
+  storeFilter = localStorage.getItem('store')
   idmanager = aesUtil.decrypt(key, localStorage.getItem('uid').toString())
   constructor(private fb: FormBuilder, private modalService: NgbModal, private storeHouseService: StoreHouseService,
               private storeService: StoreService, private notifService: NotifsService, private cartonService: CartonService,
@@ -152,7 +152,7 @@ export class StockCartonComponent implements OnInit {
   //récupération de la liste des entrepots
   getStoreHouses() {
     this.idStoreHouse = ''
-    this.storeHouseService.getStoreHousesByStore(aesUtil.encrypt(key, this.storeFilter.toString())).subscribe(
+    this.storeHouseService.getStoreHousesByStore(this.storeFilter).subscribe(
       resp => {
         this.isLoading.next(false);
         this.storeHouses = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content.filter(sth => sth.type == 'stockage')

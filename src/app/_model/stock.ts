@@ -9,15 +9,15 @@ export class Stock {
   idStore2?: number;
   store1?: Store;
   store2?: Store;
-  idStoreHouseStockage: number;
+  idStoreHouseStockage: string;
   idStoreHouseStockage2?: number;
-  listCartons: number[];
+  listCartons: string[];
   idStoreHouse1?: number;
   idStoreHouse2?: number;
   storeHouse1?: StoreHouse;
   storeHouse2?: StoreHouse;
   idStoreKeeper?: number;
-  idSpaceManager1?: number;
+  idSpaceManager1?: string;
   quantityCarton?: number;
   typeVoucher?: number;
   type?: string;

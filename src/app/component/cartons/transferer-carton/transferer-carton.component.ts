@@ -35,7 +35,7 @@ export class TransfererCartonComponent implements OnInit {
   storeHousesAdmin: StoreHouse[] = [];
   roleUser = aesUtil.decrypt(key, localStorage.getItem('userAccount').toString())
   role: string[] = []
-  idmanager = aesUtil.decrypt(key, localStorage.getItem('uid').toString())
+  idmanager = localStorage.getItem('uid')
   constructor(private notifsService: NotifsService, private storeHouseService: StoreHouseService, private fb: FormBuilder,
               private cartonService: CartonService, private mvtService: MvtStockService) {
     this.formTransfert()
@@ -88,10 +88,18 @@ export class TransfererCartonComponent implements OnInit {
   //save carton
   transfertCarton(){
     this.isLoading.next(true);
-    this.stock.idSpaceManager1 = aesUtil.encrypt(key, this.idmanager.toString()) as number
-    this.stock.idStoreHouseStockage = aesUtil.encrypt(key, this.tranfertForm.controls['idStoreHouseStockage'].value.toString()) as number
+    this.stock.idSpaceManager1 = this.idmanager
+    let rout = aesUtil.encrypt(key, this.tranfertForm.controls['idStoreHouseStockage'].value.toString())
+    while (rout.includes('/')){
+      rout = aesUtil.encrypt(key, this.tranfertForm.controls['idStoreHouseStockage'].value.toString())
+    }
+    this.stock.idStoreHouseStockage = rout
     let cartons =[]
-    cartons.push(aesUtil.encrypt(key, this.tranfertForm.controls['idCarton'].value.toString()) as number)
+    let ct = aesUtil.encrypt(key, this.tranfertForm.controls['idCarton'].value.toString())
+    while (ct.includes('/')){
+      ct = aesUtil.encrypt(key, this.tranfertForm.controls['idCarton'].value.toString())
+    }
+    cartons.push(ct)
     this.stock.listCartons = cartons
 
     this.mvtService.createStockMovement(this.stock).subscribe(
