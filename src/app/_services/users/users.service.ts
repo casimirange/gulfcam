@@ -40,8 +40,8 @@ export class UsersService {
     return this.http.get<any>(environment.users + `/lockAndUnlockAccount/${internalRef}/${status}`);
   }
 
-  updateUser(user: any): Observable<any>{
-    return this.http.put<any>(environment.users, user);
+  updateUser(user: any, userid: string): Observable<any>{
+    return this.http.put<any>(environment.users + `/update/${userid}`, user);
   }
 
   changePassword(userId: string, body: any): Observable<any>{

@@ -3,12 +3,17 @@ import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {VoucherService} from "../../_services/voucher/voucher.service";
 import {TypeVoucher} from "../../_model/typeVoucher";
-import {BehaviorSubject} from "rxjs";
+import {BehaviorSubject, Observable, of} from "rxjs";
 import {NotifsService} from "../../_services/notifications/notifs.service";
 import {StoreHouse} from "../../_model/storehouse";
 import Swal from "sweetalert2";
 import {StatusService} from "../../_services/status/status.service";
 import {aesUtil, key} from "../../_helpers/aes.js";
+import {catchError, map, startWith} from "rxjs/operators";
+import {CustomResponse} from "../../_interfaces/custom-response";
+import {Store} from "../../_model/store";
+import {AppState} from "../../_interfaces/app-state";
+import {DataState} from "../../_enum/data.state.enum";
 
 @Component({
   selector: 'app-type-bon',
@@ -19,15 +24,20 @@ export class TypeBonComponent implements OnInit {
 
   voucherForm: FormGroup;
   vouchers: TypeVoucher[] = [];
-  voucher: TypeVoucher;
-  private isLoading = new BehaviorSubject<boolean>(false);
-  isLoading$ = this.isLoading.asObservable();
+  voucher: TypeVoucher = new TypeVoucher();
+  voucher2: TypeVoucher = new TypeVoucher();
   modalTitle: string = 'Enregistrer nouveau bon';
   role: string[] = []
+  appState$: Observable<AppState<CustomResponse<TypeVoucher>>>;
+  readonly DataState = DataState;
+  private dataSubjects = new BehaviorSubject<CustomResponse<TypeVoucher>>(null);
+  private isLoading = new BehaviorSubject<boolean>(false);
+  isLoading$ = this.isLoading.asObservable();
+  page: number = 1;
+  size: number = 10;
   constructor(private modalService: NgbModal, private fb: FormBuilder, private voucherService: VoucherService,
               private statusService: StatusService, private notifService: NotifsService) {
     this.formVoucherType();
-    this.voucher = new TypeVoucher()
     JSON.parse(localStorage.getItem('Roles').toString()).forEach(authority => {
       this.role.push(aesUtil.decrypt(key,authority));
     });
@@ -53,37 +63,41 @@ export class TypeBonComponent implements OnInit {
   }
 
   createVoucher(){
-    console.log(this.voucherForm.value)
     this.isLoading.next(true);
-    this.voucher.designation = this.voucherForm.controls['designation'].value
-    this.voucher.amount = this.voucherForm.controls['amount'].value
-    this.voucherService.createTypevoucher(this.voucher).subscribe(
-      resp => {
-        console.log(resp)
-        this.vouchers.push(resp)
-        this.annuler()
-        this.isLoading.next(false);
-        this.notifService.onSuccess('type de coupon créé')
-      },
-      error => {
-        // this.notifService.onError(error.error.message, '')
-        this.isLoading.next(false);
-      }
-    )
+    this.voucher2.designation = aesUtil.encrypt(key, this.voucherForm.controls['designation'].value.toString())
+    this.voucher2.amount = aesUtil.encrypt(key, this.voucherForm.controls['amount'].value.toString())
+    this.appState$ = this.voucherService.addVoucher$(this.voucher2)
+      .pipe(
+        map((response) => {
+          this.dataSubjects.next(
+            {...this.dataSubjects.value, content: [JSON.parse(aesUtil.decrypt(key,response.key.toString())), ...this.dataSubjects.value.content]}
+          )
+          this.annuler()
+          this.isLoading.next(false)
+          this.notifService.onSuccess("Type de bon créé!")
+          return {dataState: DataState.LOADED_STATE, appData: this.dataSubjects.value}
+        }),
+        startWith({dataState: DataState.LOADED_STATE, appData: this.dataSubjects.value}),
+        catchError((error: string) => {
+          this.isLoading.next(false)
+          return of({dataState: DataState.ERROR_STATE, error: error})
+        })
+      )
   }
 
   getVouchers(){
-    console.log(this.voucherForm.value)
-    this.voucherService.getTypevoucher().subscribe(
-      resp => {
-        console.log(JSON.parse(aesUtil.decrypt(key,resp.key.toString())))
-        this.vouchers = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content
-        this.notifService.onSuccess('chargement des types de coupons')
-      },
-      error => {
-        // this.notifService.onError(error.error.message, '')
-      }
-    )
+    this.appState$ = this.voucherService.voucher$(this.page - 1, this.size)
+      .pipe(
+        map(response => {
+          this.dataSubjects.next(JSON.parse(aesUtil.decrypt(key,response.key.toString())) as CustomResponse<TypeVoucher>)
+          this.notifService.onSuccess('chargement des types de coupons')
+          return {dataState: DataState.LOADED_STATE, appData: JSON.parse(aesUtil.decrypt(key,response.key.toString())) as CustomResponse<TypeVoucher>}
+        }),
+        startWith({dataState: DataState.LOADING_STATE, appData: null}),
+        catchError((error: string) => {
+          return of({dataState: DataState.ERROR_STATE, error: error})
+        })
+      )
   }
 
   annuler() {
@@ -140,23 +154,50 @@ export class TypeBonComponent implements OnInit {
 
   updateTypeVoucher() {
     this.isLoading.next(true);
-
-    this.voucherService.updateTypeVoucher(this.voucherForm.value, this.voucher.internalReference).subscribe(
-      resp => {
-        this.isLoading.next(false);
-        // on recherche l'index du client dont on veut faire la modification dans liste des clients
-        const index = this.vouchers.findIndex(tVoucher => tVoucher.internalReference === resp.internalReference);
-        this.vouchers[ index ] = resp;
-        this.notifService.onSuccess("type de bon modifié avec succès!")
-        this.annuler()
-      },
-      error => {
-        this.isLoading.next(false);
-      }
-    )
+    this.voucher2.designation = aesUtil.encrypt(key, this.voucherForm.controls['designation'].value.toString())
+    this.voucher2.amount = aesUtil.encrypt(key, this.voucherForm.controls['amount'].value.toString())
+    let rout = aesUtil.encrypt(key, this.voucher.internalReference.toString())
+    while (rout.includes('/')){
+      rout = aesUtil.encrypt(key, this.voucher.internalReference.toString())
+    }
+    this.appState$ = this.voucherService.updateVoucher$(this.voucher2, rout as number)
+      .pipe(
+        map(response => {
+          const index = this.dataSubjects.value.content.findIndex(tv => tv.internalReference === JSON.parse(aesUtil.decrypt(key,response.key.toString())).internalReference)
+          this.dataSubjects.value.content[index] = JSON.parse(aesUtil.decrypt(key,response.key.toString()))
+          this.isLoading.next(false)
+          this.notifService.onSuccess("type de bon modifié avec succès!")
+          this.annuler()
+          return {dataState: DataState.LOADED_STATE, appData: this.dataSubjects.value}
+        }),
+        startWith({dataState: DataState.LOADED_STATE, appData: this.dataSubjects.value}),
+        catchError((error: string) => {
+          this.isLoading.next(false)
+          return of({dataState: DataState.ERROR_STATE, error: error})
+        })
+      )
   }
 
   getStatuts(status: string): string {
     return this.statusService.allStatus(status)
+  }
+
+  pageChange(event: number) {
+    this.page = event
+    this.appState$ = this.voucherService.voucher$(this.page - 1, this.size)
+      .pipe(
+        map(response => {
+          this.dataSubjects.next(JSON.parse(aesUtil.decrypt(key,response.key.toString())) as CustomResponse<TypeVoucher>)
+          return {dataState: DataState.LOADED_STATE, appData: JSON.parse(aesUtil.decrypt(key,response.key.toString())) as CustomResponse<TypeVoucher>}
+        }),
+        startWith({dataState: DataState.LOADING_STATE, appData: null}),
+        catchError((error: string) => {
+          return of({dataState: DataState.ERROR_STATE, error: error})
+        })
+      )
+  }
+
+  formatNumber(amount: any): string{
+    return parseInt(amount).toFixed(0).replace(/(\d)(?=(\d{3})+\b)/g,'$1 ');
   }
 }

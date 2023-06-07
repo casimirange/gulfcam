@@ -1,7 +1,10 @@
 import { Injectable } from '@angular/core';
-import {HttpClient} from "@angular/common/http";
-import {Observable} from "rxjs";
+import {HttpClient, HttpErrorResponse} from "@angular/common/http";
+import {Observable, throwError} from "rxjs";
 import {environment} from "../../../environments/environment";
+import {catchError} from "rxjs/operators";
+import {Store} from "../../_model/store";
+import {StoreHouse} from "../../_model/storehouse";
 
 @Injectable({
   providedIn: 'root'
@@ -42,4 +45,35 @@ export class StoreHouseService {
   getItemByStoreHouse(internalRef: string): Observable<any>{
     return this.http.get<any>(environment.storeHouse + `/group/${internalRef}`)
   }
+
+
+  storeHouse$ = (page?: number, size?: number, idStore?: string) => <Observable<any>>
+    this.http.get<any>(environment.storeHouse + `?page=${page}&size=${size}&store=${idStore}`,)
+      .pipe(catchError(this.handleError));
+
+  addStoreHouse$ = (store: StoreHouse) => <Observable<any>>
+    this.http.post<any>(environment.storeHouse, store)
+      .pipe(catchError(this.handleError));
+
+  updateStoreHouse$ = (store: any, internalRef: number) => <Observable<any>>
+    this.http.put<any>(environment.storeHouse+`/${internalRef}`, store)
+      .pipe(catchError(this.handleError));
+
+  storeHouseByInternalRef$ = (internalRef: string) => <Observable<any>>
+    this.http.get<any>(environment.storeHouse+`/${internalRef}`)
+      .pipe(catchError(this.handleError));
+
+  storeHouseByStore$ = (internalRef: string) => <Observable<any>>
+    this.http.get<any>(environment.storeHouse+`/${internalRef}`)
+      .pipe(catchError(this.handleError));
+
+  itemByStoreHouse$ = (internalRef: string) => <Observable<any>>
+    this.http.get<any>(environment.storeHouse+`/group/${internalRef}`)
+      .pipe(catchError(this.handleError));
+
+
+  handleError(error: HttpErrorResponse): Observable<never>{
+    return throwError(`Une erreur est survenue: ${error.error.message.toString().bold()}` )
+  }
+
 }

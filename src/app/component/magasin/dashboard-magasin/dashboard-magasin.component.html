@@ -18,99 +18,89 @@
                                         </span>
         Magasin
       </button>
-      <!--        <div class="d-inline-block ">-->
-      <!--          <button routerLink="/magasin/carnets" type="button" data-toggle="tooltip" title="carnets" class="btn-shadow btn btn-info">-->
-      <!--                                        <span class="btn-icon-wrapper pr-2 opacity-7">-->
-      <!--                                            <i class="fa fa-envelope-open-text fa-w-20"></i>-->
-      <!--                                        </span>-->
-      <!--            Carnets-->
-      <!--          </button>-->
-      <!--        </div>-->
     </div>
   </div>
 </div>
-<!--  <ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">-->
-<!--    <li class="nav-item" (click)="open(mymodal)"  >-->
-<!--      <a class="nav-link " >-->
-<!--        <span class="btn-icon-wrapper pr-2 opacity-7"> <i class="fa fa-plus fa-w-20"></i> </span>-->
-<!--        <span> magasin</span>-->
-<!--      </a>-->
-<!--    </li>-->
-<!--    <li class="nav-item">-->
-<!--      <a class="nav-link" >-->
-<!--        <span>Available Loaders</span>-->
-<!--      </a>-->
-<!--    </li>-->
-<!--  </ul>-->
-
-<div class="col-lg-12 col-xl-12" *ngIf="(roleUser === 'MANAGER_SPACES_2' || roleUser === 'SALES_MANAGER' || roleUser === 'MANAGER_SPACES_1' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))">
-  <div class="main-card mb-3 card">
-    <div class="card-body">
-      <h5 class="card-title">Liste des Magasins</h5>
-      <table class="table table-hover bg-white" id="servers">
-        <thead>
-        <tr>
-          <th>#</th>
-          <th>Ref. interne</th>
-          <th>Localisation</th>
-          <th>Statut</th>
-          <th>Date creation</th>
-          <th>Date modification</th>
-          <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody *ngFor="let store of role.includes('ROLE_SUPERADMIN') ? stores : storeFilter | paginate: { id: 'magasin', itemsPerPage: size, currentPage: page, totalItems: totalElements }; let i = index">
-
-        <tr >
-          <td>{{i + 1}}</td>
-          <td>{{store.internalReference}}</td>
-          <td>{{store.localization}} </td>
-          <td>{{getStatuts(store.status.name)}}</td>
-          <td> {{store.createdAt | formatDateHour}}</td>
-          <td> {{store.updateAt | formatDateHour}}</td>
-          <td>
-<!--            <a style="cursor: pointer" class=" text-success" data-toggle="modal"-->
-<!--               (click)="showDetails(store)">-->
-<!--              <i class="pe-7s-look" data-toggle="modal" title="voir les détails"></i>-->
-<!--            </a>-->
-            &nbsp;&nbsp;
-<!--            <a style="cursor: pointer" class="delete text-danger" (click)="deleteStore(store, i)">-->
-<!--              <i class="pe-7s-trash" title="supprimer"></i>-->
-<!--            </a>&nbsp;-->
-<!--            <a style="cursor: pointer" class="text-primary" (click)="updateStoreModal(mymodal, store)">-->
-<!--              <i class="pe-7s-eyedropper" title="modifier"></i>-->
-<!--            </a>-->
-            <button class="btn btn-sm btn-secondary mr-2" (click)="showDetails(store)">
-              <i class="pe-7s-look" title="consulter"></i>
-            </button>
-            <button class="btn btn-sm btn-primary" (click)="updateStoreModal(mymodal, store)" *ngIf="role.includes('ROLE_SUPERADMIN')">
-              <i class="pe-7s-eyedropper" title="modifier"></i>
-            </button>
-          </td>
-        </tr>
-        </tbody>
-      </table>
-      <div class="text-center">
-      <p *ngIf="stores.length === 0" style="color: grey; font-size: 1.8rem;" class="mx-auto" >Aucun magasin trouvé !</p>
-    </div>
-      <div class="card-footer">
-        <div class="btn-actions-pane-left">
-          <div role="group" class="btn-group-sm btn-group">
-            Total : <b>{{ totalElements }} </b>
-          </div>
-        </div>
-        <div class="btn-actions-pane-right">
-          <div role="group" class="btn-group-sm btn-group">
-            <!--              <pagination-controls id="client" (pageChange)="pageChange($event)" ></pagination-controls>-->
-            <pagination-controls
-              id="magasin"
-              previousLabel="Précédent"
-              nextLabel="Suivant"
-              (pageChange)="pageChange($event)"></pagination-controls>
-          </div>
-        </div>
+<div class="row">
+  <div class="col-md-12"  *ngIf="(roleUser === 'MANAGER_SPACES_2' || roleUser === 'SALES_MANAGER' || roleUser === 'MANAGER_SPACES_1' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))">
+    <div class="main-card mb-3 card " id="htmlData" #htmlData>
+      <div class="card-header">
+        Liste des magasins
       </div>
 
+      <ng-container class="bg-white" *ngIf="(appState$ | async) as appState" [ngSwitch]="appState.dataState">
+        <div class="table-responsive">
+          <ng-container class="bg-white" *ngSwitchCase="DataState.LOADING_STATE">
+            <div class="col-md-12 text-center my-3">
+              <!--                <div class="spinner-border text-primary my-3" role="status"></div>-->
+              <div class="ball-clip-rotate">
+                <div style="background-color: rgb(68, 64, 84);"></div>
+              </div>
+            </div>
+          </ng-container>
+          <ng-container class="bg-white py-1 px-1" *ngSwitchCase="DataState.LOADED_STATE">
+            <table class="table table-hover bg-white">
+              <thead>
+              <tr>
+                <th>#</th>
+                <th>Ref. interne</th>
+                <th>Localisation</th>
+                <th>Statut</th>
+                <th>Date creation</th>
+                <th>Date modification</th>
+                <th>Actions</th>
+              </tr>
+              </thead>
+              <!--                <tbody *ngFor="let client of clients | clientNameFilter: name | clientRefFilter: internalRef | clientCompagnyFilter: compagny-->
+              <!--                 | clientDateFilter: date | paginate: { id: 'client', itemsPerPage: size, currentPage: page, totalItems: totalElements } ; let i = index">-->
+              <tbody *ngFor="let store of appState.appData.content | paginate: { id: 'magasin', itemsPerPage: appState.appData.size, currentPage: page, totalItems: appState.appData.totalElements } ; let i = index">
+
+              <tr>
+                <td>{{i + 1}}</td>
+                <td>{{store.internalReference}}</td>
+                <td>{{store.localization}} </td>
+                <td>{{getStatuts(store.status.name)}}</td>
+                <td> {{store.createdAt | formatDateHour}}</td>
+                <td> {{store.updateAt | formatDateHour}}</td>
+                <td>
+                  <button class="btn btn-sm btn-secondary mr-2" (click)="showDetails(store)">
+                    <i class="pe-7s-look" title="consulter"></i>
+                  </button>
+                  <button class="btn btn-sm btn-primary" (click)="updateStoreModal(mymodal, store)" *ngIf="role.includes('ROLE_SUPERADMIN')">
+                    <i class="pe-7s-eyedropper" title="modifier"></i>
+                  </button>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+            <div class="text-center">
+              <p *ngIf="!appState.appData.content.length" style="color: grey; font-size: 1.8rem;" class="mx-auto">Aucun magasin trouvé !</p>
+            </div>
+            <div class="card-footer">
+              <div class="btn-actions-pane-left">
+                <div role="group" class="btn-group-sm btn-group">
+                  Total:&nbsp;<b>{{ appState.appData.totalElements }} </b>
+                </div>
+              </div>
+              <div class="btn-actions-pane-right">
+                <div role="group" class="btn-group-sm btn-group">
+                  <!--              <pagination-controls id="client" (pageChange)="pageChange($event)" ></pagination-controls>-->
+                  <pagination-controls
+                    id="magasin"
+                    previousLabel="Précédent"
+                    nextLabel="Suivant"
+                    (pageChange)="pageChange($event)"></pagination-controls>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          <ng-container class="bg-white"  *ngSwitchCase="DataState.ERROR_STATE">
+            <div class="col-md-12 text-center">
+              <div class="text-danger" >{{appState.error}}</div>
+            </div>
+          </ng-container>
+        </div>
+      </ng-container>
     </div>
   </div>
 </div>

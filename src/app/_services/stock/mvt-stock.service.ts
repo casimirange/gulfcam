@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import {HttpClient} from "@angular/common/http";
-import {Observable} from "rxjs";
+import {HttpClient, HttpErrorResponse} from "@angular/common/http";
+import {Observable, throwError} from "rxjs";
 import {environment} from "../../../environments/environment";
+import {catchError} from "rxjs/operators";
 
 @Injectable({
   providedIn: 'root'
@@ -14,15 +15,12 @@ export class MvtStockService {
     return this.http.post<any>(environment.stock, stock)
   }
 
-  deletStockMovement(internalref: number): Observable<any>{
-    return this.http.delete<any>(environment.stock+`/${internalref}`)
+  stockMovement$ = (page?: number, size?: number) => <Observable<any>>
+    this.http.get<any>(environment.stock + `?page=${page}&size=${size}`,)
+      .pipe(catchError(this.handleError));
+
+  handleError(error: HttpErrorResponse): Observable<never>{
+    return throwError(`Une erreur est survenue: ${error.error.message.toString().bold()}` )
   }
 
-  getStockMovement(): Observable<any>{
-    return this.http.get<any>(environment.stock)
-  }
-
-  updateStockMovement(payment: any, internalRef: number): Observable<any>{
-    return this.http.put<any>(environment.stock+`/${internalRef}`, payment);
-  }
 }

@@ -79,10 +79,12 @@ export class OtpComponent implements OnInit {
 
   verifyOtp(){
     this.isLoading.next(true);
+    this.inputDigitLeft = 'Vérification ...'
       // this.authService.verifyOtp(aesUtil.encrypt(key,this.otp)).subscribe(
       this.authService.verifyOtp(this.otp).subscribe(
         (response) => {
           this.isLoading.next(false);
+
           this.token.saveRefreshToken(JSON.parse(aesUtil.decrypt(key,response.key.toString())).refreshToken);
           // console.log('roles ', JSON.parse(aesUtil.decrypt(key,response.key.toString())).roles)
           // console.log('resp ', JSON.parse(aesUtil.decrypt(key,response.key.toString())))

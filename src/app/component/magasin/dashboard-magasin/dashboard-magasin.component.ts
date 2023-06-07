@@ -1,22 +1,22 @@
 import {Component, OnInit, TemplateRef} from '@angular/core';
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
-import {TypeVoucher} from "../../../_model/typeVoucher";
 import {VoucherService} from "../../../_services/voucher/voucher.service";
 import {Store} from "../../../_model/store";
 import {StoreService} from "../../../_services/store/store.service";
-import {BehaviorSubject} from "rxjs";
+import {BehaviorSubject, Observable, of} from "rxjs";
 import {NotifsService} from "../../../_services/notifications/notifs.service";
-import {PaiementMethod} from "../../../_model/paiement";
 import Swal from "sweetalert2";
 import {UnitsService} from "../../../_services/units/units.service";
-import {Unite} from "../../../_model/unite";
 import {StoreHouse} from "../../../_model/storehouse";
 import {Router} from "@angular/router";
 import {StoreHouseService} from "../../../_services/storeHouse/store-house.service";
-import {environment} from "../../../../environments/environment";
 import {StatusService} from "../../../_services/status/status.service";
 import {aesUtil, key} from "../../../_helpers/aes.js";
+import {catchError, map, startWith} from "rxjs/operators";
+import {CustomResponse} from "../../../_interfaces/custom-response";
+import {AppState} from "../../../_interfaces/app-state";
+import {DataState} from "../../../_enum/data.state.enum";
 
 @Component({
   selector: 'app-dashboard-magasin',
@@ -31,14 +31,14 @@ export class DashboardMagasinComponent implements OnInit {
   storeHouses: StoreHouse[] = [];
   store: Store = new Store ();
   store1: Store = new Store ();
-  unit: Unite = new Unite();
-  typeVouchers: TypeVoucher[]
+  appState$: Observable<AppState<CustomResponse<Store>>>;
+  readonly DataState = DataState;
+  private dataSubjects = new BehaviorSubject<CustomResponse<Store>>(null);
   private isLoading = new BehaviorSubject<boolean>(false);
   isLoading$ = this.isLoading.asObservable();
   modalTitle: string = 'Enregistrer nouveau magasin';
   page: number = 1;
-  totalPages: number;
-  totalElements: number;
+  storeFiltered = '';
   size: number = 10;
   roleUser = aesUtil.decrypt(key, localStorage.getItem('userAccount').toString())
   role: string[] = []
@@ -69,39 +69,41 @@ export class DashboardMagasinComponent implements OnInit {
   }
 
   createStore(){
-    this.store.localization = aesUtil.encrypt(key, this.storeForm.controls['localization'].value.toString())
+    this.store1.localization = aesUtil.encrypt(key, this.storeForm.controls['localization'].value.toString())
     this.isLoading.next(true);
-    this.storeService.createStore(this.store).subscribe(
-      resp => {
-        // this.unit.idStore = resp.internalReference
-        // this.unit.quantityNotebook = 0
-        // this.typeVouchers.forEach(tv => {
-        //   this.unit.idTypeVoucher = tv.internalReference
-        //   this.unitService.createUnit(this.unit).subscribe()
-        // })
-        this.stores.push(JSON.parse(aesUtil.decrypt(key,resp.key.toString())))
-        this.annuler()
-        this.isLoading.next(false);
-        this.notifService.onSuccess('enregistrement effectué')
-      },
-      error => {
-        this.notifService.onError(error.error.message, '')
-        this.isLoading.next(false);
-      }
-    )
+    this.appState$ = this.storeService.addStore$(this.store1)
+      .pipe(
+        map((response) => {
+          this.dataSubjects.next(
+            {...this.dataSubjects.value, content: [JSON.parse(aesUtil.decrypt(key,response.key.toString())), ...this.dataSubjects.value.content]}
+          )
+          this.annuler()
+          this.isLoading.next(false)
+          this.notifService.onSuccess("nouveau magasin ajouté!")
+          return {dataState: DataState.LOADED_STATE, appData: this.dataSubjects.value}
+        }),
+        startWith({dataState: DataState.LOADED_STATE, appData: this.dataSubjects.value}),
+        catchError((error: string) => {
+          this.isLoading.next(false)
+          return of({dataState: DataState.ERROR_STATE, error: error})
+        })
+      )
   }
 
   getStores(){
-    this.storeService.getAllStoresWithPagination(this.page-1, this.size).subscribe(
-      resp => {
-        this.stores = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content
-        this.storeFilter = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content.filter(sh => sh.internalReference === parseInt(aesUtil.decrypt(key, localStorage.getItem('store'))))
-        this.size = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).size
-        this.totalPages = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).totalPages
-        this.totalElements = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).totalElements
-        this.notifService.onSuccess('Chargement des magasins')
-      },
-    )
+    this.storeFiltered = this.role.includes('ROLE_SUPERADMIN') ? '' : localStorage.getItem('store')
+    this.appState$ = this.storeService.store$(this.page - 1, this.size, this.storeFiltered)
+      .pipe(
+        map(response => {
+          this.dataSubjects.next(JSON.parse(aesUtil.decrypt(key,response.key.toString())) as CustomResponse<Store>)
+          this.notifService.onSuccess('Chargement des magasins')
+          return {dataState: DataState.LOADED_STATE, appData: JSON.parse(aesUtil.decrypt(key,response.key.toString())) as CustomResponse<Store>}
+        }),
+        startWith({dataState: DataState.LOADING_STATE, appData: null}),
+        catchError((error: string) => {
+          return of({dataState: DataState.ERROR_STATE, error: error})
+        })
+      )
   }
 
   annuler() {
@@ -165,19 +167,26 @@ export class DashboardMagasinComponent implements OnInit {
   updateStore() {
     this.isLoading.next(true);
     this.store1.localization = aesUtil.encrypt(key, this.storeForm.controls['localization'].value.toString())
-    this.storeService.updateStore(this.store1, aesUtil.encrypt(key, this.store.internalReference.toString()) as number).subscribe(
-      resp => {
-        this.isLoading.next(false);
-        const index = this.stores.findIndex(store => store.internalReference === JSON.parse(aesUtil.decrypt(key,resp.key.toString())).internalReference);
-        this.stores[ index ] = JSON.parse(aesUtil.decrypt(key,resp.key.toString()));
-        this.notifService.onSuccess("magasin modifié avec succès!")
-        this.modalTitle = 'Enregistrer nouveau magasin'
-        this.annuler()
-      },
-      error => {
-        this.isLoading.next(false);
-      }
-    )
+    let rout = aesUtil.encrypt(key, this.store.internalReference.toString())
+    while (rout.includes('/')){
+      rout = aesUtil.encrypt(key, this.store.internalReference.toString())
+    }
+    this.appState$ = this.storeService.updateStore$(this.store1, rout as number)
+      .pipe(
+        map(response => {
+          const index = this.dataSubjects.value.content.findIndex(client => client.internalReference === JSON.parse(aesUtil.decrypt(key,response.key.toString())).internalReference)
+          this.dataSubjects.value.content[index] = JSON.parse(aesUtil.decrypt(key,response.key.toString()))
+          this.isLoading.next(false)
+          this.notifService.onSuccess("magasin modifié avec succès!")
+          this.annuler()
+          return {dataState: DataState.LOADED_STATE, appData: this.dataSubjects.value}
+        }),
+        startWith({dataState: DataState.LOADED_STATE, appData: this.dataSubjects.value}),
+        catchError((error: string) => {
+          this.isLoading.next(false)
+          return of({dataState: DataState.ERROR_STATE, error: error})
+        })
+      )
   }
 
   showDetails(store: Store) {
@@ -199,8 +208,18 @@ export class DashboardMagasinComponent implements OnInit {
     return this.statusService.allStatus(status)
   }
 
-  pageChange(event: number){
+  pageChange(event: number) {
     this.page = event
-    this.getStores()
+    this.appState$ = this.storeService.store$(this.page - 1, this.size)
+      .pipe(
+        map(response => {
+          this.dataSubjects.next(JSON.parse(aesUtil.decrypt(key,response.key.toString())) as CustomResponse<Store>)
+          return {dataState: DataState.LOADED_STATE, appData: JSON.parse(aesUtil.decrypt(key,response.key.toString())) as CustomResponse<Store>}
+        }),
+        startWith({dataState: DataState.LOADING_STATE, appData: null}),
+        catchError((error: string) => {
+          return of({dataState: DataState.ERROR_STATE, error: error})
+        })
+      )
   }
 }

@@ -62,8 +62,8 @@ export class CouponService {
     this.http.get<Coupon>(environment.coupon + `/export/excel/client/${clientInternalReference}`,)
       .pipe(catchError(this.handleError));
 
-  couponByStation$ = (idStation: number, page: number, size: number) => <Observable<Coupon>>
-    this.http.get<Coupon>(environment.coupon+`/station/${idStation}?page=${page}&size=${size}`)
+  couponByStation$ = (idStation: number, serialNumber?: string, statut?: string, type?: string, clientName?: string, page?: number, size?: number) => <Observable<any>>
+    this.http.get<any>(environment.coupon+`/station/${idStation}?page=${page}&size=${size}&serialnumber=${serialNumber}&status=${statut}&client=${clientName}&type=${type}`)
       .pipe(catchError(this.handleError));
 
   handleError(error: HttpErrorResponse): Observable<never>{

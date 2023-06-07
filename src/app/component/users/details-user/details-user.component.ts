@@ -3,7 +3,7 @@ import {OrderService} from "../../../_services/order/order.service";
 import {NotifsService} from "../../../_services/notifications/notifs.service";
 import {ActivatedRoute} from "@angular/router";
 import {UsersService} from "../../../_services/users/users.service";
-import {ICredentialsSignup, ISignup} from "../../../_model/signup";
+import {ICredentialsSignup, IRole, ISignup} from "../../../_model/signup";
 import {StoreService} from "../../../_services/store/store.service";
 import {Store} from "../../../_model/store";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
@@ -25,6 +25,7 @@ export class DetailsUserComponent implements OnInit {
   user: ISignup = new ISignup();
   store: Store = new Store();
   typeAccount: string = '';
+  typeRol: string = '';
   statusUser: string = '';
   updateUser: FormGroup ;
   credentials: ICredentialsSignup = new ICredentialsSignup()
@@ -35,6 +36,21 @@ export class DetailsUserComponent implements OnInit {
   private isLoading = new BehaviorSubject<boolean>(false);
   isLoading$ = this.isLoading.asObservable();
   role: string[] = []
+  accounts = [
+    {name : "Attaché Commercial" , value : "COMMERCIAL_ATTACHE"},
+    {name : "Caissier/Trésorier" , value : "TREASURY"},
+    {name : "Comptable" , value : "COMPTABLE"},
+    {name : "Directeur Commercial" , value : "SALES_MANAGER"},
+    {name : "DSI/AUDIT" , value : "DSI_AUDIT"},
+    {name : "Gestionnaire espace 1" , value : "MANAGER_SPACES_1"},
+    {name : "Gestionnaire espace 2" , value : "MANAGER_SPACES_2"},
+    {name : "Gestionnaire de station" , value : "MANAGER_STATION"},
+  ]
+  roles = [
+    {name : "Administrateur" , value : "ROLE_ADMIN"},
+    {name : "Simple Utilisateur" , value : "ROLE_USER"},
+    {name : "Super Administrateur" , value : "ROLE_SUPERADMIN"}
+  ]
   constructor(private userService: UsersService,  private notifsService: NotifsService, private route: ActivatedRoute,
               private storeService: StoreService, private fb: FormBuilder, private statusAccountService: StatusAccountService,
               private statusUserService: StatusUserService, private roleUserService: RoleUserService, private _location: Location) {
@@ -44,10 +60,11 @@ export class DetailsUserComponent implements OnInit {
       pinCode: ['', [Validators.required, Validators.pattern('^[0-9 ]*$')]],
       idStore: ['', [Validators.required]],
       typeAccount: ['', [Validators.required, Validators.minLength(4)]],
-      password: ['', [Validators.required, Validators.pattern("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$")]],
+      // password: ['', [Validators.required, Validators.pattern("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$")]],
       firstName: ['', [Validators.required, Validators.minLength(4)]],
       lastName: ['', [Validators.required, Validators.minLength(4)]],
       position: ['', [Validators.required, Validators.minLength(4)]],
+      roleName: ['', ]
     });
 
     this.form = this.updateUser.controls;
@@ -64,7 +81,6 @@ export class DetailsUserComponent implements OnInit {
   getStores(){
     this.storeService.getStore().subscribe(
       resp => {
-        console.log(resp)
         this.stores = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content
       },
       error => {
@@ -78,16 +94,12 @@ export class DetailsUserComponent implements OnInit {
 
     this.userService.getUser(id).subscribe(
       resp => {
-        console.log(JSON.parse(aesUtil.decrypt(key,resp.key.toString())))
+        // console.log(JSON.parse(aesUtil.decrypt(key,resp.key.toString())))
         this.user = JSON.parse(aesUtil.decrypt(key,resp.key.toString()))
         this.typeAccount = this.user.typeAccount.name
+        this.typeRol = this.user.roles[0].name
         this.statusUser = this.user.status.name
 
-        this.storeService.getStoreByInternalref(aesUtil.encrypt(key, this.user.idStore.toString())).subscribe(
-          resp => {
-            this.store = JSON.parse(aesUtil.decrypt(key,resp.key.toString()))
-          }
-        )
       },
       err => {
         this.notifsService.onError(err.error.message, 'échec chargement de l\'utilisateur')
@@ -110,24 +122,40 @@ export class DetailsUserComponent implements OnInit {
   }
 
   onSubmit() {
-    this.isLoading.next(true);
-    this.credentials = this.updateUser.value;
-    const store = this.stores.filter(store => store.localization === this.updateUser.controls['idStore'].value)
-    // for (let st of store){
-    this.credentials.idStore = store[0].internalReference.toString();
-    // }
+      this.isLoading.next(true);
+      this.credentials = this.updateUser.value;
 
-    this.userService.updateUser(this.credentials).subscribe(
-      resp => {
-        console.log(resp)
-        this.isLoading.next(false);
-        this.notifsService.onSuccess('utilisateur modifié')
-      },
-      error => {
-        this.isLoading.next(false)
-        this.errorMessage = error.error.message;
-      }
-    )
+      // this.credentials.internalReference = aesUtil.encrypt(key, this.user.internalReference.toString());
+      this.credentials.email = aesUtil.encrypt(key, this.updateUser.controls['email'].value.toString());
+      this.credentials.typeAccount = aesUtil.encrypt(key, this.updateUser.controls['typeAccount'].value.toString());
+      this.credentials.telephone = aesUtil.encrypt(key, this.updateUser.controls['telephone'].value.toString());
+      this.credentials.firstName = aesUtil.encrypt(key, this.updateUser.controls['firstName'].value.toString());
+      this.credentials.lastName = aesUtil.encrypt(key, this.updateUser.controls['lastName'].value.toString());
+      this.credentials.roleName = aesUtil.encrypt(key, this.updateUser.controls['roleName'].value);
+      this.credentials.password = aesUtil.encrypt(key, 'null');
+      this.credentials.pinCode = aesUtil.encrypt(key, this.updateUser.controls['pinCode'].value.toString());
+      this.credentials.position = aesUtil.encrypt(key, this.updateUser.controls['position'].value.toString());
+      // on recherche l'id du magasin dans la liste des magasins
+
+      const store = this.updateUser.controls['idStore'].value
+      this.credentials.idStore = aesUtil.encrypt(key, store.toString());
+      // this.credentials.idStore = aesUtil.encrypt(key, '123456789');
+
+    const id = this.route.snapshot.paramMap.get('id');
+      this.userService.updateUser(this.credentials, id).subscribe(
+        resp => {
+          this.isLoading.next(false);
+          this.getUser()
+          this.notifsService.onSuccess('utilisateur modifié')
+          // this.router.navigate(['users'])
+        },
+        error => {
+          this.isLoading.next(false)
+          // this.errorMessage = error.error.message;
+          // console.log("voici l'erreur ", error.error.message)
+        }
+      )
+
   }
 
   getStatusAccount(status: string): string {

@@ -85,13 +85,14 @@ export class TokenService {
     localStorage.setItem('bearerToken', rout);
 
     new IdleTimer({
-      timeout: 600, //expired after 600 secs
+      timeout: 1800, //expired after 600 secs
       onTimeout: () => {
         localStorage.setItem('url', this.router.url)
         this.clearTokenExpired();
+        this.modalService.dismissAll()
         Swal.fire({
           title: 'Inactivité',
-          html: 'Nous avons constaté que vous n\'êtes plus actif sur la plateforme',
+          html: 'Nous avons constaté que vous n\'êtes plus actif sur la plateforme depuis un moment',
           icon: 'info',
           footer: '<a >Veuillez vous reconnecter de nouveau</a>',
           showCancelButton: false,
@@ -107,7 +108,6 @@ export class TokenService {
       }
     }).startInterval();
     if (this.isRedirect()){
-      this.modalService.dismissAll()
       this.router.navigate(['/dashboard'])
       // this.router.navigate([localStorage.getItem('url').toString()])
       localStorage.removeItem('url')

@@ -46,7 +46,6 @@ export class DetailsCreditNoteComponent implements OnInit {
     this.activatedRoute.params.subscribe(params => {
       this.noteService.getCreditNoteByInternalRef(params['id'].toString()).subscribe(
         res => {
-          console.log(JSON.parse(aesUtil.decrypt(key, res.key.toString())))
           this.creditNote = JSON.parse(aesUtil.decrypt(key, res.key.toString()));
           this.statut = this.creditNote.status.name
           this.coupons = this.creditNote.coupon

@@ -64,6 +64,10 @@ export class StationService {
     this.http.get<any>(environment.station + `/filter?page=${page}&size=${size}&designation=${designation}&localization=${localization}&pinCode=${pinCode}&idManagerStation=${idManagerStation}`,)
       .pipe(catchError(this.handleError));
 
+  getStationByInternalref$ = (internalRef: string) => <Observable<any>>
+    this.http.get<any>(environment.station+ `/${internalRef}`)
+      .pipe(catchError(this.handleError));
+
   addStation$ = (station: Station) => <Observable<Station>>
     this.http.post<Station>(environment.station, station)
       .pipe(catchError(this.handleError));

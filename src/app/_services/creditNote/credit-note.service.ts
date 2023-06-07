@@ -50,6 +50,10 @@ export class CreditNoteService {
     this.http.get<any>(environment.creditNote + `/filter?page=${page}&size=${size}&status=${status}&date=${date}&station=${station}&internalRef=${internalRef}`,)
       .pipe(catchError(this.handleError));
 
+  getCreditNoteByStation$ = (idStation: number, internalRef: string, status?: string, date?: string, page?: number, size?: number) => <Observable<any>>
+    this.http.get<any>(environment.creditNote + `/station/${idStation}?status=${status}&internalRef=${internalRef}&date=${date}&page=${page}&size=${size}`,)
+      .pipe(catchError(this.handleError));
+
   handleError(error: HttpErrorResponse): Observable<never>{
     return throwError(`Une erreur est survenue: ${error.error.message.toString().bold()}` )
   }

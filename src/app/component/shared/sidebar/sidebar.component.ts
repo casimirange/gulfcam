@@ -41,7 +41,7 @@ export class SidebarComponent implements OnInit {
       this.role.push(aesUtil.decrypt(key,authority));
     });
 
-    this.extraParameter = this.activatedRoute.snapshot.firstChild.data.extraParameter;
+    // this.extraParameter = this.activatedRoute.snapshot.firstChild.data.extraParameter;
 
   }
 

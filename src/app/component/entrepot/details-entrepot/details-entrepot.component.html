@@ -345,7 +345,7 @@
               </tr>
               </thead>
               <tbody *ngFor="let carnet of appState.appData.content |
-              paginate: { id: 'carnetsStorehouse', itemsPerPage: appState.appData.size, currentPage: page, totalItems: appState.appData.totalElements }; let i = index">
+              paginate: { id: 'carnetsStorehouse', itemsPerPage: appState.appData.size, currentPage: page1, totalItems: appState.appData.totalElements }; let i = index">
               <tr>
                 <td>{{i + 1}}</td>
                 <td>{{carnet.internalReference}}</td>

@@ -23,8 +23,13 @@ import {CouponService} from "../../../_services/coupons/coupon.service";
 import {Coupon} from "../../../_model/coupon";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
-import {BehaviorSubject} from "rxjs";
+import {BehaviorSubject, Observable, of} from "rxjs";
 import {aesUtil, key} from "../../../_helpers/aes.js";
+import {AppState} from "../../../_interfaces/app-state";
+import {CustomResponse} from "../../../_interfaces/custom-response";
+import {DataState} from "../../../_enum/data.state.enum";
+import {catchError, map, startWith} from "rxjs/operators";
+import {Client} from "../../../_model/client";
 
 @Component({
   selector: 'app-details-station',
@@ -40,21 +45,37 @@ export class DetailsStationComponent implements OnInit {
   coupons: Coupon[] = [];
   user = parseInt(aesUtil.decrypt(key, localStorage.getItem('uid').toString()))
   pageCoupon: number = 1;
+  pageCreditNote: number = 1;
   totalPagesCoupon: number;
   totalElementsCoupon: number;
   size: number = 10;
   vouchers: TypeVoucher[] = [];
   stations: Station[] = []
-  couponForm: FormGroup ;
+  couponForm: FormGroup;
   coupon: Coupon = new Coupon();
   private isLoading = new BehaviorSubject<boolean>(false);
   isLoading$ = this.isLoading.asObservable();
+  appState$: Observable<AppState<CustomResponse<Station>>>;
+  appStateCreditNote$: Observable<AppState<CustomResponse<CreditNote>>>;
+  appStateCoupon$: Observable<AppState<CustomResponse<Coupon>>>;
+  readonly DataState = DataState;
+  private dataSubjects = new BehaviorSubject<CustomResponse<Station>>(null);
   idParam: number;
-  constructor(private stationService: StationService, private activatedRoute: ActivatedRoute, private router: Router,private modalService: NgbModal,
-              private _location: Location, private voucherService: VoucherService, private statusService: StatusService,private fb: FormBuilder,
-              private creditNoteService: CreditNoteService, private couponService: CouponService, private notifService: NotifsService) {
+  onFilterCN: boolean = false;
+  onFilterCP: boolean = false;
+  dateCNFilter? = ''
+  statutCNFilter? = ''
+  internalRefCNFilter? = ''
+  serialNumber? = ''
+  statusFilter? = ''
+  typeFilter? = ''
+  clientName? = ''
+  clients: Client[] = [];
+  constructor(private stationService: StationService, private activatedRoute: ActivatedRoute, private router: Router, private modalService: NgbModal,
+              private _location: Location, private voucherService: VoucherService, private statusService: StatusService, private fb: FormBuilder,
+              private creditNoteService: CreditNoteService, private couponService: CouponService, private notifService: NotifsService, private clientService: ClientService) {
     JSON.parse(localStorage.getItem('Roles').toString()).forEach(authority => {
-      this.role.push(aesUtil.decrypt(key,authority));
+      this.role.push(aesUtil.decrypt(key, authority));
     });
     this.formCoupon()
     this.activatedRoute.params.subscribe(params => {
@@ -62,7 +83,7 @@ export class DetailsStationComponent implements OnInit {
     })
   }
 
-  formCoupon(){
+  formCoupon() {
     this.couponForm = this.fb.group({
       coupon: ['', [Validators.required]],
       // idStation: ['', [Validators.required]],
@@ -72,39 +93,46 @@ export class DetailsStationComponent implements OnInit {
 
 
   ngOnInit(): void {
-    this.getStationInfos()
     this.getCreditNoteByStation()
     this.getCouponByStation()
-    this.getTypeVoucher()
+    this.getStationInfos()
+    this.getVouchers()
     // this.getStations()
   }
-
-  getStationInfos(){
-    // this.activatedRoute.params.subscribe(params => {
-      this.stationService.getStationByInternalref(this.idParam as number).subscribe(
-        res => {
-          this.station = JSON.parse(aesUtil.decrypt(key,res.key.toString()));
-        }
-      )
-    // })
-  }
-
-  // getStations(){
-  //   this.stationService.getStations().subscribe(
-  //     resp => {
-  //       this.stations = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content
-  //     },
-  //   )
-  // }
-
-  //on récupère la liste des types de coupon
-  getTypeVoucher(): void{
+  getVouchers(){
     this.voucherService.getTypevoucher().subscribe(
       resp => {
         this.vouchers = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content
+      },
+    )
+  }
+  getStationInfos() {
+    // this.appState$ = this.stationService.getStationByInternalref$(this.idParam)
+    //   .pipe(
+    //     map(response => {
+    //       this.dataSubjects.next(JSON.parse(aesUtil.decrypt(key,response.key.toString())))
+    //       return {dataState: DataState.LOADED_STATE, appData: JSON.parse(aesUtil.decrypt(key,response.key.toString())) as Station}
+    //     }),
+    //     startWith({dataState: DataState.LOADING_STATE, appData: null}),
+    //     catchError((error: string) => {
+    //       return of({dataState: DataState.ERROR_STATE, error: error})
+    //     })
+    //   )
+    this.stationService.getStationByInternalref(this.idParam as number).subscribe(
+      res => {
+        this.station = JSON.parse(aesUtil.decrypt(key, res.key.toString()));
       }
     )
   }
+
+  //on récupère la liste des types de coupon
+  // getTypeVoucher(): void {
+  //   this.voucherService.getTypevoucher().subscribe(
+  //     resp => {
+  //       this.vouchers = JSON.parse(aesUtil.decrypt(key, resp.key.toString())).content
+  //     }
+  //   )
+  // }
 
   back() {
     this._location.back()
@@ -118,49 +146,103 @@ export class DetailsStationComponent implements OnInit {
     return this.statusService.allStatus(status)
   }
 
-  getCreditNoteByStation(){
-    // this.activatedRoute.params.subscribe(params => {
-      this.creditNoteService.getCreditNoteByStation(this.idParam).subscribe(
-        resp => {
-          this.creditNotes = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content
-          // console.log(resp)
-        },
+  getCreditNoteByStation() {
+
+    this.appStateCreditNote$ = this.creditNoteService.getCreditNoteByStation$(this.idParam as number, this.internalRefCNFilter, this.statutCNFilter, this.dateCNFilter, this.pageCreditNote - 1, this.size)
+      .pipe(
+        map(response => {
+          return {dataState: DataState.LOADED_STATE, appData: JSON.parse(aesUtil.decrypt(key,response.key.toString())) as Station}
+        }),
+        startWith({dataState: DataState.LOADING_STATE, appData: null}),
+        catchError((error: string) => {
+          return of({dataState: DataState.ERROR_STATE, error: error})
+        })
       )
-    // })
+    // this.creditNoteService.getCreditNoteByStation(this.idParam).subscribe(
+    //   resp => {
+    //     this.creditNotes = JSON.parse(aesUtil.decrypt(key, resp.key.toString())).content
+    //   },
+    // )
   }
 
-  getCouponByStation(){
-    // this.activatedRoute.params.subscribe(params => {
-      this.couponService.getCouponsByStation(this.idParam.toString(), this.pageCoupon -1, this.size).subscribe(
-        resp => {
-          this.coupons = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content
-          this.totalElementsCoupon = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).totalElements
-          this.totalPagesCoupon = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).totalPages
-        },
-      )
-    // })
+  pageChangeCN(event: number) {
+    this.pageCreditNote = event
+    this.getCreditNoteByStation()
   }
 
+  getCouponByStation() {
+    this.appStateCoupon$ = this.couponService.couponByStation$(this.idParam as number, this.serialNumber, this.statusFilter, this.typeFilter, this.clientName, this.pageCoupon - 1, this.size)
+      .pipe(
+        map(response => {
+          this.dataSubjects.next(JSON.parse(aesUtil.decrypt(key,response.key.toString())))
+          // this.notifService.onSuccess('Chargement des coupons')
+          return {dataState: DataState.LOADED_STATE, appData: JSON.parse(aesUtil.decrypt(key,response.key.toString()))}
+        }),
+        startWith({dataState: DataState.LOADING_STATE, appData: null}),
+        catchError((error: string) => {
+          return of({dataState: DataState.ERROR_STATE, error: error})
+        })
+      )
+    // this.couponService.getCouponsByStation(this.idParam.toString(), ).subscribe(
+    //   resp => {
+    //     this.coupons = JSON.parse(aesUtil.decrypt(key, resp.key.toString())).content
+    //     this.totalElementsCoupon = JSON.parse(aesUtil.decrypt(key, resp.key.toString())).totalElements
+    //     this.totalPagesCoupon = JSON.parse(aesUtil.decrypt(key, resp.key.toString())).totalPages
+    //   },
+    // )
+  }
+
+  findClients(event: string): Client[]{
+    if (event != '' && event.length >= 3){
+      this.clientService.searchClient(event) .subscribe(
+        resp => {
+          this.clients = JSON.parse(aesUtil.decrypt(key,resp.key.toString()));
+          if (this.clients.length <= 1){
+            this.getCouponByStation()
+          }
+
+          if (!JSON.parse(aesUtil.decrypt(key,resp.key.toString())).length){
+            this.notifService.onError('Ce client n\'existe pas', '')
+          }
+        }
+      )
+    }else {
+      if (this.clientName == ''){
+        this.getCouponByStation()
+      }
+      this.clients = []
+    }
+    return this.clients
+  }
+
+  formatNumber(amount: any): string{
+    return parseInt(amount).toFixed(0).replace(/(\d)(?=(\d{3})+\b)/g,'$1 ');
+  }
+
+  pageChangeCP(event: number) {
+    this.pageCoupon = event
+    this.getCouponByStation()
+  }
   padWithZero(num, targetLength) {
     return String(num).padStart(targetLength, '0');
   }
 
   creditNoteDetails(note: CreditNote) {
     let rout = aesUtil.encrypt(key, note.internalReference.toString())
-    while (rout.includes('/')){
+    while (rout.includes('/')) {
       rout = aesUtil.encrypt(key, note.internalReference.toString())
     }
     this.router.navigate(['/credit-note/details', rout])
   }
 
-  open(content: any){
+  open(content: any) {
     this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title', size: 'lg'});
   }
 
   accepterCoupon() {
-    let str= parseInt(this.couponForm.controls['coupon'].value).toString();
+    let str = parseInt(this.couponForm.controls['coupon'].value).toString();
     let rout = aesUtil.encrypt(key, str.toString())
-    while (rout.includes('/')){
+    while (rout.includes('/')) {
       rout = aesUtil.encrypt(key, str.toString())
     }
     this.coupon.serialNumber = rout
@@ -192,6 +274,28 @@ export class DetailsStationComponent implements OnInit {
   annuler() {
     this.formCoupon();
     this.modalService.dismissAll()
+  }
+
+  showFilterCN() {
+    this.onFilterCN = !this.onFilterCN
+
+    if (!this.onFilterCN) {
+      this.dateCNFilter = '';
+      this.statutCNFilter = '';
+      this.internalRefCNFilter = '';
+      this.getCreditNoteByStation()
+    }
+  }
+  showFilterCP() {
+    this.onFilterCP = !this.onFilterCP
+
+    if (!this.onFilterCP) {
+      // this.dateFilter = '';
+      // this.statutFilter = '';
+      // this.stationName = '';
+      // this.internalRef = '';
+      // this.getCreditNote()
+    }
   }
 
 }

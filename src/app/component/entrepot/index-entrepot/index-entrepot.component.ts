@@ -6,11 +6,15 @@ import {Store} from "../../../_model/store";
 import {StoreService} from "../../../_services/store/store.service";
 import {NotifsService} from "../../../_services/notifications/notifs.service";
 import {StoreHouseService} from "../../../_services/storeHouse/store-house.service";
-import {BehaviorSubject} from "rxjs";
+import {BehaviorSubject, Observable, of} from "rxjs";
 import Swal from "sweetalert2";
 import {Router} from "@angular/router";
 import {StatusService} from "../../../_services/status/status.service";
 import {aesUtil, key} from "../../../_helpers/aes.js";
+import {AppState} from "../../../_interfaces/app-state";
+import {CustomResponse} from "../../../_interfaces/custom-response";
+import {DataState} from "../../../_enum/data.state.enum";
+import {catchError, map, startWith} from "rxjs/operators";
 
 @Component({
   selector: 'app-index-entrepot',
@@ -28,6 +32,9 @@ export class IndexEntrepotComponent implements OnInit {
   storeHouseType = ['stockage', 'vente']
   stores: Store[] = [];
   store: Store = new Store();
+  appState$: Observable<AppState<CustomResponse<StoreHouse>>>;
+  readonly DataState = DataState;
+  private dataSubjects = new BehaviorSubject<CustomResponse<StoreHouse>>(null);
   private isLoading = new BehaviorSubject<boolean>(false);
   isLoading$ = this.isLoading.asObservable();
   modalTitle = 'Enregistrer un nouvel entrepot'
@@ -35,8 +42,7 @@ export class IndexEntrepotComponent implements OnInit {
   roleUser = aesUtil.decrypt(key, localStorage.getItem('userAccount').toString())
   role: string[] = []
   page: number = 1;
-  totalPages: number;
-  totalElements: number;
+  storeFilter = '';
   size: number = 10;
   constructor(private fb: FormBuilder, private modalService: NgbModal, private storeHouseService: StoreHouseService,
               private storeService: StoreService, private notifService: NotifsService, private router: Router,
@@ -75,46 +81,62 @@ export class IndexEntrepotComponent implements OnInit {
 
   //récupération de la liste des entrepots
   getStoreHouses(){
-    this.storeHouseService.getAllStoreHousesWithPagination(this.page-1, this.size).subscribe(
-      response => {
-        console.log(JSON.parse(aesUtil.decrypt(key,response.key.toString())))
-        this.storeHouses = JSON.parse(aesUtil.decrypt(key,response.key.toString())).content
-        this.storeHousesByStore = JSON.parse(aesUtil.decrypt(key,response.key.toString())).content.filter(sh => sh.store.internalReference === parseInt(aesUtil.decrypt(key, localStorage.getItem('store'))))
-        console.log(this.storeHousesByStore)
-        this.size = JSON.parse(aesUtil.decrypt(key,response.key.toString())).size
-        this.totalPages = JSON.parse(aesUtil.decrypt(key,response.key.toString())).totalPages
-        this.totalElements = JSON.parse(aesUtil.decrypt(key,response.key.toString())).totalElements
-        this.notifService.onSuccess('chargement des entrepots')
-      },
-      // error => {
-      //   this.notifService.onError(error.error.message, 'Erreur de chargement des magasins')
-      // }
-    )
+    this.storeFilter = this.role.includes('ROLE_SUPERADMIN') ? '' : localStorage.getItem('store');
+    this.appState$ = this.storeHouseService.storeHouse$(this.page - 1, this.size, this.storeFilter)
+      .pipe(
+        map(response => {
+          this.dataSubjects.next(JSON.parse(aesUtil.decrypt(key,response.key.toString())) as CustomResponse<StoreHouse>)
+          this.notifService.onSuccess('Chargement des entrepots')
+          return {dataState: DataState.LOADED_STATE, appData: JSON.parse(aesUtil.decrypt(key,response.key.toString())) as CustomResponse<StoreHouse>}
+        }),
+        startWith({dataState: DataState.LOADING_STATE, appData: null}),
+        catchError((error: string) => {
+          return of({dataState: DataState.ERROR_STATE, error: error})
+        })
+      )
   }
 
   //save store house
   saveStoreHouse(){
     this.isLoading.next(true);
-    this.store = this.stores.find(store => store.localization === this.storeHouseForm.controls['store'].value)
-    this.storeHouse2.idStore = aesUtil.encrypt(key, this.store.internalReference.toString())
+    // this.store = this.stores.find(store => store.localization === )
+    this.storeHouse2.idStore = aesUtil.encrypt(key, this.storeHouseForm.controls['store'].value.toString())
     this.storeHouse2.type = aesUtil.encrypt(key, this.storeHouseForm.controls['type'].value.toString())
     this.storeHouse2.name = aesUtil.encrypt(key, this.storeHouseForm.controls['name'].value.toString())
-    this.storeHouseService.createStoreHouse(this.storeHouse2).subscribe(
-      resp => {
-        /**
-         * je dois gérer cette partie
-         */
-        // this.storeHouses.push(resp)
-        this.annuler()
-        this.getStoreHouses()
-        this.isLoading.next(false);
-        this.notifService.onSuccess('enregistrement effectué')
-      },
-      error => {
-        this.isLoading.next(false);
-        // this.notifService.onError(error.error.message, 'Erreur lors de la création')
-      }
-    )
+    this.appState$ = this.storeHouseService.addStoreHouse$(this.storeHouse2)
+      .pipe(
+        map((response) => {
+          this.dataSubjects.next(
+            {...this.dataSubjects.value, content: [JSON.parse(aesUtil.decrypt(key,response.key.toString())), ...this.dataSubjects.value.content]}
+          )
+          this.annuler()
+          this.isLoading.next(false)
+          this.notifService.onSuccess("nouveau magasin ajouté!")
+          return {dataState: DataState.LOADED_STATE, appData: this.dataSubjects.value}
+        }),
+        startWith({dataState: DataState.LOADED_STATE, appData: this.dataSubjects.value}),
+        catchError((error: string) => {
+          this.isLoading.next(false)
+          return of({dataState: DataState.ERROR_STATE, error: error})
+        })
+      )
+
+    // this.storeHouseService.createStoreHouse(this.storeHouse2).subscribe(
+    //   resp => {
+    //     /**
+    //      * je dois gérer cette partie
+    //      */
+    //     // this.storeHouses.push(resp)
+    //     this.annuler()
+    //     this.getStoreHouses()
+    //     this.isLoading.next(false);
+    //     this.notifService.onSuccess('enregistrement effectué')
+    //   },
+    //   error => {
+    //     this.isLoading.next(false);
+    //     // this.notifService.onError(error.error.message, 'Erreur lors de la création')
+    //   }
+    // )
   }
 
   annuler() {
@@ -177,8 +199,7 @@ export class IndexEntrepotComponent implements OnInit {
 
   updateStoreHouse() {
     this.isLoading.next(true);
-    this.store = this.stores.find(store => store.localization === this.storeHouseForm.controls['store'].value)
-    console.log(this.store)
+    // this.store = this.stores.find(store => store.localization === )
     const updateStoreHouse = {
       "idStore" : 0,
       "type" : '',
@@ -186,32 +207,29 @@ export class IndexEntrepotComponent implements OnInit {
     }
     updateStoreHouse.type = aesUtil.encrypt(key, this.storeHouseForm.controls['type'].value.toString())
     updateStoreHouse.name = aesUtil.encrypt(key, this.storeHouseForm.controls['name'].value.toString())
-    updateStoreHouse.idStore = aesUtil.encrypt(key, this.store.internalReference.toString())
+    updateStoreHouse.idStore = aesUtil.encrypt(key, this.storeHouseForm.controls['store'].value.toString())
+    let rout = aesUtil.encrypt(key, this.storeHouse.internalReference.toString())
+    while (rout.includes('/')) {
+      rout = aesUtil.encrypt(key, this.storeHouse.internalReference.toString())
+    }
+    this.appState$ = this.storeHouseService.updateStoreHouse$(updateStoreHouse, rout as number)
+      .pipe(
+        map(response => {
+          const index = this.dataSubjects.value.content.findIndex(client => client.internalReference === JSON.parse(aesUtil.decrypt(key,response.key.toString())).internalReference)
+          this.dataSubjects.value.content[index] = JSON.parse(aesUtil.decrypt(key,response.key.toString()))
+          this.isLoading.next(false)
+          this.notifService.onSuccess("entrepot modifié avec succès!")
+          this.annuler()
+          return {dataState: DataState.LOADED_STATE, appData: this.dataSubjects.value}
+        }),
+        startWith({dataState: DataState.LOADED_STATE, appData: this.dataSubjects.value}),
+        catchError((error: string) => {
+          this.isLoading.next(false)
+          return of({dataState: DataState.ERROR_STATE, error: error})
+        })
+      )
 
-    this.storeHouseService.updateStoreHouse(updateStoreHouse, aesUtil.encrypt(key, this.storeHouse.internalReference.toString())).subscribe(
-      res => {
-        this.isLoading.next(false);
-        // on recherche l'index du client dont on veut faire la modification dans liste des clients
-        const index = this.storeHouses.findIndex(storeHouse => storeHouse.internalReference === JSON.parse(aesUtil.decrypt(key,res.key.toString())).internalReference);
-        // this.storeHouses[ index ] = resp;
-        this.storeHouses[ index ].internalReference = JSON.parse(aesUtil.decrypt(key,res.key.toString())).internalReference;
-        this.storeHouses[ index ].localisationStore = JSON.parse(aesUtil.decrypt(key,res.key.toString())).localisationStore;
-        this.storeHouses[ index ].name = JSON.parse(aesUtil.decrypt(key,res.key.toString())).name;
-        this.storeHouses[ index ].updateAt = JSON.parse(aesUtil.decrypt(key,res.key.toString())).updateAt;
-        this.getStoreHouses()
-        this.notifService.onSuccess("entrepot modifié avec succès!")
-        this.modalTitle = 'Enregistrer un nouvel entrepot'
-        this.annuler()
-      },
-      error => {
-        this.isLoading.next(false);
-        // if (error.error.message.includes('JWT expired')){
-        //
-        // }else {
-        //   this.notifService.onError(error.error.message, '')
-        // }
-      }
-    )
+
   }
 
   showDetails(storeHouse: StoreHouse) {
@@ -228,6 +246,16 @@ export class IndexEntrepotComponent implements OnInit {
 
   pageChange(event: number){
     this.page = event
-    this.getStores()
+    this.appState$ = this.storeHouseService.storeHouse$(this.page - 1, this.size)
+      .pipe(
+        map(response => {
+          this.dataSubjects.next(JSON.parse(aesUtil.decrypt(key,response.key.toString())) as CustomResponse<StoreHouse>)
+          return {dataState: DataState.LOADED_STATE, appData: JSON.parse(aesUtil.decrypt(key,response.key.toString())) as CustomResponse<StoreHouse>}
+        }),
+        startWith({dataState: DataState.LOADING_STATE, appData: null}),
+        catchError((error: string) => {
+          return of({dataState: DataState.ERROR_STATE, error: error})
+        })
+      )
   }
 }

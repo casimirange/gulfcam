@@ -262,7 +262,8 @@
                   commande</a></li>
                 <!--          <li class="nav-item"><a data-toggle="tab" href="#tab-eg10-2" class="nav-link">Etats de la commande</a></li>-->
                 <li class="nav-item"><a data-toggle="tab" href="#tab-eg10-3" class="nav-link"
-                                        *ngIf="statut == 'IN_PROCESS_OF_DELIVERY' && (roleUser == 'MANAGER_SPACES_2' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))">Attribution coupon</a></li>
+                                        *ngIf="statut == 'IN_PROCESS_OF_DELIVERY' && (roleUser == 'MANAGER_SPACES_2' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))">
+                  Affecter des carnets à la commande</a></li>
                 <!--          <li class="nav-item"><a data-toggle="tab" href="#tab-eg10-3" class="nav-link">Caisse/Trésorerie</a></li>-->
               </ul>
               <div class="tab-content">
@@ -295,8 +296,8 @@
                   </table>
                 </div>
                 <div class="tab-pane" id="tab-eg10-3" role="tabpanel" *ngIf="statut == 'IN_PROCESS_OF_DELIVERY' && (roleUser == 'MANAGER_SPACES_2' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))">
-                  <p>Pour rajouter un carnet, veuillez rajouter un de ses coupons, le système sélectionnera
-                    automatiquement tous les coupons du dit carnet</p>
+                  <p>Pour rajouter un carnet, <strong> veuillez rajouter un coupon contenu dans ce dernier</strong>, le système sélectionnera
+                    automatiquement tous les coupons du dit carnet.</p>
                   <div class="modal-body">
                     <div class="">
                       <div class="">
@@ -353,11 +354,9 @@
                               </table>
                               <div class="text-center">
                                 <p *ngIf="listVouchers.length === 0" style="color: grey; font-size: 0.9rem;"
-                                   class="mx-auto">Ajouter
-                                  des
-                                  coupons </p>
+                                   class="mx-auto">Ajouter des coupons </p>
                               </div>
-                              <div class="card-subtitle float-right">Total: {{listVouchers.length}} coupon(s)</div>
+                              <div class="card-subtitle float-right">Total: {{listVouchers.length}} carnet(s)</div>
                             </div>
                           </div>
 

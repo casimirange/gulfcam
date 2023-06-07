@@ -5,6 +5,7 @@ import {SharedModule} from "../shared/shared.module";
 import {TypeBonComponent} from "./type-bon.component";
 import {ReactiveFormsModule} from "@angular/forms";
 import {ClientModule} from "../client/client.module";
+import {NgxPaginationModule} from "ngx-pagination";
 
 
 
@@ -17,7 +18,8 @@ import {ClientModule} from "../client/client.module";
         TypeBonRoutingModule,
         SharedModule,
         ReactiveFormsModule,
-        ClientModule
+        ClientModule,
+        NgxPaginationModule
     ]
 })
 export class TypeBonModule { }

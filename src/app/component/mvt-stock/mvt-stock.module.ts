@@ -7,6 +7,7 @@ import {SharedModule} from "../shared/shared.module";
 import {IndexMvtStockComponent} from "./index-mvt-stock/index-mvt-stock.component";
 import {MvtStockLayoutComponent} from "./mvt-stock-layout/mvt-stock-layout.component";
 import {ClientModule} from "../client/client.module";
+import {NgxPaginationModule} from "ngx-pagination";
 
 
 @NgModule({
@@ -19,7 +20,8 @@ import {ClientModule} from "../client/client.module";
         MvtStockRoutingModule,
         ReactiveFormsModule,
         SharedModule,
-        ClientModule
+        ClientModule,
+        NgxPaginationModule
     ]
 })
 export class MvtStockModule { }

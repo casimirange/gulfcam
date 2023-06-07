@@ -152,32 +152,12 @@ export class DetailsEntrepotComponent implements OnInit {
 
   pageChangeCarnet(event: number){
     this.page1 = event
-    this.carnetState$ = this.carnetService.carnetsByStoreHouse$(aesUtil.encrypt(key, this.storeHouse.internalReference.toString()),this.page1 - 1, this.size)
-      .pipe(
-        map(response => {
-          this.datacarnetSubjects.next(JSON.parse(aesUtil.decrypt(key,response.key.toString())))
-          return {dataState: DataState.LOADED_STATE, appData: JSON.parse(aesUtil.decrypt(key,response.key.toString()))}
-        }),
-        startWith({dataState: DataState.LOADING_STATE, appData: null}),
-        catchError((error: string) => {
-          return of({dataState: DataState.ERROR_STATE, error: error})
-        })
-      )
+    this.getCarnetsByStoreHouse()
   }
 
   pageChangeCarton(event: number){
     this.page = event
-    this.cartonState$ = this.cartonService.cartonsByStoreHouse$(aesUtil.encrypt(key, this.storeHouse.internalReference.toString()),this.page - 1, this.size)
-      .pipe(
-        map(response => {
-          this.datacartonSubjects.next(JSON.parse(aesUtil.decrypt(key,response.key.toString())))
-          return {dataState: DataState.LOADED_STATE, appData: JSON.parse(aesUtil.decrypt(key,response.key.toString()))}
-        }),
-        startWith({dataState: DataState.LOADING_STATE, appData: null}),
-        catchError((error: string) => {
-          return of({dataState: DataState.ERROR_STATE, error: error})
-        })
-      )
+    this.getCartonsByStoreHouse()
   }
 
   padWithZero(num, targetLength) {

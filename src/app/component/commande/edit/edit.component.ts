@@ -553,16 +553,16 @@ export class EditComponent implements OnInit {
 
   addCoupon() {
     let str = parseInt(this.addCouponClientForm.controls['coupon'].value).toString();
-    let rout = aesUtil.encrypt(key, this.addCouponClientForm.controls['coupon'].value.toString())
+    let rout = aesUtil.encrypt(key, str.toString())
     while (rout.includes('/')){
-      rout = aesUtil.encrypt(key, this.addCouponClientForm.controls['coupon'].value.toString())
+      rout = aesUtil.encrypt(key, str.toString())
     }
     this.couponService.getCouponsBySerialNumber(rout.toString()).subscribe(
       res => {
         if (JSON.parse(aesUtil.decrypt(key,res.key.toString())).status.name !== 'AVAILABLE') {
           this.notifsService.onWarning('Ce coupon n\'une plus dans notre espace de stockage')
         } else {
-          this.listVouchers.push(this.addCouponClientForm.controls['coupon'].value)
+          this.listVouchers.push(+str)
           this.addCouponClientForm.controls['coupon'].reset()
         }
       }, error => {
