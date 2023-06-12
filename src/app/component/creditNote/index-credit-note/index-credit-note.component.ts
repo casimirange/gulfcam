@@ -35,7 +35,7 @@ import {aesUtil, key} from "../../../_helpers/aes.js";
   templateUrl: './index-credit-note.component.html',
   styleUrls: ['./index-credit-note.component.css']
 })
-export class IndexCreditNoteComponent implements OnInit, OnDestroy {
+export class IndexCreditNoteComponent implements OnInit {
 
   creditForm: FormGroup;
   stores: Store[] = [];
@@ -50,7 +50,10 @@ export class IndexCreditNoteComponent implements OnInit, OnDestroy {
   clients: Client[]
   stations: Station[]
   vouchers: any[] = []
+  voucher2: any[] = []
   appState$: Observable<AppState<CustomResponse<CreditNote>>>;
+  appStateStation$: Observable<AppState<CustomResponse<Station>>>;
+  appStateCoupon$: Observable<AppState<CustomResponse<Coupon>>>;
   readonly DataState = DataState;
   private dataSubjects = new BehaviorSubject<CustomResponse<CreditNote>>(null);
   private isLoading = new BehaviorSubject<boolean>(false);
@@ -83,14 +86,6 @@ export class IndexCreditNoteComponent implements OnInit, OnDestroy {
     // this.getCouponByStation()
   }
 
-  ngOnDestroy(): void {
-    // this.creditNoteService.saveCreditNote(this.creditNote).subscribe().unsubscribe();
-    // this.creditNoteService.getCreditNote(this.page - 1, this.size).subscribe().unsubscribe();
-    // this.stationService.getStations().subscribe().unsubscribe();
-    // this.creditNoteService.validCreditNote(0).subscribe().unsubscribe();
-    // this.couponService.getCouponsBySerialNumber("str").subscribe().unsubscribe();
-  }
-
   //initialisation du formulaire de création type de bon
   formStore() {
     this.creditForm = this.fb.group({
@@ -107,7 +102,8 @@ export class IndexCreditNoteComponent implements OnInit, OnDestroy {
 
   createCreditNote() {
     this.creditNote.idStation = aesUtil.encrypt(key, this.creditForm.controls['idStation'].value.toString())
-    this.creditNote.serialCoupons = this.vouchers
+    this.vouchers.forEach(v => this.voucher2.push(""+aesUtil.encrypt(key, v.toString()) as string))
+    this.creditNote.serialCoupons = this.voucher2
     this.isLoading.next(true);
     this.creditNoteService.saveCreditNote(this.creditNote).subscribe(
       resp => {
@@ -157,11 +153,21 @@ export class IndexCreditNoteComponent implements OnInit, OnDestroy {
   }
 
   getStations() {
-    this.stationService.getStations().subscribe(
-      resp => {
-        this.stations = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content
-      },
-    )
+    this.appStateStation$ = this.stationService.filterStation$(this.statutFilter, this.stationName, this.internalRef, this.dateFilter, this.page - 1, 300000)
+      .pipe(
+        map(response => {
+          return {dataState: DataState.LOADED_STATE, appData: JSON.parse(aesUtil.decrypt(key,response.key.toString()))}
+        }),
+        startWith({dataState: DataState.LOADING_STATE, appData: null}),
+        catchError((error: string) => {
+          return of({dataState: DataState.ERROR_STATE, error: error})
+        })
+      )
+    // this.stationService.getStations().subscribe(
+    //   resp => {
+    //     this.stations = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content
+    //   },
+    // )
   }
 
   annuler() {
@@ -193,7 +199,7 @@ export class IndexCreditNoteComponent implements OnInit, OnDestroy {
     this.isLoading.next(true);
     this.creditNoteService.validCreditNote(internalRef).subscribe(
       resp => {
-        console.log(resp)
+        // console.log(resp)
         const index = this.creditNotes.findIndex(req => req.internalReference === resp.internalReference);
         this.creditNotes[index] = resp;
         this.isLoading.next(false);
@@ -230,7 +236,7 @@ export class IndexCreditNoteComponent implements OnInit, OnDestroy {
   }
 
   updateStoreModal(mymodal: TemplateRef<any>, store: CreditNote) {
-    console.log(store)
+    // console.log(store)
     this.modalService.open(mymodal, {ariaLabelledBy: 'modal-basic-title', size: 'lg'});
     this.creditNote = store
     for (let coupon of store.coupon) {
@@ -241,7 +247,7 @@ export class IndexCreditNoteComponent implements OnInit, OnDestroy {
 
   updateRequest() {
     this.isLoading.next(true);
-    console.log(this.creditForm.controls['localization'].value)
+    // console.log(this.creditForm.controls['localization'].value)
     // this.storeService.updateStore(this.creditForm.value, this.store.internalReference).subscribe(
     //   resp => {
     //     this.isLoading.next(false);
@@ -282,26 +288,38 @@ export class IndexCreditNoteComponent implements OnInit, OnDestroy {
   }
 
   addCoupons(str: string) {
-    this.vouchers.push(aesUtil.encrypt(key, str));
+    this.vouchers.push(str);
   }
 
   getCouponByStation() {
+    this.selectedStation = true
     let stationId = this.creditForm.controls['idStation'].value
     let rout = aesUtil.encrypt(key, stationId.toString())
-    while (rout.includes('/')){
+    while (rout.includes('/') || rout.includes(' ')){
       rout = aesUtil.encrypt(key, stationId.toString())
     }
     // console.log(stationId)
     this.vouchers = []
     this.couponsFiltered = []
     if (stationId != 0) {
-      this.couponService.getCouponsByStation(rout, 0, 13000000).subscribe(
-        resp => {
-          this.selectedStation = true
-          this.coupons = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content
-          this.couponsFiltered = this.coupons.filter(cp => cp.idCreditNote == null);
-        },
-      )
+      this.appStateCoupon$ = this.couponService.couponByStationNotCreditNote$(rout , this.page - 1, 200)
+        .pipe(
+          map(response => {
+            // console.log(JSON.parse(aesUtil.decrypt(key,response.key.toString())))
+            return {dataState: DataState.LOADED_STATE, appData: JSON.parse(aesUtil.decrypt(key,response.key.toString()))}
+          }),
+          startWith({dataState: DataState.LOADING_STATE, appData: null}),
+          catchError((error: string) => {
+            return of({dataState: DataState.ERROR_STATE, error: error})
+          })
+        )
+      // this.couponService.getCouponsByStation(rout, 0, 13000000).subscribe(
+      //   resp => {
+      //     this.selectedStation = true
+      //     this.coupons = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content
+      //     this.couponsFiltered = this.coupons.filter(cp => cp.idCreditNote == null);
+      //   },
+      // )
     }
   }
 
@@ -313,8 +331,7 @@ export class IndexCreditNoteComponent implements OnInit, OnDestroy {
 
 
   removeCoupons(coupon: string) {
-    // console.log(this.vouchers.indexOf(+coupon))
-    const prodIndex = this.vouchers.indexOf(+coupon)
+    const prodIndex = this.vouchers.indexOf(coupon)
     this.vouchers.splice(prodIndex, 1)
   }
 
@@ -324,7 +341,7 @@ export class IndexCreditNoteComponent implements OnInit, OnDestroy {
 
   creditNoteDetails(note: CreditNote) {
     let rout = aesUtil.encrypt(key, note.internalReference.toString())
-    while (rout.includes('/')){
+    while (rout.includes('/') || rout.includes(' ')){
       rout = aesUtil.encrypt(key, note.internalReference.toString())
     }
     this.router.navigate(['/credit-note/details', rout])

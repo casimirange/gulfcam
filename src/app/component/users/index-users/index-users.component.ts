@@ -60,8 +60,9 @@ export class IndexUsersComponent implements OnInit {
     this.appState$ = this.userService.users$(this.nameFilter, this.lastNameFilter, this.accountFilter, this.statusFilter, this.storeFilter, this.page - 1, this.size)
       .pipe(
         map(response => {
+          // console.log(response)
+          // console.log(response.key)
           // console.log(JSON.parse(aesUtil.decrypt(key,response.key.toString())))
-          // console.log(aesUtil.decrypt(key, response.toString()) as Observable<CustomResponse<ISignup>>)
           this.dataSubjects.next(JSON.parse(aesUtil.decrypt(key,response.key.toString())))
           // this.notifsService.onSuccess('chargement des utilisateurs')
           return {dataState: DataState.LOADED_STATE, appData: JSON.parse(aesUtil.decrypt(key,response.key.toString()))}

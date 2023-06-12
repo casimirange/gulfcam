@@ -210,6 +210,10 @@ export class IndexCommandComponent implements OnInit {
   }
 
   getOrders() {
+    // let rout = aesUtil.encrypt(key, id.toString())
+    // while (rout.includes('/')){
+    //   rout = aesUtil.encrypt(key, id.toString())
+    // }
     this.orderState$ = this.orderService.filterOrders$(
       this.storeFilter, this.clientName, this.date, this.internalRef, this.statusFilter,
       this.page - 1, this.size)
@@ -292,7 +296,7 @@ export class IndexCommandComponent implements OnInit {
     this.order.tax = aesUtil.encrypt(key, this.global.tax.toString()) as number;
     this.order.ttcaggregateAmount = aesUtil.encrypt(key, this.totalTTC.toString()) as number;
     this.order.netAggregateAmount = aesUtil.encrypt(key,  this.totalOrder.toString()) as number;
-    console.log(this.order)
+    // console.log(this.order)
     if (this.client.completeName) {
       this.orderState$ = this.orderService.addOrder$(this.order)
         .pipe(

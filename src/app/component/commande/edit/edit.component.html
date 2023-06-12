@@ -66,11 +66,11 @@
                       </option>
                       <option *ngIf="statut == 'CLOSED' " value="bonCommand">Preuve de Bon de Livraison</option>
                       <option
-                        *ngIf="statut != 'CREATED' && (roleUser == 'SALES_MANAGER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))"
+                        *ngIf="statut != 'CREATED'  && statut != 'CANCELED' && (roleUser == 'SALES_MANAGER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))"
                         value="preuve">Preuve de paiement
                       </option>
                       <option
-                        *ngIf="statut != 'CREATED' && (roleUser == 'TREASURY' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))"
+                        *ngIf="statut != 'CREATED' && statut != 'CANCELED' && (roleUser == 'TREASURY' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))"
                         value="reçu">Reçu de paiement
                       </option>
 
@@ -79,7 +79,7 @@
                 </div>
                 <div class="float-right">
                   <button class="btn btn-outline-danger btn-lg mr-3"
-                          *ngIf="statut != 'ORDER_CANCEL' && statut != 'CLOSED' && (roleUser == 'COMMERCIAL_ATTACHE' || roleUser == 'SALES_MANAGER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))"
+                          *ngIf="statut != 'CANCELED' && statut != 'CLOSED' && (roleUser == 'COMMERCIAL_ATTACHE' || roleUser == 'SALES_MANAGER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))"
                           (click)="deny(order)" [disabled]="isCanceling$ | async">
                     <i *ngIf="isCanceling$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
                     <span *ngIf="isCanceling$ | async">Annulation ...</span>

@@ -9,6 +9,7 @@ import {ReactiveFormsModule} from "@angular/forms";
 import { DetailsEntrepotComponent } from './details-entrepot/details-entrepot.component';
 import {NgxPaginationModule} from "ngx-pagination";
 import {ClientModule} from "../client/client.module";
+import { ItemsComponent } from './items/items.component';
 // import {AppModule} from "../../app.module";
 
 
@@ -17,6 +18,7 @@ import {ClientModule} from "../client/client.module";
     EntrepotLayoutComponent,
     IndexEntrepotComponent,
     DetailsEntrepotComponent,
+    ItemsComponent,
   ],
   imports: [
     CommonModule,

@@ -56,7 +56,7 @@
               </thead>
               <!--                <tbody *ngFor="let client of clients | clientNameFilter: name | clientRefFilter: internalRef | clientCompagnyFilter: compagny-->
               <!--                 | clientDateFilter: date | paginate: { id: 'client', itemsPerPage: size, currentPage: page, totalItems: totalElements } ; let i = index">-->
-              <tbody *ngFor="let storeHouse of appState.appData.content | paginate: { id: 'magasin', itemsPerPage: appState.appData.size, currentPage: page, totalItems: appState.appData.totalElements } ; let i = index">
+              <tbody *ngFor="let storeHouse of appState.appData.content | paginate: { id: 'entrepot', itemsPerPage: appState.appData.size, currentPage: page, totalItems: appState.appData.totalElements } ; let i = index">
 
               <tr>
                 <td>{{i + 1}}</td>

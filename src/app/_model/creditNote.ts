@@ -12,5 +12,5 @@ export class CreditNote{
   status?:	Status
   createdAt?:	string
   updateAt?:	string
-  serialCoupons: any[]
+  serialCoupons: string[]
 }

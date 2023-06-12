@@ -16,7 +16,7 @@ export class StatusOrderService {
         break;
       case 'PAID': this.status = 'PAYEE'
         break;
-      case 'ORDER_CANCEL': this.status = 'ANNULEE'
+      case 'CANCELED': this.status = 'ANNULEE'
         break;
       case 'ACCEPTED': this.status = 'ACCEPTEE'
         break;

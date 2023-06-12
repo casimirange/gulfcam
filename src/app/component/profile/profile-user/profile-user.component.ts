@@ -43,8 +43,8 @@ export class ProfileUserComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log(aesUtil.decrypt(key, localStorage.getItem('id').toString()))
-    this.id = aesUtil.encrypt(key, (aesUtil.decrypt(key, this.route.snapshot.paramMap.get('id').toString()) as string));
+    // console.log(aesUtil.decrypt(key, localStorage.getItem('id').toString()))
+    this.id = this.route.snapshot.paramMap.get('id');
     this.getUser()
   }
 
@@ -53,7 +53,7 @@ export class ProfileUserComponent implements OnInit {
 
     this.userService.getUser(this.id).subscribe(
       resp => {
-        console.log(JSON.parse(aesUtil.decrypt(key,resp.key.toString())))
+        // console.log(JSON.parse(aesUtil.decrypt(key,resp.key.toString())))
         this.user = JSON.parse(aesUtil.decrypt(key,resp.key.toString()))
 
       },
@@ -73,12 +73,12 @@ export class ProfileUserComponent implements OnInit {
     body.oldPassword = aesUtil.encrypt(key, this.changePwd.controls['oldpassword'].value);
     body.password = aesUtil.encrypt(key, this.changePwd.controls['password'].value);
     const id = aesUtil.encrypt(key, (aesUtil.decrypt(key, this.route.snapshot.paramMap.get('id').toString()) as string));
-    console.log(id)
-    console.log(body)
+    // console.log(id)
+    // console.log(body)
 
     this.userService.changePassword(this.id, body).subscribe(
       resp => {
-        console.log(resp)
+        // console.log(resp)
         this.isLoading.next(false);
         localStorage.removeItem('bearerToken')
         this.notifsService.onSuccess('mot de passe modifié')

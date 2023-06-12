@@ -256,7 +256,7 @@ export class DetailsStationComponent implements OnInit {
     body.modulo = aesUtil.encrypt(key, modulo.toString()) as number
     // body.idStation = this.couponForm.controls['idStation'].value
     // body.productionDate = new Date().toLocaleString().toString()
-    console.log(body)
+    // console.log(body)
     this.isLoading.next(true);
     this.couponService.acceptCoupon(this.coupon.serialNumber, body).subscribe(
       resp => {

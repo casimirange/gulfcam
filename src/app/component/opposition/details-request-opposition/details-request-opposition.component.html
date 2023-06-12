@@ -1,4 +1,13 @@
-
+<ng-container class="bg-white" *ngIf="(appState$ | async) as appState" [ngSwitch]="appState.dataState">
+  <ng-container class="bg-white" *ngSwitchCase="DataState.LOADING_STATE">
+    <div class="col-md-12 text-center my-3">
+      <!--                <div class="spinner-border text-primary my-3" role="status"></div>-->
+      <div class="ball-clip-rotate">
+        <div style="background-color: rgb(68, 64, 84);"></div>
+      </div>
+    </div>
+  </ng-container>
+  <ng-container class="bg-white py-1 px-1" *ngSwitchCase="DataState.LOADED_STATE">
 <div class="app-page-title" *ngIf="roleUser === 'SALES_MANAGER' || roleUser === 'COMMERCIAL_ATTACHE' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
   <div class="page-title-wrapper">
     <div class="page-title-heading">
@@ -6,8 +15,8 @@
         <i class="pe-7s-close-circle icon-gradient bg-danger">
         </i>
       </div>
-      <div>Demande N° {{request.internalReference}}
-        <div class="page-title-subheading">Description :{{request.description}}&nbsp;</div>
+      <div>Demande d'opposition N° {{appState.appData.internalReference}}
+        <div class="page-title-subheading">Description :{{appState.appData.description}}&nbsp;</div>
       </div>
     </div>
     <div class="page-title-actions">
@@ -21,7 +30,24 @@
     </div>
   </div>
 </div>
+  </ng-container>
+  <ng-container class="bg-white"  *ngSwitchCase="DataState.ERROR_STATE">
+    <div class="col-md-12 text-center">
+      <div class="text-danger" >{{appState.error}}</div>
+    </div>
+  </ng-container>
+</ng-container>
 
+<ng-container class="bg-white" *ngIf="(appStateTicket$ | async) as appStateTicket" [ngSwitch]="appStateTicket.dataState">
+  <ng-container class="bg-white" *ngSwitchCase="DataState.LOADING_STATE">
+    <div class="col-md-12 text-center my-3">
+      <!--                <div class="spinner-border text-primary my-3" role="status"></div>-->
+      <div class="ball-clip-rotate">
+        <div style="background-color: rgb(68, 64, 84);"></div>
+      </div>
+    </div>
+  </ng-container>
+  <ng-container class="bg-white py-1 px-1" *ngSwitchCase="DataState.LOADED_STATE">
 <div class="row" *ngIf="roleUser === 'SALES_MANAGER' || roleUser === 'COMMERCIAL_ATTACHE' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
   <div class="col-md-12">
     <div class="main-card mb-3 card">
@@ -58,7 +84,7 @@
                 <th>Date</th>
               </tr>
               </thead>
-              <tbody *ngFor="let ticket of tickets | paginate: { id: 'ticket', itemsPerPage: size, currentPage: page, totalItems: totalElements } ; let i = index">
+              <tbody *ngFor="let ticket of appStateTicket.appData.content | paginate: { id: 'ticket', itemsPerPage: size, currentPage: page, totalItems: appStateTicket.appData.totalElements } ; let i = index">
 
               <tr>
                 <td>{{i + 1}}</td>
@@ -73,7 +99,7 @@
               </tbody>
             </table>
             <div class="text-center">
-              <p *ngIf="tickets.length === 0" style="color: grey; font-size: 1.8rem;" class="mx-auto" >Aucun Ticket trouvé !</p>
+              <p *ngIf="appStateTicket.appData.totalElements === 0" style="color: grey; font-size: 1.8rem;" class="mx-auto" >Aucun Ticket trouvé !</p>
             </div>
           </ng-container>
         </ng-container>
@@ -81,7 +107,7 @@
       <div class="card-footer">
         <div class="btn-actions-pane-left">
           <div role="group" class="btn-group-sm btn-group">
-            Total: <b>{{ tickets.length }} </b>
+            Total: <b>{{ appStateTicket.appData.totalElements}} </b>
           </div>
         </div>
         <div class="btn-actions-pane-right">
@@ -98,4 +124,11 @@
     </div>
   </div>
 </div>
+  </ng-container>
+  <ng-container class="bg-white"  *ngSwitchCase="DataState.ERROR_STATE">
+    <div class="col-md-12 text-center">
+      <div class="text-danger" >{{appStateTicket.error}}</div>
+    </div>
+  </ng-container>
+</ng-container>
 

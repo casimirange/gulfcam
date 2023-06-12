@@ -66,39 +66,7 @@ export class LoginComponent implements OnInit {
 
     this.credentials.login = aesUtil.encrypt(key, this.loginForm.controls['username'].value).toString();
     this.credentials.password = aesUtil.encrypt(key, this.loginForm.controls['password'].value).toString();
-    // this.credentials.login = CryptoJS.enc.Hex.parse(this.loginForm.controls['username'].value).toString(CryptoJS.enc.Hex);
-    // this.credentials.password = CryptoJS.enc.Hex.parse(this.loginForm.controls['password'].value).toString(CryptoJS.enc.Hex);
 
-    // console.log(this.credentials)
-    // this.appState$ = this.authService.login$(this.credentials)
-    //   .pipe(
-    //     map((response) => {
-    //       console.log('la reponse', response.access_token)
-    //       this.tokenService.saveToken(response.access_token);
-    //           // this.tokenService.saveAuthorities(data.roles);
-    //           // this.tokenService.saveUsername(data.username);
-    //           this.isLoginFailed = false;
-    //           this.isLoggedIn = true;
-    //       this.dataSubject.next(
-    //           {
-    //             ...response, data: { logins: [response.data.login, ...this.dataSubject.value.data.logins]}
-    //           }
-    //         );
-    //       this.isLoading.next(false);
-    //       return {dataState: DataState.LOADED_STATE, appData: this.dataSubject.value};
-    //     }),
-    //     startWith({dataState: DataState.LOADING_STATE, appData: null}),
-    //     catchError((error => {
-    //       // this.notificationService.onError(error);
-    //       this.isLoading.next(false);
-    //       // this.errorMessage = error.error.message.toString();
-    //       console.error("message d'erreur", error.message)
-    //       // console.log("message d'erreur1", this.errorMessage);
-    //       return of({dataState: DataState.ERROR_STATE, error: error});
-    //     }))
-    //   );
-    // this.credentials.login = this.loginForm.controls['username'].value;
-    // this.credentials.password = this.loginForm.controls['password'].value;
     this.authService.login(this.credentials).subscribe(
       (response) => {
         this.tokenService.saveToken(JSON.parse(aesUtil.decrypt(key,response.key.toString())) as IToken);

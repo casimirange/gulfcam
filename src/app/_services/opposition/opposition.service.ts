@@ -39,6 +39,10 @@ export class OppositionService {
     this.http.get<any>(environment.requestOpposition + `/filter?page=${page}&size=${size}&client=${client}&date=${date}&status=${statut}&commercialAttach=${commAttach}&salemanager=${saleManager}`,)
       .pipe(catchError(this.handleError));
 
+  requestByInternalRef$ = (internalRef: string) => <Observable<any>>
+    this.http.get<any>(environment.requestOpposition + `/${internalRef}`,)
+      .pipe(catchError(this.handleError));
+
   saveRequest$ = (requestOpposition: RequestOpposition) => <Observable<RequestOpposition>>
     this.http.post<RequestOpposition>(environment.requestOpposition, requestOpposition)
       .pipe(catchError(this.handleError));

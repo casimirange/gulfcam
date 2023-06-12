@@ -6,11 +6,16 @@ import {OppositionService} from "../../../_services/opposition/opposition.servic
 import {Ticket} from "../../../_model/ticket";
 import {TicketService} from "../../../_services/ticket/ticket.service";
 import {StatusService} from "../../../_services/status/status.service";
-import {BehaviorSubject} from "rxjs";
+import {BehaviorSubject, Observable, of} from "rxjs";
 import {Location} from "@angular/common";
 import {CouponService} from "../../../_services/coupons/coupon.service";
 import {Coupon} from "../../../_model/coupon";
 import {aesUtil, key} from "../../../_helpers/aes.js";
+import {AppState} from "../../../_interfaces/app-state";
+import {ISignup} from "../../../_model/signup";
+import {DataState} from "../../../_enum/data.state.enum";
+import {catchError, map, startWith} from "rxjs/operators";
+import {CustomResponse} from "../../../_interfaces/custom-response";
 
 @Component({
   selector: 'app-details-request-opposition',
@@ -24,6 +29,9 @@ export class DetailsRequestOppositionComponent implements OnInit {
   coupons: Coupon[] = [];
   roleUser = aesUtil.decrypt(key, localStorage.getItem('userAccount').toString());
   role: string[] = [];
+  appState$: Observable<AppState<RequestOpposition>>;
+  appStateTicket$: Observable<AppState<CustomResponse<Ticket>>>;
+  readonly DataState = DataState;
   private isLoading = new BehaviorSubject<boolean>(false);
   isLoading$ = this.isLoading.asObservable();
   page: number = 1;
@@ -48,30 +56,51 @@ export class DetailsRequestOppositionComponent implements OnInit {
 
   getRequestInfos() {
     this.activatedRoute.params.subscribe(params => {
-      this.requestService.getRequestByInternalRef(params['id'] as string).subscribe(
-        res => {
-
-          console.log(JSON.parse(aesUtil.decrypt(key,res.key.toString())));
-          this.request = JSON.parse(aesUtil.decrypt(key,res.key.toString()));
-          this.statut = this.request.status.name
-        }
-      )
+      this.appState$ = this.requestService.requestByInternalRef$(params['id'].toString())
+        .pipe(
+          map(response => {
+            return {dataState: DataState.LOADED_STATE, appData: JSON.parse(aesUtil.decrypt(key,response.key.toString()))}
+          }),
+          startWith({dataState: DataState.LOADING_STATE, appData: null}),
+          catchError((error: string) => {
+            return of({dataState: DataState.ERROR_STATE, error: error})
+          })
+        )
+      // this.requestService.getRequestByInternalRef(params['id'] as string).subscribe(
+      //   res => {
+      //
+      //     // console.log(JSON.parse(aesUtil.decrypt(key,res.key.toString())));
+      //     this.request = JSON.parse(aesUtil.decrypt(key,res.key.toString()));
+      //     this.statut = this.request.status.name
+      //   }
+      // )
     })
   }
 
   getTicketsByRequestOpposition() {
     this.tickets = []
     this.activatedRoute.params.subscribe(params => {
-      this.ticketService.getTicketByRequestOpposition(params['id'] as number, this.page-1, this.size).subscribe(
-        resp => {
-          this.tickets = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content;
-          this.size = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).size
-          this.totalPages = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).totalPages
-          this.totalElements = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).totalElements
-          // this.getCoupons()
-          this.notifService.onSuccess('chargement des tickets')
-        }
-      )
+      this.appStateTicket$ = this.ticketService.getTicketByRequestOpposition$(params['id'].toString(), this.page-1, this.size)
+        .pipe(
+          map(response => {
+            this.notifService.onSuccess('chargement des tickets')
+            return {dataState: DataState.LOADED_STATE, appData: JSON.parse(aesUtil.decrypt(key,response.key.toString()))}
+          }),
+          startWith({dataState: DataState.LOADING_STATE, appData: null}),
+          catchError((error: string) => {
+            return of({dataState: DataState.ERROR_STATE, error: error})
+          })
+        )
+    //   this.ticketService.getTicketByRequestOpposition(params['id'] as number, this.page-1, this.size).subscribe(
+    //     resp => {
+    //       this.tickets = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content;
+    //       this.size = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).size
+    //       this.totalPages = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).totalPages
+    //       this.totalElements = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).totalElements
+    //       // this.getCoupons()
+    //       this.notifService.onSuccess('chargement des tickets')
+    //     }
+    //   )
     })
   }
 
@@ -80,7 +109,7 @@ export class DetailsRequestOppositionComponent implements OnInit {
     for (let ticket of this.tickets){
       this.couponService.getCouponByInternalRel(ticket.idCoupon).subscribe(
         res => {
-          console.log('coupon',res)
+          // console.log('coupon',res)
           this.coupons.push(res)
         }, error => {
           this.notifService.onError("Ce coupon n'existe pas", '')

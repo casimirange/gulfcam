@@ -192,7 +192,7 @@ export class IndexEntrepotComponent implements OnInit {
   updateStoreHouseModal(mymodal: TemplateRef<any>, storeHouse: StoreHouse) {
     this.modalService.open(mymodal, {ariaLabelledBy: 'modal-basic-title', size: 'lg'});
     this.storeHouse = storeHouse
-    console.log('magasin', this.stores.find(store => store.internalReference === storeHouse.idStore))
+    // console.log('magasin', this.stores.find(store => store.internalReference === storeHouse.idStore))
     // this.magasin = this.stores.find(store => store.internalReference === storeHouse.idStore).localization
     this.modalTitle = 'Modifier entrepot'
   }

@@ -24,6 +24,10 @@ export class UsersService {
     this.http.get<any>(environment.users + `/filter?page=${page}&size=${size}&firstName=${firstname}&lastName=${lastname}&typeAccount=${type}&status=${status}&store=${idStore}`,)
       .pipe(catchError(this.handleError));
 
+  user$ = (internalRef: string) => <Observable<any>>
+    this.http.get<any>(environment.users + `/${internalRef}`,)
+      .pipe(catchError(this.handleError));
+
   getAllUsersWithPagination(page: number, size: number): Observable<any>{
     return this.http.get<any>(environment.users+ `?page=${page}&size=${size}`)
   }

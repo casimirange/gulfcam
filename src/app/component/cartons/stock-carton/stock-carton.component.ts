@@ -103,8 +103,8 @@ export class StockCartonComponent implements OnInit {
     this.getStoreHouses();
     this.getStoreHousesAdmin();
     this.getCartons();
-    console.log(localStorage.getItem('uid').toString())
-    console.log(aesUtil.decrypt(key, localStorage.getItem('uid').toString()))
+    // console.log(localStorage.getItem('uid').toString())
+    // console.log(aesUtil.decrypt(key, localStorage.getItem('uid').toString()))
   }
 
   //formulaire de création
@@ -176,7 +176,7 @@ export class StockCartonComponent implements OnInit {
     this.carton.serialFrom = aesUtil.encrypt(key, this.cartonForm.controls['serialFrom'].value.toString()) as number
     this.carton.serialTo = aesUtil.encrypt(key, this.cartonForm.controls['serialTo'].value.toString()) as number
     this.carton.typeVoucher = aesUtil.encrypt(key, typ.amount.toString()) as number
-    console.log(this.carton)
+    // console.log(this.carton)
     this.cartonService.createCarton(this.carton).subscribe(
       resp => {
         this.isLoading.next(false);

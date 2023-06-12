@@ -63,8 +63,8 @@ export class StoreHouseService {
     this.http.get<any>(environment.storeHouse+`/${internalRef}`)
       .pipe(catchError(this.handleError));
 
-  storeHouseByStore$ = (internalRef: string) => <Observable<any>>
-    this.http.get<any>(environment.storeHouse+`/${internalRef}`)
+  storeHouseByStore$ = (internalRef: string, page?: number) => <Observable<any>>
+    this.http.get<any>(environment.storeHouse+`/store/${internalRef}?page=${page}`)
       .pipe(catchError(this.handleError));
 
   itemByStoreHouse$ = (internalRef: string) => <Observable<any>>

@@ -16,6 +16,13 @@ import {VoucherService} from "../../../_services/voucher/voucher.service";
 import Swal from "sweetalert2";
 import {StatusService} from "../../../_services/status/status.service";
 import {aesUtil, key} from "../../../_helpers/aes.js";
+import {BehaviorSubject, Observable, of} from "rxjs";
+import {AppState} from "../../../_interfaces/app-state";
+import {CustomResponse} from "../../../_interfaces/custom-response";
+import {Carnet} from "../../../_model/carnet";
+import {Carton} from "../../../_model/carton";
+import {DataState} from "../../../_enum/data.state.enum";
+import {catchError, map, startWith} from "rxjs/operators";
 export class Un{
   cp: number
   qtc: number
@@ -32,6 +39,13 @@ export class DetailsMagasinComponent implements OnInit {
   storeHouses: StoreHouse[] = [];
   roleUser = aesUtil.decrypt(key, localStorage.getItem('userAccount').toString())
   role: string[] = []
+  storeState$: Observable<AppState<Store>>;
+  storeHouseState$: Observable<AppState<CustomResponse<StoreHouse>>>;
+  readonly DataState = DataState;
+  private isLoading = new BehaviorSubject<boolean>(false);
+  isLoading$ = this.isLoading.asObservable();
+  page = 1;
+  size = 20;
   constructor(private activatedRoute: ActivatedRoute, private router: Router, private notifService: NotifsService, private storeService: StoreService,
               private storeHouseService: StoreHouseService, private _location: Location, private statusService: StatusService, ) {
     this.store = new Store()
@@ -48,9 +62,20 @@ export class DetailsMagasinComponent implements OnInit {
 
   getStoreInfos(){
     this.activatedRoute.params.subscribe(params => {
+      // this.storeState$ = this.storeHouseService.storeHouseByInternalRef$(params['id'].toString())
+      //   .pipe(
+      //     map(response => {
+      //       this.notifService.onSuccess('chargement des espaces de stockage du magasin')
+      //       return {dataState: DataState.LOADED_STATE, appData: JSON.parse(aesUtil.decrypt(key,response.key.toString()))}
+      //     }),
+      //     startWith({dataState: DataState.LOADING_STATE, appData: null}),
+      //     catchError((error: string) => {
+      //       return of({dataState: DataState.ERROR_STATE, error: error})
+      //     })
+      //   )
       this.storeService.getStoreByInternalref(params['id']).subscribe(
         res => {
-          console.log(JSON.parse(aesUtil.decrypt(key,res.key.toString())))
+          // console.log(JSON.parse(aesUtil.decrypt(key,res.key.toString())))
           this.store = JSON.parse(aesUtil.decrypt(key,res.key.toString()));
         }
       )
@@ -59,12 +84,24 @@ export class DetailsMagasinComponent implements OnInit {
 
   getStoreHousesByStore(){
     this.activatedRoute.params.subscribe(params => {
-      this.storeHouseService.getStoreHousesByStore(params['id']).subscribe(
-        res => {
-          this.storeHouses = JSON.parse(aesUtil.decrypt(key,res.key.toString())).content;
-          this.notifService.onSuccess('chargement des espaces de stockage du magasin')
-        }
-      )
+      this.storeHouseState$ = this.storeHouseService.storeHouseByStore$(params['id'].toString(), this.page -1)
+        .pipe(
+          map(response => {
+            this.notifService.onSuccess('chargement des espaces de stockage du magasin')
+            return {dataState: DataState.LOADED_STATE, appData: JSON.parse(aesUtil.decrypt(key,response.key.toString()))}
+          }),
+          startWith({dataState: DataState.LOADING_STATE, appData: null}),
+          catchError((error: string) => {
+            return of({dataState: DataState.ERROR_STATE, error: error})
+          })
+        )
+
+      // this.storeHouseService.getStoreHousesByStore(params['id']).subscribe(
+      //   res => {
+      //     this.storeHouses = JSON.parse(aesUtil.decrypt(key,res.key.toString())).content;
+      //     this.notifService.onSuccess('chargement des espaces de stockage du magasin')
+      //   }
+      // )
     })
   }
 
@@ -82,5 +119,10 @@ export class DetailsMagasinComponent implements OnInit {
       rout = aesUtil.encrypt(key, storeHouse.toString())
     }
     this.router.navigate(['/entrepots/details', rout])
+  }
+
+  pageChange(event: number){
+    this.page = event
+    this.getStoreHousesByStore()
   }
 }

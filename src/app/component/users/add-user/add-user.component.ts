@@ -62,7 +62,7 @@ export class AddUserComponent implements OnInit {
   getStores(){
     this.storeService.getStore().subscribe(
       resp => {
-        console.log(resp)
+        // console.log(resp)
         this.stores = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content
       },
       error => {
@@ -75,7 +75,7 @@ export class AddUserComponent implements OnInit {
   saveUser() {
     this.isLoading.next(true);
     this.credentials = this.signup.value;
-    console.log('user1', this.credentials)
+    // console.log('user1', this.credentials)
     this.credentials.email = aesUtil.encrypt(key, this.signup.controls['email'].value);
     this.credentials.typeAccount = aesUtil.encrypt(key, this.signup.controls['typeAccount'].value);
     this.credentials.telephone = aesUtil.encrypt(key, this.signup.controls['telephone'].value);
@@ -90,7 +90,7 @@ export class AddUserComponent implements OnInit {
     const store = this.stores.find(store => store.localization === this.signup.controls['idStore'].value)
     this.credentials.idStore = aesUtil.encrypt(key, store.internalReference.toString());
     // this.credentials.idStore = aesUtil.encrypt(key, '123456789');
-    console.log('user2', this.credentials)
+    // console.log('user2', this.credentials)
     this.authService.signup(this.credentials).subscribe(
       resp => {
         this.isLoading.next(false);

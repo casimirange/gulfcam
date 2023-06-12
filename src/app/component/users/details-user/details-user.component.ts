@@ -1,19 +1,23 @@
 import { Component, OnInit } from '@angular/core';
 import {OrderService} from "../../../_services/order/order.service";
 import {NotifsService} from "../../../_services/notifications/notifs.service";
-import {ActivatedRoute} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {UsersService} from "../../../_services/users/users.service";
 import {ICredentialsSignup, IRole, ISignup} from "../../../_model/signup";
 import {StoreService} from "../../../_services/store/store.service";
 import {Store} from "../../../_model/store";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {IToken} from "../../../_model/token";
-import {BehaviorSubject} from "rxjs";
+import {BehaviorSubject, Observable, of} from "rxjs";
 import {StatusAccountService} from "../../../_services/status/status-account.service";
 import {StatusUserService} from "../../../_services/status/status-user.service";
 import {RoleUserService} from "../../../_services/role/role-user.service";
 import {aesUtil, key} from "../../../_helpers/aes.js";
 import {Location} from "@angular/common";
+import {catchError, map, startWith} from "rxjs/operators";
+import {AppState} from "../../../_interfaces/app-state";
+import {CustomResponse} from "../../../_interfaces/custom-response";
+import {DataState} from "../../../_enum/data.state.enum";
 
 @Component({
   selector: 'app-details-user',
@@ -33,6 +37,9 @@ export class DetailsUserComponent implements OnInit {
   errorMessage = '';
   stores: Store[] = [];
   form: any;
+  appState$: Observable<AppState<ISignup>>;
+  readonly DataState = DataState;
+  private dataSubjects = new BehaviorSubject<ISignup>(null);
   private isLoading = new BehaviorSubject<boolean>(false);
   isLoading$ = this.isLoading.asObservable();
   role: string[] = []
@@ -51,7 +58,7 @@ export class DetailsUserComponent implements OnInit {
     {name : "Simple Utilisateur" , value : "ROLE_USER"},
     {name : "Super Administrateur" , value : "ROLE_SUPERADMIN"}
   ]
-  constructor(private userService: UsersService,  private notifsService: NotifsService, private route: ActivatedRoute,
+  constructor(private userService: UsersService,  private notifsService: NotifsService, private route: ActivatedRoute, private router: Router,
               private storeService: StoreService, private fb: FormBuilder, private statusAccountService: StatusAccountService,
               private statusUserService: StatusUserService, private roleUserService: RoleUserService, private _location: Location) {
     this.updateUser = this.fb.group({
@@ -92,19 +99,30 @@ export class DetailsUserComponent implements OnInit {
   getUser() {
     const id = this.route.snapshot.paramMap.get('id');
 
-    this.userService.getUser(id).subscribe(
-      resp => {
-        // console.log(JSON.parse(aesUtil.decrypt(key,resp.key.toString())))
-        this.user = JSON.parse(aesUtil.decrypt(key,resp.key.toString()))
-        this.typeAccount = this.user.typeAccount.name
-        this.typeRol = this.user.roles[0].name
-        this.statusUser = this.user.status.name
+    // this.userService.getUser(id).subscribe(
+    //   resp => {
+    //     // console.log(JSON.parse(aesUtil.decrypt(key,resp.key.toString())))
+    //     this.user = JSON.parse(aesUtil.decrypt(key,resp.key.toString()))
+    //     this.typeAccount = this.user.typeAccount.name
+    //     this.typeRol = this.user.roles[0].name
+    //     this.statusUser = this.user.status.name
+    //
+    //   },
+    //   err => {
+    //     this.notifsService.onError(err.error.message, 'échec chargement de l\'utilisateur')
+    //   }
+    // )
 
-      },
-      err => {
-        this.notifsService.onError(err.error.message, 'échec chargement de l\'utilisateur')
-      }
-    )
+    this.appState$ = this.userService.user$(id)
+      .pipe(
+        map(response => {
+          return {dataState: DataState.LOADED_STATE, appData: JSON.parse(aesUtil.decrypt(key,response.key.toString()))}
+        }),
+        startWith({dataState: DataState.LOADING_STATE, appData: null}),
+        catchError((error: string) => {
+          return of({dataState: DataState.ERROR_STATE, error: error})
+        })
+      )
 
   }
 
@@ -147,7 +165,7 @@ export class DetailsUserComponent implements OnInit {
           this.isLoading.next(false);
           this.getUser()
           this.notifsService.onSuccess('utilisateur modifié')
-          // this.router.navigate(['users'])
+          this.router.navigate(['users'])
         },
         error => {
           this.isLoading.next(false)

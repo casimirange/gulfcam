@@ -93,7 +93,7 @@ export class DetailsComponent implements OnInit {
     this.clientOrder$ = this.orderService.clientOrders$(this.page - 1, this.size, this.IdParam)
       .pipe(
         map(response => {
-          console.log('client order', JSON.parse(aesUtil.decrypt(key,response.key.toString())))
+          // console.log('client order', JSON.parse(aesUtil.decrypt(key,response.key.toString())))
           this.dataSubjectsClientOrder.next(JSON.parse(aesUtil.decrypt(key,response.key.toString())))
           return {dataState: DataState.LOADED_STATE, appData: JSON.parse(aesUtil.decrypt(key,response.key.toString()))}
         }),

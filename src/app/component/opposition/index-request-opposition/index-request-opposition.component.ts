@@ -277,7 +277,7 @@ export class IndexRequestOppositionComponent implements OnInit {
             if (JSON.parse(aesUtil.decrypt(key,res.key.toString())).idClient === client.internalReference) {
               this.vouchers.push(this.requestForm.controls['serialNumber'].value)
               this.vouchers1.push(rout)
-              console.log('coupons', this.vouchers1)
+              // console.log('coupons', this.vouchers1)
               this.requestForm.controls['serialNumber'].reset()
             } else {
               this.notifService.onWarning('Ce coupon n\'appartient pas à ce client')

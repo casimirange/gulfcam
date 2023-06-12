@@ -61,8 +61,8 @@
                   <!--                  <input type="text" >-->
                   <select id="serialnumber" formControlName="idCarton" class="form-control">
                     <option disabled selected hidden value="">Sélectionner un carton</option>
-                    <option *ngFor="let carton of cartons"
-                            value="{{carton.internalReference}}">{{carton.number}}</option>
+                    <option *ngFor="let carton of cartons" value="{{carton.internalReference}}">{{carton.number}}</option>
+                    <option *ngIf="!cartons.length" disabled value="">Aucun carton disponible</option>
                   </select>
                 </div>
                 <div *ngIf="form['idCarton'].invalid && (form['idCarton'].dirty || form['idCarton'].touched)"

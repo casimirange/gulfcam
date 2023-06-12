@@ -66,6 +66,10 @@ export class CouponService {
     this.http.get<any>(environment.coupon+`/station/${idStation}?page=${page}&size=${size}&serialnumber=${serialNumber}&status=${statut}&client=${clientName}&type=${type}`)
       .pipe(catchError(this.handleError));
 
+  couponByStationNotCreditNote$ = (idStation: number, page?: number, size?: number) => <Observable<any>>
+    this.http.get<any>(environment.coupon+`/station/notCreditNote/?station=${idStation}&page=${page}&size=${size}`)
+      .pipe(catchError(this.handleError));
+
   handleError(error: HttpErrorResponse): Observable<never>{
     return throwError(`Une erreur est survenue: ${error.error.message.toString().bold()}` )
   }
