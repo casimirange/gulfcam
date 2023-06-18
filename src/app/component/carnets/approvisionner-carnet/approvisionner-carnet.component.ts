@@ -80,9 +80,10 @@ export class ApprovisionnerCarnetComponent implements OnInit {
   // }
 
   getStoreHouses(){
-    this.storeHouseService.getAllStoreHousesWithPagination(0, 500).subscribe(
+    this.storeHouseService.getAllStoreHousesWithPagination(0, 500, localStorage.getItem('store').toString(), 'vente').subscribe(
       resp => {
-        this.storeHouses2 = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content.filter(st => st.type == 'vente' && st.store.internalReference == (aesUtil.decrypt(key, localStorage.getItem('store').toString()) as number))
+        // this.storeHouses2 = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content.filter(st => st.type == 'vente' && st.store.internalReference == (aesUtil.decrypt(key, localStorage.getItem('store').toString()) as number))
+        this.storeHouses2 = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content
       },
     )
   }
@@ -112,7 +113,15 @@ export class ApprovisionnerCarnetComponent implements OnInit {
 
     // console.log('supply', this.supply)
 
-    this.cartonService.createCartonSupply(this.supply.idCarton, this.supply.idStoreHouseSell).subscribe(
+    const SupplyCarton = {
+      "idCarton" : "",
+      "idStoreHouseSell" : ""
+    }
+
+    SupplyCarton.idCarton = this.supply.idCarton.toString();
+    SupplyCarton.idStoreHouseSell = this.supply.idStoreHouseSell.toString();
+
+    this.cartonService.createCartonSupply(SupplyCarton).subscribe(
       resp => {
 
         this.isLoading.next(false);

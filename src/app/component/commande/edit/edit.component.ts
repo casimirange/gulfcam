@@ -422,18 +422,22 @@ export class EditComponent implements OnInit {
   generateBonCommande() {
     const docType = 'pdf'
     const type = 'DELIVERY'
-    let rout = aesUtil.encrypt(key, this.order.internalReference.toString())
-    while (rout.includes('/')){
-      rout = aesUtil.encrypt(key, this.order.internalReference.toString())
-    }
-    this.orderService.getFile(rout, type, docType).subscribe(
+    this.openLoader()
+    // let rout = aesUtil.encrypt(key, this.order.internalReference.toString())
+    // while (rout.includes('/')){
+    //   rout = aesUtil.encrypt(key, this.order.internalReference.toString())
+    // }
+    this.orderService.getFile(this.IdParam, type, docType).subscribe(
       response => {
-
+        this.closeLoader()
         const file = new Blob([response], {type: 'application/pdf'});
         const fileURL = URL.createObjectURL(file);
         window.open(fileURL);
         // this.isLoading.next(false);
       },
+      error => {
+        this.closeLoader()
+      }
     )
   }
 

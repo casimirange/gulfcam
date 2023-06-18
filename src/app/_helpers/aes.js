@@ -42,7 +42,20 @@ export class AESUtil {
     let encrypted = CryptoJS.AES.encrypt(plainText, key, {
       iv: CryptoJS.enc.Hex.parse(iv)
     });
-    return encrypted.ciphertext.toString(CryptoJS.enc.Base64);
+    let result = encrypted.ciphertext.toString(CryptoJS.enc.Base64);
+    let iteration = 0;
+    while (result.includes('/') || result.includes(' ')){
+      key = this.generateKey(salt, passPhrase);
+      encrypted = CryptoJS.AES.encrypt(plainText, key, {
+        iv: CryptoJS.enc.Hex.parse(iv)
+      });
+      result = encrypted.ciphertext.toString(CryptoJS.enc.Base64);
+      iteration++;
+      if (iteration >= 1){
+        break;
+      }
+    }
+    return result;
   }
 
   decryptWithIvSalt(salt, iv, passPhrase, cipherText) {

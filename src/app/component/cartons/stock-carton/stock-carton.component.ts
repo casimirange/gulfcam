@@ -261,7 +261,7 @@ export class StockCartonComponent implements OnInit {
       .pipe(
         map(response => {
           this.dataSubjects.next(JSON.parse(aesUtil.decrypt(key,response.key.toString())))
-          // this.notifsService.onSuccess('Chargement des commandes')
+          console.log(JSON.parse(aesUtil.decrypt(key,response.key.toString())))
           return {dataState: DataState.LOADED_STATE, appData: JSON.parse(aesUtil.decrypt(key,response.key.toString()))}
         }),
         startWith({dataState: DataState.LOADING_STATE, appData: null}),

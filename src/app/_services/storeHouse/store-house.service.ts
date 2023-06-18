@@ -21,8 +21,8 @@ export class StoreHouseService {
     return this.http.get<any>(environment.storeHouse)
   }
 
-  getAllStoreHousesWithPagination(page: number, size: number): Observable<any>{
-    return this.http.get<any>(environment.storeHouse+ `?page=${page}&size=${size}`)
+  getAllStoreHousesWithPagination(page: number, size: number, idStore?: string, type?: string): Observable<any>{
+    return this.http.get<any>(environment.storeHouse+ `?page=${page}&size=${size}&store=${idStore}&type=${type}`)
   }
 
   getStoreHouseByInternalRef(internalRef: string): Observable<any>{
@@ -47,8 +47,8 @@ export class StoreHouseService {
   }
 
 
-  storeHouse$ = (page?: number, size?: number, idStore?: string) => <Observable<any>>
-    this.http.get<any>(environment.storeHouse + `?page=${page}&size=${size}&store=${idStore}`,)
+  storeHouse$ = (page?: number, size?: number, idStore?: string, type?: string) => <Observable<any>>
+    this.http.get<any>(environment.storeHouse + `?page=${page}&size=${size}&store=${idStore}&type=${type}`,)
       .pipe(catchError(this.handleError));
 
   addStoreHouse$ = (store: StoreHouse) => <Observable<any>>

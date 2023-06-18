@@ -82,7 +82,8 @@ export class IndexEntrepotComponent implements OnInit {
   //récupération de la liste des entrepots
   getStoreHouses(){
     this.storeFilter = this.role.includes('ROLE_SUPERADMIN') ? '' : localStorage.getItem('store');
-    this.appState$ = this.storeHouseService.storeHouse$(this.page - 1, this.size, this.storeFilter)
+    const type = 'vente'
+    this.appState$ = this.storeHouseService.storeHouse$(this.page - 1, this.size, this.storeFilter, type)
       .pipe(
         map(response => {
           this.dataSubjects.next(JSON.parse(aesUtil.decrypt(key,response.key.toString())) as CustomResponse<StoreHouse>)
