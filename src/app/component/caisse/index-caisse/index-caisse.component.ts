@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {Client} from "../../../_model/client";
 import {Store} from "../../../_model/store";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
@@ -12,7 +12,7 @@ import {StoreService} from "../../../_services/store/store.service";
 import {ProductService} from "../../../_services/product/product.service";
 import {OrderService} from "../../../_services/order/order.service";
 import {Products} from "../../../_model/products";
-import {BehaviorSubject, Observable, of} from "rxjs";
+import {BehaviorSubject, Observable, of, Subscription} from "rxjs";
 import {AppState} from "../../../_interfaces/app-state";
 import {CustomResponse} from "../../../_interfaces/custom-response";
 import {DataState} from "../../../_enum/data.state.enum";
@@ -32,10 +32,10 @@ export class Product{
   templateUrl: './index-caisse.component.html',
   styleUrls: ['./index-caisse.component.css']
 })
-export class IndexCaisseComponent implements OnInit {
+export class IndexCaisseComponent implements OnInit, OnDestroy {
 
   title = 'Enregistrer nouvelle commande';
-  clients: Client[] = [];
+  clients: Client[];
   client: Client;
   // stores: Store;
   showClientForm = false;
@@ -44,9 +44,10 @@ export class IndexCaisseComponent implements OnInit {
   clF: any;
   orF: any;
   canaux = ['Appel', 'Courier papier', 'Email', 'Sur site']
-  stores: Store[] = [];
+  stores: Store[] ;
+  loadSore: boolean;
   typeVoucher = [3000, 5000, 10000]
-  tabProducts: Product[] = [];
+  tabProducts: Product[];
   tabProd: Product;
   Products: Products[] = [];
   Product: Products = new Products();
@@ -77,6 +78,8 @@ export class IndexCaisseComponent implements OnInit {
   isLoading$ = this.isLoading.asObservable();
   clientNotFound: boolean = false;
   onFilter: boolean = false;
+  private mySubscription: Subscription;
+  private mySubscription2: Subscription;
   constructor(private fb: FormBuilder, private modalService: NgbModal, private clientService: ClientService,
               private voucherService: VoucherService, private notifsService: NotifsService, private storeService: StoreService,
               private productService: ProductService, private orderService: OrderService, private statusService: StatusOrderService,
@@ -113,9 +116,11 @@ export class IndexCaisseComponent implements OnInit {
   }
 
   getStores(){
-    this.storeService.getStore().subscribe(
+    this.loadSore = true
+    this.mySubscription = this.storeService.getStore().subscribe(
       resp => {
         this.stores = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content
+        this.loadSore = false
       },
       error => {
         // this.notifsService.onError(error.error.message, 'échec chargement magasins')
@@ -208,7 +213,7 @@ export class IndexCaisseComponent implements OnInit {
 
   findClientsForFilter(event: string): Client[]{
     if (event != '' && event.length >= 3){
-      this.clientService.searchClient(event) .subscribe(
+      this.mySubscription2 =this.clientService.searchClient(event).subscribe(
         resp => {
           this.clients = JSON.parse(aesUtil.decrypt(key,resp.key.toString()));
           if (this.clients.length <= 1){
@@ -235,5 +240,10 @@ export class IndexCaisseComponent implements OnInit {
       rout = aesUtil.encrypt(key, id.toString())
     }
     this.router.navigate(['/commandes/complete-order/', rout])
+  }
+
+  ngOnDestroy(): void {
+    this.mySubscription ? this.mySubscription.unsubscribe() : null;
+    this.mySubscription2 ? this.mySubscription2.unsubscribe() : null;
   }
 }

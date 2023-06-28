@@ -116,6 +116,8 @@ export class DetailsUserComponent implements OnInit {
     this.appState$ = this.userService.user$(id)
       .pipe(
         map(response => {
+          this.user = JSON.parse(aesUtil.decrypt(key,response.key.toString()))
+          this.statusUser = this.user.status.name
           return {dataState: DataState.LOADED_STATE, appData: JSON.parse(aesUtil.decrypt(key,response.key.toString()))}
         }),
         startWith({dataState: DataState.LOADING_STATE, appData: null}),

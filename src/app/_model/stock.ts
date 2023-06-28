@@ -11,7 +11,8 @@ export class Stock {
   store2?: Store;
   idStoreHouseStockage: string;
   idStoreHouseStockage2?: number;
-  listCartons: string[];
+  // listCartons: string[];
+  listCartons: string;
   idStoreHouse1?: number;
   idStoreHouse2?: number;
   storeHouse1?: StoreHouse;

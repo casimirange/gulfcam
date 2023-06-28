@@ -36,14 +36,35 @@
       <div class="main-card mb-3 card">
         <div class="card-body">
           <h5 class="card-title">Transfert de carton</h5>
+          <div class="col-md-12 text-center my-3" *ngIf="loadCarton || loadStoreHouse; else approv">
+            <div class="ball-clip-rotate">
+              <div style="background-color: rgb(68, 64, 84);"></div>
+            </div>
+          </div>
+          <ng-template #approv>
           <form [formGroup]="tranfertForm">
             <div class="form-row">
               <div class="col-md-6">
                 <div class="position-relative form-group">
                   <label>Espace de stockage d'arrivé</label>
+<!--                  <ng-container
+>-->
                   <select formControlName="idStoreHouseStockage" class="form-control">
                     <option disabled selected hidden value="">Sélectionner un espace de stockage</option>
-                    <option *ngFor="let store of role.includes('ROLE_SUPERADMIN') ? storeHousesAdmin : storeHouses1" [value]="store.internalReference">{{store.name}}</option>
+<!--                    <ng-container >-->
+<!--                      <ng-container class="bg-danger" *ngIf="!(isLoad$ | async)">-->
+<!--                        <div class="col-md-12 text-center my-3">-->
+<!--                          <div class="ball-clip-rotate">-->
+<!--                            <div style="background-color: rgb(68, 64, 84);"></div>-->
+<!--                          </div>-->
+<!--                        </div>-->
+<!--                      </ng-container>-->
+<!--                      <ng-container class="bg-white" *ngIf="!(isLoad$ | async)">-->
+                        <option *ngFor="let store of storeHouses1" [value]="store.internalReference">{{store.name}}</option>
+                        <option *ngIf="!storeHouses1.length" value="" disabled>Aucun espace trouvé</option>
+<!--                      </ng-container>-->
+<!--                    </ng-container>-->
+<!--                    <option *ngFor="let store of storeHouses1" [value]="store.internalReference">{{store.name}}</option>-->
                   </select>
                   <div
                     *ngIf="form['idStoreHouseStockage'].invalid && (form['idStoreHouseStockage'].dirty || form['idStoreHouseStockage'].touched)"
@@ -85,6 +106,7 @@
               </div>
             </div>
           </form>
+          </ng-template>
         </div>
       </div>
     </div>

@@ -12,6 +12,7 @@ import {TokenService} from "./_services/token/token.service";
 import {Location} from "@angular/common";
 import {ConnectionService} from "ng-connection-service";
 import IdleTimer from "src/app/_helpers/idleTimer.js"
+import {aesUtil} from "./_helpers/aes";
 const Toast = Swal.mixin({
   toast: true,
   position: 'bottom-end',
@@ -42,6 +43,7 @@ export class AppComponent implements OnInit, OnDestroy{
   networkStatus$: Subscription = Subscription.EMPTY;
   constructor(private notifsService: NotifsService, private tokenService: TokenService, private _http: HttpClient, private connectionService: ConnectionService,
               private bnIdle: BnNgIdleService, private router: Router, private _location: Location) {
+
     // this.connectionService.monitor().subscribe(isConnected => {
     //   console.log(isConnected)
     //   this.isConnected = isConnected.hasInternetAccess;

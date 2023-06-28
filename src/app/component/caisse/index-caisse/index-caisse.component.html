@@ -21,7 +21,7 @@
 
         <div class="btn-actions-pane-right">
           <div role="group" class="btn-group-sm btn-group">
-            <button class="btn btn-icon btn-pill border-0 btn-transition" [ngClass]="onFilter? 'btn-outline-light' : 'btn-light'" (click)="showFilter()">
+            <button class="btn btn-icon btn-pill border-0 btn-transition" [disabled]="loadSore" [ngClass]="onFilter? 'btn-outline-light' : 'btn-light'" (click)="showFilter()">
               <i class="fa btn-icon-wrapper fa-sliders-h"></i>
               {{!onFilter ? "Filtrer" : "Annuler"}}
             </button>

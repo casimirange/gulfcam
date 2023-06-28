@@ -173,7 +173,7 @@
                     </div>
                   </div>
                   <div class="row">
-                    <div class="col-md-4" >
+                    <div class="col-md-4" *ngIf="statut == 'CREATED' && (roleUser == 'TREASURY' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))">
                       <div class="position-relative form-group">
                         <label for="exampleEmail" class="">Mode de paiement</label>
                         <select name="select" id="exampleSelect" ngModel="{{order.idPaymentMethod}}"
@@ -191,7 +191,7 @@
                                class="form-control">
                       </div>
                     </div>
-                    <div class="col-md-4" >
+                    <div class="col-md-4" *ngIf="statut == 'CREATED' && (roleUser == 'TREASURY' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))">
                       <div class="position-relative form-group">
                         <label for="exampleEmail" class="">Ref. paeiment</label>
                         <input name="email" id="exampleEmail" placeholder="entrer la référence" type="text"
@@ -244,11 +244,11 @@
                     <div class="col-md-12">
                       <div class="position-relative form-group">
                         <label for="exampleEmail" class="">Raison d'annulation</label>
-                        <textarea *ngIf="statut != 'ORDER_CANCEL' && statut != 'CLOSED' && roleUser != 'COMMERCIAL_ATTACHE' || roleUser != 'SALES_MANAGER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')"
+                        <textarea *ngIf="statut != 'ORDER_CANCEL' && statut != 'CLOSED' && roleUser == 'COMMERCIAL_ATTACHE' || roleUser == 'SALES_MANAGER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')"
                                   name="text" rows="1" id="exampleText" class="form-control" formControlName="reason"
                                   placeholder="raison d'annulation de la commande" ngModel="{{order.reasonForCancellation}}"
                                   [disabled]="statut == 'ORDER_CANCEL' || statut != 'CLOSED'"></textarea>
-                        <textarea *ngIf="roleUser != 'COMMERCIAL_ATTACHE' && !role.includes('ROLE_ADMIN') && !role.includes('ROLE_SUPERADMIN')" rows="1" class="form-control"
+                        <textarea *ngIf="roleUser != 'COMMERCIAL_ATTACHE' || roleUser != 'SALES_MANAGER' && !role.includes('ROLE_ADMIN') && !role.includes('ROLE_SUPERADMIN')" rows="1" class="form-control"
                                   [value]="order.reasonForCancellation"
                                   disabled></textarea>
                       </div>

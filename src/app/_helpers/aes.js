@@ -37,26 +37,37 @@ export class AESUtil {
     })
   }
 
+  // encryptWithIvSalt(salt, iv, passPhrase, plainText) {
+  //   let key = this.generateKey(salt, passPhrase);
+  //   let encrypted = CryptoJS.AES.encrypt(plainText, key, {
+  //     iv: CryptoJS.enc.Hex.parse(iv)
+  //   });
+  //   let result = encrypted.ciphertext.toString(CryptoJS.enc.Base64);
+  //   let iteration = 0;
+  //   while (result.includes('/') || result.includes(' ') || result.includes('+')){
+  //     key = this.generateKey(salt, passPhrase);
+  //     encrypted = CryptoJS.AES.encrypt(plainText, key, {
+  //       iv: CryptoJS.enc.Hex.parse(iv)
+  //     });
+  //     result = encrypted.ciphertext.toString(CryptoJS.enc.Base64);
+  //     iteration++;
+  //     if (iteration >= 2){
+  //       break;
+  //     }
+  //   }
+  //   return result;
+  // }
+
   encryptWithIvSalt(salt, iv, passPhrase, plainText) {
     let key = this.generateKey(salt, passPhrase);
     let encrypted = CryptoJS.AES.encrypt(plainText, key, {
       iv: CryptoJS.enc.Hex.parse(iv)
     });
-    let result = encrypted.ciphertext.toString(CryptoJS.enc.Base64);
-    let iteration = 0;
-    while (result.includes('/') || result.includes(' ')){
-      key = this.generateKey(salt, passPhrase);
-      encrypted = CryptoJS.AES.encrypt(plainText, key, {
-        iv: CryptoJS.enc.Hex.parse(iv)
-      });
-      result = encrypted.ciphertext.toString(CryptoJS.enc.Base64);
-      iteration++;
-      if (iteration >= 1){
-        break;
-      }
-    }
-    return result;
+    let base64Url = CryptoJS.enc.Base64.stringify(encrypted.ciphertext);
+    console.log('cryptée',base64Url)
+    return base64Url;
   }
+
 
   decryptWithIvSalt(salt, iv, passPhrase, cipherText) {
     let key = this.generateKey(salt, passPhrase);

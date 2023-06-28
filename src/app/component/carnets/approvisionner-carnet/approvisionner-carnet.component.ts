@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {UsersService} from "../../../_services/users/users.service";
 import {NotifsService} from "../../../_services/notifications/notifs.service";
@@ -6,7 +6,7 @@ import {ActivatedRoute} from "@angular/router";
 import {StoreService} from "../../../_services/store/store.service";
 import {ICredentialsSignup, ISignup} from "../../../_model/signup";
 import {Store} from "../../../_model/store";
-import {BehaviorSubject} from "rxjs";
+import {BehaviorSubject, Subscription} from "rxjs";
 import {Supply} from "../../../_model/supply";
 import {StoreHouse} from "../../../_model/storehouse";
 import {VoucherService} from "../../../_services/voucher/voucher.service";
@@ -22,20 +22,24 @@ import {aesUtil, key} from "../../../_helpers/aes.js";
   templateUrl: './approvisionner-carnet.component.html',
   styleUrls: ['./approvisionner-carnet.component.css']
 })
-export class ApprovisionnerCarnetComponent implements OnInit {
+export class ApprovisionnerCarnetComponent implements OnInit, OnDestroy {
 
   store: Store = new Store();
   supply: Supply = new Supply();
   supplyForm: FormGroup ;
-  cartons: Carton[] = [];
+  cartons: Carton[];
   form: any;
   private isLoading = new BehaviorSubject<boolean>(false);
   isLoading$ = this.isLoading.asObservable();
   sn: any;
-  storeHouses2: StoreHouse[] = [];
+  storeHouses2: StoreHouse[];
   storeHousesAdmin: StoreHouse[] = [];
   roleUser = aesUtil.decrypt(key,localStorage.getItem('userAccount').toString())
   role: string[] = []
+  private mySubscription: Subscription;
+  private mySubscription2: Subscription;
+  loadCarton: boolean;
+  loadStoreHouse: boolean;
   constructor(private userService: UsersService,  private notifsService: NotifsService, private route: ActivatedRoute,
               private storeService: StoreService, private storeHouseService: StoreHouseService, private fb: FormBuilder,
               private voucherService: VoucherService, private cartonService: CartonService) {
@@ -62,9 +66,11 @@ export class ApprovisionnerCarnetComponent implements OnInit {
 
   //on récupère la liste des types de coupon
   getCartons(): void{
-    this.cartonService.getAllCartonWithPagination(0, 500).subscribe(
+    this.loadCarton = true
+    this.mySubscription = this.cartonService.getAllCartonWithPagination(0, 500).subscribe(
       resp => {
         this.cartons = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content.filter((carton: Carton) => carton.status.name === 'AVAILABLE' && carton.storeHouse.idStore == (aesUtil.decrypt(key, localStorage.getItem('store').toString()) as number))
+        this.loadCarton = false
       }
     )
   }
@@ -80,10 +86,12 @@ export class ApprovisionnerCarnetComponent implements OnInit {
   // }
 
   getStoreHouses(){
-    this.storeHouseService.getAllStoreHousesWithPagination(0, 500, localStorage.getItem('store').toString(), 'vente').subscribe(
+    this.loadStoreHouse = true
+    this.mySubscription2 = this.storeHouseService.getAllStoreHousesWithPagination(0, 500, localStorage.getItem('store').toString(), 'vente').subscribe(
       resp => {
         // this.storeHouses2 = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content.filter(st => st.type == 'vente' && st.store.internalReference == (aesUtil.decrypt(key, localStorage.getItem('store').toString()) as number))
         this.storeHouses2 = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content
+        this.loadStoreHouse = false
       },
     )
   }
@@ -138,6 +146,11 @@ export class ApprovisionnerCarnetComponent implements OnInit {
   annuler() {
     this.formSupply();
     this.supplyForm.reset()
+  }
+
+  ngOnDestroy(): void {
+    this.mySubscription ? this.mySubscription.unsubscribe() : null;
+    this.mySubscription2 ? this.mySubscription2.unsubscribe() : null;
   }
 
 
