@@ -64,7 +64,7 @@ export class AESUtil {
       iv: CryptoJS.enc.Hex.parse(iv)
     });
     let base64Url = CryptoJS.enc.Base64.stringify(encrypted.ciphertext);
-    console.log('cryptée',base64Url)
+    // console.log('cryptée',base64Url)
     return base64Url;
   }
 

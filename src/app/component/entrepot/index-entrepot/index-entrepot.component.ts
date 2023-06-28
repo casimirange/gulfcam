@@ -81,15 +81,15 @@ export class IndexEntrepotComponent implements OnInit {
 
   //récupération de la liste des entrepots
   getStoreHouses(){
-    console.log(aesUtil.decrypt(key, localStorage.getItem('store')))
+    // console.log(aesUtil.decrypt(key, localStorage.getItem('store')))
 
     this.storeFilter = this.role.includes('ROLE_SUPERADMIN') ? '' : localStorage.getItem('store');
-    console.log(this.storeFilter)
+    // console.log(this.storeFilter)
     const type = ''
     this.appState$ = this.storeHouseService.storeHouse$(this.page - 1, this.size, this.storeFilter, type)
       .pipe(
         map(response => {
-          console.log(JSON.parse(aesUtil.decrypt(key,response.key.toString())))
+          // console.log(JSON.parse(aesUtil.decrypt(key,response.key.toString())))
           this.dataSubjects.next(JSON.parse(aesUtil.decrypt(key,response.key.toString())) as CustomResponse<StoreHouse>)
           this.notifService.onSuccess('Chargement des entrepots')
           return {dataState: DataState.LOADED_STATE, appData: JSON.parse(aesUtil.decrypt(key,response.key.toString())) as CustomResponse<StoreHouse>}
