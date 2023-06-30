@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnInit, TemplateRef, ViewChild} from '@angular/core';
+import {Component, ElementRef, OnDestroy, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {StoreHouse} from "../../../_model/storehouse";
@@ -6,7 +6,7 @@ import {Store} from "../../../_model/store";
 import {StoreService} from "../../../_services/store/store.service";
 import {NotifsService} from "../../../_services/notifications/notifs.service";
 import {StoreHouseService} from "../../../_services/storeHouse/store-house.service";
-import {BehaviorSubject, Observable, of} from "rxjs";
+import {BehaviorSubject, Observable, of, Subscription} from "rxjs";
 import Swal from "sweetalert2";
 import {Router} from "@angular/router";
 import {StatusService} from "../../../_services/status/status.service";
@@ -21,7 +21,7 @@ import {catchError, map, startWith} from "rxjs/operators";
   templateUrl: './index-entrepot.component.html',
   styleUrls: ['./index-entrepot.component.scss']
 })
-export class IndexEntrepotComponent implements OnInit {
+export class IndexEntrepotComponent implements OnInit, OnDestroy {
 
   storeHouses: StoreHouse[] = [];
   storeHousesByStore: StoreHouse[] = [];
@@ -44,6 +44,8 @@ export class IndexEntrepotComponent implements OnInit {
   page: number = 1;
   storeFilter = '';
   size: number = 10;
+  load: boolean
+  private mySubscription: Subscription;
   constructor(private fb: FormBuilder, private modalService: NgbModal, private storeHouseService: StoreHouseService,
               private storeService: StoreService, private notifService: NotifsService, private router: Router,
               private statusService: StatusService) {
@@ -69,13 +71,16 @@ export class IndexEntrepotComponent implements OnInit {
 
   //récupération de la liste des magasins
   getStores(){
-    this.storeService.getStore().subscribe(
+    this.load = true
+    this.mySubscription = this.storeService.getStore().subscribe(
       resp => {
         this.stores = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content
+        this.load = false
       },
-      // error => {
+      error => {
         // this.notifService.onError(error.error.message, 'Erreur de chargement des magasins')
-      // }
+        this.load = false
+      }
     )
   }
 
@@ -264,5 +269,9 @@ export class IndexEntrepotComponent implements OnInit {
           return of({dataState: DataState.ERROR_STATE, error: error})
         })
       )
+  }
+
+  ngOnDestroy(): void {
+    this.mySubscription ? this.mySubscription.unsubscribe() : null
   }
 }

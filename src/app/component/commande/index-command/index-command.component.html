@@ -12,7 +12,7 @@
     <div class="page-title-actions"
          *ngIf="roleUser === 'COMMERCIAL_ATTACHE' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
       <div class="d-inline-block ">
-        <button (click)="openCommandModal(orderModal)" type="button" data-toggle="tooltip" title="nouvelle commande"
+        <button *ngIf="!load" (click)="openCommandModal(orderModal)" type="button" data-toggle="tooltip" title="nouvelle commande"
                 class="btn-shadow btn btn-primary">
                                         <span class="btn-icon-wrapper pr-2 opacity-7">
                                             <i class="fa fa-plus fa-w-20"></i>
@@ -345,6 +345,7 @@
                         <select name="select" id="tb" class="form-control" formControlName="voucherType">
                           <option value="" selected disabled hidden>Sélectionner un coupon</option>
                           <option *ngFor="let tVoucher of vouchers">{{tVoucher.amount}}</option>
+                          <option value="" disabled *ngIf="!load && !vouchers.length">Aucun bon trouvé</option>
                         </select>
                       </div>
                     </div>

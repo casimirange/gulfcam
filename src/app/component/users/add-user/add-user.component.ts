@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ICredentialsSignup} from "../../../_model/signup";
 import {IToken} from "../../../_model/token";
 import {Store} from "../../../_model/store";
-import {BehaviorSubject, Observable} from "rxjs";
+import {BehaviorSubject, Observable, Subscription} from "rxjs";
 import {AppState} from "../../../_interfaces/app-state";
 import {AuthService} from "../../../_services/auth.service";
 import {Router} from "@angular/router";
@@ -17,7 +17,7 @@ import {Location} from "@angular/common";
   templateUrl: './add-user.component.html',
   styleUrls: ['./add-user.component.css']
 })
-export class AddUserComponent implements OnInit {
+export class AddUserComponent implements OnInit, OnDestroy {
 
   signup: FormGroup ;
   credentials: ICredentialsSignup = new ICredentialsSignup()
@@ -30,6 +30,8 @@ export class AddUserComponent implements OnInit {
   // readonly DataState = DataState;
   form: any;
   role: string[] = []
+  private mySubscription: Subscription;
+  load: boolean;
   constructor(
     private fb: FormBuilder, private authService: AuthService, private router: Router, private storeService: StoreService, private _location: Location,
     private notifService: NotifsService) {
@@ -60,10 +62,12 @@ export class AddUserComponent implements OnInit {
   }
 
   getStores(){
-    this.storeService.getStore().subscribe(
+    this.load = true
+    this.mySubscription = this.storeService.getStore().subscribe(
       resp => {
         // console.log(resp)
         this.stores = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content
+        this.load = false
       },
       error => {
 
@@ -107,5 +111,9 @@ export class AddUserComponent implements OnInit {
 
   back() {
     this._location.back()
+  }
+
+  ngOnDestroy(): void {
+    this.mySubscription ? this.mySubscription.unsubscribe() : null
   }
 }

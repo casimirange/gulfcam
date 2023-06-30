@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {AuthService} from "../../../_services/auth.service";
 import {TokenService} from "../../../_services/token/token.service";
 import {NotifsService} from "../../../_services/notifications/notifs.service";
@@ -6,14 +6,14 @@ import {Router} from "@angular/router";
 import {BnNgIdleService} from "bn-ng-idle";
 import {aesUtil, key} from "../../../_helpers/aes.js";
 import {ISignup} from "../../../_model/signup";
-import {BehaviorSubject} from "rxjs";
+import {BehaviorSubject, Subscription} from "rxjs";
 
 @Component({
   selector: 'app-otp',
   templateUrl: './otp.component.html',
   styleUrls: ['./otp.component.scss']
 })
-export class OtpComponent implements OnInit {
+export class OtpComponent implements OnInit, OnDestroy{
 
   otp!: string;
   inputDigitLeft: string = "Entrer le code";
@@ -38,6 +38,7 @@ export class OtpComponent implements OnInit {
     containerClass: 'd-flex justify-content-between'
   }
 
+  private mySubscription: Subscription
   constructor(private authService: AuthService, private token: TokenService, private notifService: NotifsService,
               private router: Router, private bnIdle: BnNgIdleService,) {
   }
@@ -81,7 +82,7 @@ export class OtpComponent implements OnInit {
     this.isLoading.next(true);
     this.inputDigitLeft = 'Vérification ...'
       // this.authService.verifyOtp(aesUtil.encrypt(key,this.otp)).subscribe(
-      this.authService.verifyOtp(this.otp).subscribe(
+      this.mySubscription = this.authService.verifyOtp(this.otp).subscribe(
         (response) => {
           this.isLoading.next(false);
 
@@ -140,6 +141,10 @@ export class OtpComponent implements OnInit {
     //     // this.notifService.onError(error.error.message, 'échec de connexion')
     //   }
     // )
+  }
+
+  ngOnDestroy(): void {
+    this.mySubscription ? this.mySubscription.unsubscribe() : null
   }
 
 }

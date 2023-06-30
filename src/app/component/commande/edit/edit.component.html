@@ -1,4 +1,4 @@
-<div *ngIf="roleUser === 'MANAGER_SPACES_1' || roleUser === 'MANAGER_SPACES_2' || roleUser === 'TREASURY' ||
+<div *ngIf="roleUser === 'MANAGER_SPACES_2' || roleUser === 'TREASURY' ||
                    roleUser === 'COMMERCIAL_ATTACHE' || roleUser === 'SALES_MANAGER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
   <ng-container class="bg-white" *ngIf="(orderState$ | async) as appState" [ngSwitch]="appState.dataState">
     <ng-container class="bg-white" *ngSwitchCase="DataState.LOADING_STATE">
@@ -56,7 +56,7 @@
                             class="form-control form-control-sm">
                       <option value="" selected disabled hidden>Consulter les documents pdf</option>
                       <option
-                        *ngIf="statut == 'PAID' || statut == 'IN_PROCESS_OF_DELIVERY' || statut == 'CLOSED' && (roleUser=='MANAGER_SPACES_2' || roleUser=='SALES_MANAGER' || roleUser=='MANAGER_SPACES_1'
+                        *ngIf="statut == 'PAID' || statut == 'IN_PROCESS_OF_DELIVERY' || statut == 'CLOSED' && (roleUser=='SALES_MANAGER' || roleUser=='MANAGER_SPACES_2'
                         || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))"
                         value="bordereau">Bordereau de livraison
                       </option>
@@ -184,6 +184,7 @@
                           <option value="" selected hidden disabled>Sélectionner un mode de paiement</option>
                           <option *ngFor="let payment of paymentMethods"
                                   value="{{payment.internalReference}}">{{payment.designation}}</option>
+                          <option value="" disabled *ngIf="!load && !paymentMethods.length">Aucun mode de paiement trouvé</option>
                         </select>
                         <input *ngIf="roleUser != 'TREASURY' && statut != 'CREATED'"
                                placeholder="Sélecyionner un mode de paiement" type="text"
@@ -249,7 +250,7 @@
                                   placeholder="raison d'annulation de la commande" ngModel="{{order.reasonForCancellation}}"
                                   [disabled]="statut == 'ORDER_CANCEL' || statut != 'CLOSED'"></textarea>
                         <textarea *ngIf="roleUser != 'COMMERCIAL_ATTACHE' || roleUser != 'SALES_MANAGER' && !role.includes('ROLE_ADMIN') && !role.includes('ROLE_SUPERADMIN')" rows="1" class="form-control"
-                                  [value]="order.reasonForCancellation"
+                                  [value]="order.reasonForCancellation" placeholder="raison d'annulation de la commande"
                                   disabled></textarea>
                       </div>
                     </div>
@@ -328,8 +329,11 @@
                                 <div class="position-relative form-group">
                                   <label for="add" class="text-white">ajouter</label>
                                   <button id="add" class=" btn btn-primary float-right"
-                                          [disabled]="addCouponClientForm.controls['coupon'].invalid"
-                                          (click)="addCoupon()">Ajouter
+                                          [disabled]="addCouponClientForm.controls['coupon'].invalid || (isVerifying$ | async)"
+                                          (click)="addCoupon()">
+                                    <i *ngIf="isVerifying$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
+                                    <span *ngIf="isVerifying$ | async">Vérif ...</span>
+                                    <span *ngIf="!(isVerifying$ | async)">Ajouter</span>
                                   </button>
                                 </div>
                               </div>

@@ -1,8 +1,8 @@
-import {Component, ElementRef, OnInit, TemplateRef, ViewChild} from '@angular/core';
+import {Component, ElementRef, OnDestroy, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import {StoreHouse} from "../../../_model/storehouse";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {Store} from "../../../_model/store";
-import {BehaviorSubject, Observable, of} from "rxjs";
+import {BehaviorSubject, Observable, of, Subscription} from "rxjs";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {StoreHouseService} from "../../../_services/storeHouse/store-house.service";
 import {StoreService} from "../../../_services/store/store.service";
@@ -33,7 +33,7 @@ import {aesUtil, key} from "../../../_helpers/aes.js";
   templateUrl: './stock-carton.component.html',
   styleUrls: ['./stock-carton.component.scss']
 })
-export class StockCartonComponent implements OnInit {
+export class StockCartonComponent implements OnInit, OnDestroy {
 
   storeHouses: StoreHouse[] = [];
   storeHousesAdmin: StoreHouse[] = [];
@@ -45,6 +45,7 @@ export class StockCartonComponent implements OnInit {
   mvtStock: Stock = new Stock();
   vouchers: TypeVoucher[] = [];
   users: ISignup[] = [];
+  load: boolean
   @ViewChild('mymodal', {static: false}) viewMe?: ElementRef<HTMLElement>;
   cartonForm: FormGroup;
   storeHouseType = ['stockage', 'vente']
@@ -86,6 +87,18 @@ export class StockCartonComponent implements OnInit {
   idStoreHouse = '';
   storeFilter = localStorage.getItem('store')
   idmanager = aesUtil.decrypt(key, localStorage.getItem('uid').toString())
+  private mySubscription: Subscription;
+  private mySubscription2: Subscription;
+  private mySubscription3: Subscription;
+  private mySubscription4: Subscription;
+  private mySubscription5: Subscription;
+  private mySubscription6: Subscription;
+  private mySubscription7: Subscription;
+  private mySubscription8: Subscription;
+  loadStoreHouse: boolean;
+  loadStore: boolean;
+  loadVoucher: boolean;
+  loadUser: boolean;
   constructor(private fb: FormBuilder, private modalService: NgbModal, private storeHouseService: StoreHouseService,
               private storeService: StoreService, private notifService: NotifsService, private cartonService: CartonService,
               private carnetService: CarnetService, private voucherService: VoucherService, private couponService: CouponService,
@@ -122,9 +135,11 @@ export class StockCartonComponent implements OnInit {
 
   //récupération de la liste des magasins
   getStores(){
-    this.storeService.getStore().subscribe(
+    this.loadStore = true
+    this.mySubscription = this.storeService.getStore().subscribe(
       resp => {
         this.stores = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content
+        this.loadStore = false
       },
       error => {
         // this.notifsService.onError(error.error.message, 'échec chargement magasins')
@@ -141,7 +156,7 @@ export class StockCartonComponent implements OnInit {
   //récupération de la liste des entrepots
   getStoreHousesAdmin() {
     this.idStoreHouse = ''
-    this.storeHouseService.getStoreHouses().subscribe(
+    this.mySubscription2 = this.storeHouseService.getStoreHouses().subscribe(
       resp => {
         this.isLoading.next(false);
         this.storeHousesAdmin = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content.filter(sth => sth.type == 'stockage')
@@ -152,7 +167,7 @@ export class StockCartonComponent implements OnInit {
   //récupération de la liste des entrepots
   getStoreHouses() {
     this.idStoreHouse = ''
-    this.storeHouseService.getStoreHousesByStore(this.storeFilter).subscribe(
+    this.mySubscription3 = this.storeHouseService.getStoreHousesByStore(this.storeFilter).subscribe(
       resp => {
         this.isLoading.next(false);
         this.storeHouses = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content.filter(sth => sth.type == 'stockage')
@@ -192,19 +207,23 @@ export class StockCartonComponent implements OnInit {
 
   //on récupère la liste des types de coupon
   getTypeVoucher(): void {
-    this.voucherService.getTypevoucher().subscribe(
+    this.loadVoucher = true
+    this.mySubscription4 = this.voucherService.getTypevoucher().subscribe(
       resp => {
         this.vouchers = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content
+        this.loadVoucher = false
       }
     )
   }
 
   getUsers(): void {
     const type = 'MANAGER_SPACES_1'
-    this.userService.getUsersByTypeAccount(type.toString()).subscribe(
+    this.loadUser = true
+    this.mySubscription5 = this.userService.getUsersByTypeAccount(type.toString()).subscribe(
       resp => {
         // console.log(resp)
         this.users = JSON.parse((aesUtil.decrypt(key, resp.key.toString())))
+        this.loadUser = false
       }
     )
   }
@@ -268,5 +287,15 @@ export class StockCartonComponent implements OnInit {
           return of({dataState: DataState.ERROR_STATE, error: error})
         })
       )
+  }
+
+  ngOnDestroy(): void {
+    this.mySubscription ? this.mySubscription.unsubscribe() : null;
+    this.mySubscription2 ? this.mySubscription2.unsubscribe() : null;
+    this.mySubscription3 ? this.mySubscription3.unsubscribe() : null;
+    this.mySubscription4 ? this.mySubscription4.unsubscribe() : null;
+    this.mySubscription5 ? this.mySubscription5.unsubscribe() : null;
+    this.mySubscription6 ? this.mySubscription6.unsubscribe() : null;
+    this.mySubscription8 ? this.mySubscription8.unsubscribe() : null;
   }
 }

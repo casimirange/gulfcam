@@ -1,11 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {StoreHouse} from "../../../_model/storehouse";
 import {Carton} from "../../../_model/carton";
 import {Carnet} from "../../../_model/carnet";
 import {TypeVoucher} from "../../../_model/typeVoucher";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {Store} from "../../../_model/store";
-import {BehaviorSubject, Observable, of} from "rxjs";
+import {BehaviorSubject, Observable, of, Subscription} from "rxjs";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {StoreHouseService} from "../../../_services/storeHouse/store-house.service";
 import {StoreService} from "../../../_services/store/store.service";
@@ -32,7 +32,7 @@ import {aesUtil, key} from "../../../_helpers/aes.js";
   templateUrl: './index-coupon.component.html',
   styleUrls: ['./index-coupon.component.scss']
 })
-export class IndexCouponComponent implements OnInit {
+export class IndexCouponComponent implements OnInit, OnDestroy {
 
   storeHouses: StoreHouse[] = [];
   storeHouse: StoreHouse = new StoreHouse();
@@ -66,7 +66,14 @@ export class IndexCouponComponent implements OnInit {
   stationName? = ''
   clients: Client[] = [];
   stations: Station[] = [];
-
+  private mySubscription: Subscription;
+  private mySubscription2: Subscription;
+  private mySubscription3: Subscription;
+  private mySubscription4: Subscription;
+  private mySubscription5: Subscription;
+  private mySubscription6: Subscription;
+  private mySubscription7: Subscription;
+  private mySubscription8: Subscription;
   constructor(private fb: FormBuilder, private modalService: NgbModal, private storeHouseService: StoreHouseService,
               private storeService: StoreService, private notifService: NotifsService, private cartonService: CartonService,
               private carnetService: CarnetService, private voucherService: VoucherService, private couponService: CouponService,
@@ -82,7 +89,7 @@ export class IndexCouponComponent implements OnInit {
   }
 
   getVouchers(){
-    this.voucherService.getTypevoucher().subscribe(
+    this.mySubscription = this.voucherService.getTypevoucher().subscribe(
       resp => {
         this.vouchers = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content
       },
@@ -165,7 +172,7 @@ export class IndexCouponComponent implements OnInit {
 
   findClients(event: string): Client[]{
     if (event != '' && event.length >= 3){
-      this.clientService.searchClient(event) .subscribe(
+      this.mySubscription2 = this.clientService.searchClient(event) .subscribe(
         resp => {
           this.clients = JSON.parse(aesUtil.decrypt(key,resp.key.toString()));
           if (this.clients.length <= 1){
@@ -188,7 +195,7 @@ export class IndexCouponComponent implements OnInit {
 
   findStation(event: string): Station[]{
     if (event != '' && event.length >= 3){
-      this.stationService.searchStation(event).subscribe(
+      this.mySubscription3 = this.stationService.searchStation(event).subscribe(
         resp => {
           this.stations = JSON.parse(aesUtil.decrypt(key,resp.key.toString()));
           if (this.stations.length <= 1){
@@ -207,5 +214,11 @@ export class IndexCouponComponent implements OnInit {
       this.stations = []
     }
     return this.stations
+  }
+
+  ngOnDestroy(): void {
+    this.mySubscription ? this.mySubscription.unsubscribe() : null;
+    this.mySubscription2 ? this.mySubscription2.unsubscribe() : null;
+    this.mySubscription3 ? this.mySubscription3.unsubscribe() : null;
   }
 }

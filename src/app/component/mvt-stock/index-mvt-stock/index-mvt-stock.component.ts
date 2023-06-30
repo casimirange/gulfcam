@@ -42,7 +42,7 @@ export class IndexMvtStockComponent implements OnInit {
     this.appState$ = this.mvtStockService.stockMovement$(this.page - 1, this.size)
       .pipe(
         map(response => {
-          console.log(JSON.parse(aesUtil.decrypt(key, response.key.toString())))
+          // console.log(JSON.parse(aesUtil.decrypt(key, response.key.toString())))
           this.dataSubjects.next(JSON.parse(aesUtil.decrypt(key, response.key.toString())) as CustomResponse<Stock>)
           this.notifService.onSuccess('chargement des mouvements du stock')
           return {

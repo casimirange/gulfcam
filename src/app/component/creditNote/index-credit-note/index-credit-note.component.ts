@@ -6,7 +6,7 @@ import {RequestOpposition} from "../../../_model/requestOpposition";
 import {Unite} from "../../../_model/unite";
 import {TypeVoucher} from "../../../_model/typeVoucher";
 import {Client} from "../../../_model/client";
-import {BehaviorSubject, Observable, of} from "rxjs";
+import {BehaviorSubject, Observable, of, Subscription} from "rxjs";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {StoreService} from "../../../_services/store/store.service";
 import {Router} from "@angular/router";
@@ -35,7 +35,7 @@ import {aesUtil, key} from "../../../_helpers/aes.js";
   templateUrl: './index-credit-note.component.html',
   styleUrls: ['./index-credit-note.component.css']
 })
-export class IndexCreditNoteComponent implements OnInit {
+export class IndexCreditNoteComponent implements OnInit, OnDestroy {
 
   creditForm: FormGroup;
   stores: Store[] = [];
@@ -70,6 +70,8 @@ export class IndexCreditNoteComponent implements OnInit {
   internalRef? = ''
   stationName? = ''
   idmanager = aesUtil.decrypt(key, localStorage.getItem('uid').toString())
+  private mySubscription : Subscription;
+  private mySubscription2 : Subscription;
   constructor(private modalService: NgbModal, private fb: FormBuilder, private storeService: StoreService, private router: Router,
               private notifService: NotifsService, private unitService: UnitsService, private voucherService: VoucherService,
               private clientService: ClientService, private userService: UsersService, private creditNoteService: CreditNoteService,
@@ -388,5 +390,8 @@ export class IndexCreditNoteComponent implements OnInit {
       this.internalRef = '';
       this.getCreditNote()
     }
+  }
+
+  ngOnDestroy(): void {
   }
 }

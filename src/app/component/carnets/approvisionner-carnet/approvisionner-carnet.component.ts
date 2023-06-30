@@ -100,6 +100,11 @@ export class ApprovisionnerCarnetComponent implements OnInit, OnDestroy {
     this.isLoading.next(true);
     this.supply.idCarton = aesUtil.encrypt(key, this.supplyForm.controls['idCarton'].value.toString()) as number;
     this.supply.idStoreHouseSell = aesUtil.encrypt(key, this.supplyForm.controls['idStoreHouseSell'].value.toString()) as number;
+
+    const SupplyCarton = {
+      "idCarton" : "",
+      "idStoreHouseSell" : ""
+    }
     setTimeout(() =>{
       const notif = 'Vous recevrez une notification une fois l\'opération terminée'
       Swal.fire({
@@ -107,31 +112,24 @@ export class ApprovisionnerCarnetComponent implements OnInit, OnDestroy {
         html: 'Le système est entrain de créer les carnets et générer les coupons. '+ notif.toString().bold() ,
         icon: 'info',
         showCancelButton: false,
+        showConfirmButton: false,
         confirmButtonText: 'OK',
         allowOutsideClick: false,
         focusConfirm: false,
         timer: 3000,
         backdrop: `rgba(0, 0, 0, 0.4)`
       }).then((result) => {
-        if (result.value) {
-          this.annuler()
-        }
+        // if (result.value) {
+        //   this.annuler()
+        // }
       })
     }  , 1000);
-
-    // console.log('supply', this.supply)
-
-    const SupplyCarton = {
-      "idCarton" : "",
-      "idStoreHouseSell" : ""
-    }
-
     SupplyCarton.idCarton = this.supply.idCarton.toString();
     SupplyCarton.idStoreHouseSell = this.supply.idStoreHouseSell.toString();
 
     this.cartonService.createCartonSupply(SupplyCarton).subscribe(
       resp => {
-
+        this.annuler()
         this.isLoading.next(false);
         this.getCartons();
         this.notifsService.onSuccess('approvisionnement effectué')
@@ -141,6 +139,8 @@ export class ApprovisionnerCarnetComponent implements OnInit, OnDestroy {
         this.isLoading.next(false);
       }
     )
+
+
   }
 
   annuler() {

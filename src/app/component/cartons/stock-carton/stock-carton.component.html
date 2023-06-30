@@ -67,6 +67,7 @@
                 <select name="stat" id="typ" class="form-control form-control-sm mr-3" [(ngModel)]="typeFilter" (ngModelChange)="filterCartons()">
                   <option value="" selected disabled hidden>Sélectionner Type</option>
                   <option value="{{v.amount}}" *ngFor="let v of vouchers">{{v.amount}}</option>
+                  <option value="" disabled *ngIf="!loadVoucher && !vouchers.length">Aucun bon trouvé</option>
                   <option value="">Tout afficher</option>
                 </select>
               </div>
@@ -75,6 +76,7 @@
                 <select name="storeHouse" id="storeHouseStockage" class="form-control form-control-sm mr-3" [(ngModel)]="idStoreHouse" (ngModelChange)="filterCartons()">
                   <option value="" selected disabled hidden>Choisir un espace</option>
                   <option value="{{v.internalReference}}" *ngFor="let v of storeHouses">{{v.name}}</option>
+                  <option value="" disabled *ngIf="!loadStoreHouse && !storeHouses.length">Aucun espace trouvé</option>
                   <option value="">Tout afficher</option>
                 </select>
               </div>
@@ -83,6 +85,7 @@
                 <select name="spacemanager" id="spacemanager" class="form-control form-control-sm mr-3" [(ngModel)]="spaceManager" (ngModelChange)="filterCartons()">
                   <option value="" selected disabled hidden>Sélectionner </option>
                   <option value="{{v.internalReference}}" *ngFor="let v of users">{{v.lastName}} {{v.firstName}}</option>
+                  <option value="" disabled *ngIf="!loadUser && !users.length">Aucun gestionnaire trouvé</option>
                   <option value="">Tout afficher</option>
                 </select>
               </div>
@@ -193,7 +196,12 @@
   <div class="modal-body">
     <div class="">
       <div class="">
-        <form [formGroup]="cartonForm">
+        <div class="col-md-12 text-center my-3" *ngIf="loadVoucher|| loadStoreHouse;">
+          <div class="ball-clip-rotate">
+            <div style="background-color: rgb(68, 64, 84);"></div>
+          </div>
+        </div>
+        <form [formGroup]="cartonForm" *ngIf="!loadVoucher && !loadStoreHouse">
 
           <!--            <div class="col-md-12">-->
 <!--          <div class="position-relative form-group">-->
@@ -225,6 +233,7 @@
             <select name="select" id="storeHouse" class="form-control" formControlName="idStoreHouse">
               <option value="" selected disabled hidden>Sélectionner un espace de stockage</option>
               <option *ngFor="let storeHouse of storeHouses" [value]="storeHouse.internalReference">{{storeHouse.name}}</option>
+              <option value="" disabled *ngIf="!loadStoreHouse && !storeHouses.length">Aucun espace trouvé</option>
             </select>
           </div>
           <div
@@ -241,6 +250,7 @@
             <select name="select" id="tb" class="form-control" formControlName="typeVoucher">
               <option value="" selected hidden>Sélectionner un coupon</option>
               <option *ngFor="let tVoucher of vouchers">{{tVoucher.amount}}</option>
+              <option value="" disabled *ngIf="!loadVoucher && !vouchers.length">Aucun bon trouvé</option>
             </select>
           </div>
           <div

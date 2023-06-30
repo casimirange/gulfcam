@@ -1,7 +1,7 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {RequestOpposition} from "../../../_model/requestOpposition";
 import {Ticket} from "../../../_model/ticket";
-import {BehaviorSubject, Observable, of} from "rxjs";
+import {BehaviorSubject, Observable, of, Subscription} from "rxjs";
 import {OppositionService} from "../../../_services/opposition/opposition.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {TicketService} from "../../../_services/ticket/ticket.service";
@@ -22,7 +22,7 @@ import {catchError, map, startWith} from "rxjs/operators";
   templateUrl: './details-credit-note.component.html',
   styleUrls: ['./details-credit-note.component.css']
 })
-export class DetailsCreditNoteComponent implements OnInit {
+export class DetailsCreditNoteComponent implements OnInit, OnDestroy {
 
   creditNote: CreditNote = new CreditNote();
   roleUser = aesUtil.decrypt(key, localStorage.getItem('userAccount').toString())
@@ -35,7 +35,8 @@ export class DetailsCreditNoteComponent implements OnInit {
   isExtracting$ = this.isExporting.asObservable();
   statut: string;
   coupons: Coupon[] = []
-
+  private mySubscription: Subscription;
+  private mySubscription2: Subscription;
   idmanager = aesUtil.decrypt(key, localStorage.getItem('uid').toString())
   constructor(private noteService: CreditNoteService, private activatedRoute: ActivatedRoute, private router: Router,
               private statusService: StatusService, private _location: Location, private notifService: NotifsService) {
@@ -61,13 +62,13 @@ export class DetailsCreditNoteComponent implements OnInit {
           })
         )
 
-      this.noteService.getCreditNoteByInternalRef(params['id'].toString()).subscribe(
-        res => {
-          this.creditNote = JSON.parse(aesUtil.decrypt(key, res.key.toString()));
-          this.statut = this.creditNote.status.name
-          this.coupons = this.creditNote.coupon
-        }
-      )
+      // this.noteService.getCreditNoteByInternalRef(params['id'].toString()).subscribe(
+      //   res => {
+      //     this.creditNote = JSON.parse(aesUtil.decrypt(key, res.key.toString()));
+      //     this.statut = this.creditNote.status.name
+      //     this.coupons = this.creditNote.coupon
+      //   }
+      // )
     })
   }
 
@@ -78,7 +79,7 @@ export class DetailsCreditNoteComponent implements OnInit {
   validCreditNote() {
     this.activatedRoute.params.subscribe(params => {
       this.isLoading.next(true);
-      this.noteService.validCreditNote(params['id'] as number).subscribe(
+      this.mySubscription = this.noteService.validCreditNote(params['id'] as number).subscribe(
         resp => {
           this.isLoading.next(false);
           this.getCreditNoteInfos()
@@ -102,7 +103,7 @@ export class DetailsCreditNoteComponent implements OnInit {
   exportCreditNote() {
     this.activatedRoute.params.subscribe(params => {
       this.isExporting.next(true)
-      this.noteService.exportCreditNote(params['id'] as number).subscribe(
+      this.mySubscription2 = this.noteService.exportCreditNote(params['id'] as number).subscribe(
         resp => {
           this.isExporting.next(false)
           const file = new Blob([resp], {type: 'application/pdf'});
@@ -114,4 +115,10 @@ export class DetailsCreditNoteComponent implements OnInit {
       )
     })
   }
+
+  ngOnDestroy(): void {
+    this.mySubscription ? this.mySubscription.unsubscribe() : null;
+    this.mySubscription2 ? this.mySubscription2.unsubscribe() : null;
+  }
+
 }

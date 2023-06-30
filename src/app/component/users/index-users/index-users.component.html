@@ -46,6 +46,7 @@
                 <select name="mag" id="mag" class="form-control form-control-sm mr-3" [(ngModel)]="storeFilter" (ngModelChange)="getUsers()" >
                   <option value="" selected disabled hidden>Choix magasin</option>
                   <option *ngFor="let store of stores" ngValue="{{store.internalReference}}">{{store.localization}}</option>
+                  <option value="" disabled *ngIf="!load && !stores.length">Aucun magasin trouvé</option>
                   <option value="">Tout afficher</option>
                 </select>
               </div>

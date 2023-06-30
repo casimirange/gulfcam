@@ -11,7 +11,7 @@
     </div>
     <div class="page-title-actions" *ngIf="role.includes('ROLE_SUPERADMIN')">
       <div class="d-inline-block ">
-        <button type="button" data-toggle="tooltip" title="nouvelle station" class="btn-shadow mr-3 btn btn-primary" (click)="open(mymodal)">
+        <button type="button" *ngIf="!load" data-toggle="tooltip" title="nouvelle station" class="btn-shadow mr-3 btn btn-primary" (click)="open(mymodal)">
                                         <span class="btn-icon-wrapper pr-2 opacity-7">
                                             <i class="fa fa-plus fa-w-20"></i>
                                         </span>
@@ -46,6 +46,7 @@
                 <select name="stat" id="typ" class="form-control form-control-sm mr-3" [(ngModel)]="idManagerStation" (ngModelChange)="getStations()">
                   <option value="" selected disabled hidden>choix du manager</option>
                   <option value="{{user.internalReference}}" *ngFor="let user of users">{{user.lastName}} {{user.firstName}}</option>
+                  <option value="" disabled *ngIf="!load && !users.length">Aucun gestionnaire trouvé</option>
                   <option value="">Tout afficher</option>
                 </select>
               </div>
@@ -298,6 +299,7 @@
                         formControlName="managerStagion" >
                   <option value="" selected hidden disabled>Sélectionner un utilisateur</option>
                   <option *ngFor="let user of users" value="{{user.internalReference}}">{{user.firstName}}&nbsp;{{user.lastName}}</option>
+                  <option value="" disabled *ngIf="!load && !users.length">Aucun gestionnaire trouvé</option>
                 </select>
               </div>
               <div *ngIf="stationForm.controls['managerStagion'].invalid && (stationForm.controls['managerStagion'].dirty || stationForm.controls['managerStagion'].touched)"

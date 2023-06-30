@@ -1,4 +1,4 @@
-import {AfterContentInit, Component, OnInit} from '@angular/core';
+import {AfterContentInit, Component, OnDestroy, OnInit} from '@angular/core';
 import {Store} from "../../../_model/store";
 import {Order} from "../../../_model/order";
 import {StoreHouse} from "../../../_model/storehouse";
@@ -23,7 +23,7 @@ import {CouponService} from "../../../_services/coupons/coupon.service";
 import {Coupon} from "../../../_model/coupon";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
-import {BehaviorSubject, Observable, of} from "rxjs";
+import {BehaviorSubject, Observable, of, Subscription} from "rxjs";
 import {aesUtil, key} from "../../../_helpers/aes.js";
 import {AppState} from "../../../_interfaces/app-state";
 import {CustomResponse} from "../../../_interfaces/custom-response";
@@ -36,7 +36,7 @@ import {Client} from "../../../_model/client";
   templateUrl: './details-station.component.html',
   styleUrls: ['./details-station.component.css']
 })
-export class DetailsStationComponent implements OnInit {
+export class DetailsStationComponent implements OnInit, OnDestroy {
 
   station: Station = new Station();
   roleUser = aesUtil.decrypt(key, localStorage.getItem('userAccount').toString())
@@ -71,6 +71,11 @@ export class DetailsStationComponent implements OnInit {
   typeFilter? = ''
   clientName? = ''
   clients: Client[] = [];
+  private mySubscription: Subscription;
+  private mySubscription2: Subscription;
+  private mySubscription3: Subscription;
+  load: boolean
+  load2: boolean
   constructor(private stationService: StationService, private activatedRoute: ActivatedRoute, private router: Router, private modalService: NgbModal,
               private _location: Location, private voucherService: VoucherService, private statusService: StatusService, private fb: FormBuilder,
               private creditNoteService: CreditNoteService, private couponService: CouponService, private notifService: NotifsService, private clientService: ClientService) {
@@ -100,13 +105,16 @@ export class DetailsStationComponent implements OnInit {
     // this.getStations()
   }
   getVouchers(){
-    this.voucherService.getTypevoucher().subscribe(
+    this.load2 = true
+    this.mySubscription = this.voucherService.getTypevoucher().subscribe(
       resp => {
         this.vouchers = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content
+        this.load2 = false
       },
     )
   }
   getStationInfos() {
+    this.load = true
     // this.appState$ = this.stationService.getStationByInternalref$(this.idParam)
     //   .pipe(
     //     map(response => {
@@ -118,9 +126,12 @@ export class DetailsStationComponent implements OnInit {
     //       return of({dataState: DataState.ERROR_STATE, error: error})
     //     })
     //   )
-    this.stationService.getStationByInternalref(this.idParam as number).subscribe(
+    this.mySubscription2 = this.stationService.getStationByInternalref(this.idParam as number).subscribe(
       res => {
         this.station = JSON.parse(aesUtil.decrypt(key, res.key.toString()));
+        this.load = false
+      }, error => {
+        this.load = false
       }
     )
   }
@@ -194,7 +205,7 @@ export class DetailsStationComponent implements OnInit {
 
   findClients(event: string): Client[]{
     if (event != '' && event.length >= 3){
-      this.clientService.searchClient(event) .subscribe(
+      this.mySubscription3 = this.clientService.searchClient(event) .subscribe(
         resp => {
           this.clients = JSON.parse(aesUtil.decrypt(key,resp.key.toString()));
           if (this.clients.length <= 1){
@@ -296,6 +307,12 @@ export class DetailsStationComponent implements OnInit {
       // this.internalRef = '';
       // this.getCreditNote()
     }
+  }
+
+  ngOnDestroy(): void {
+    this.mySubscription ? this.mySubscription.unsubscribe() : null;
+    this.mySubscription2 ? this.mySubscription2.unsubscribe() : null;
+    this.mySubscription3 ? this.mySubscription3.unsubscribe() : null;
   }
 
 }

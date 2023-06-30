@@ -88,6 +88,7 @@
                        class="form-control form-control-sm mr-3" list="clientListOption" placeholder="Entrer le nom">
                 <datalist id="clientListOption">
                   <option *ngFor="let client of clients" [value]="client.completeName"></option>
+                  <option *ngIf="!clients.length" [value]="">Aucun client trouvé</option>
                 </datalist>
               </div>
               <div class="position-relative form-group  mr-2">
@@ -300,8 +301,12 @@
                 <div class="position-relative form-group">
                   <label for="add" class="text-white">ajouter</label>
                   <button id="add" class=" btn btn-primary float-right"
-                          [disabled]="requestForm.controls['serialNumber'].invalid"
-                          (click)="addCoupon()">Ajouter</button>
+                          [disabled]="requestForm.controls['serialNumber'].invalid || (isVerifying$ | async)"
+                          (click)="addCoupon()">
+                    <i *ngIf="isVerifying$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
+                    <span *ngIf="isVerifying$ | async">Vérif ...</span>
+                    <span *ngIf="!(isVerifying$ | async)">Ajouter</span>
+                  </button>
                 </div>
               </div>
             </div>

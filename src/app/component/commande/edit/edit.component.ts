@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {OrderService} from "../../../_services/order/order.service";
 import {Order} from "../../../_model/order";
 import {NotifsService} from "../../../_services/notifications/notifs.service";
@@ -15,7 +15,7 @@ import {PaiementService} from "../../../_services/paiement/paiement.service";
 import {PaiementMethod} from "../../../_model/paiement";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import Swal from "sweetalert2";
-import {BehaviorSubject, Observable, of} from "rxjs";
+import {BehaviorSubject, Observable, of, Subscription} from "rxjs";
 import {CouponService} from "../../../_services/coupons/coupon.service";
 import {StatusOrderService} from "../../../_services/status/status-order.service";
 import {catchError, filter, map, startWith} from "rxjs/operators";
@@ -36,7 +36,7 @@ export class Product {
   templateUrl: './edit.component.html',
   styleUrls: ['./edit.component.css']
 })
-export class EditComponent implements OnInit {
+export class EditComponent implements OnInit, OnDestroy {
 
   order: Order = new Order();
   vouchers: TypeVoucher[] = []
@@ -47,6 +47,7 @@ export class EditComponent implements OnInit {
   store: Store = new Store();
   products: Products[] = []
   paymentMethods: PaiementMethod[] = []
+  load: boolean
   paymentMethod: PaiementMethod = new PaiementMethod()
   statut: string;
   clientid: string;
@@ -65,6 +66,8 @@ export class EditComponent implements OnInit {
   role: string[] = [];
   private isLoading = new BehaviorSubject<boolean>(false);
   isLoading$ = this.isLoading.asObservable();
+  private isVerifying = new BehaviorSubject<boolean>(false);
+  isVerifying$ = this.isVerifying.asObservable();
   private isCanceling = new BehaviorSubject<boolean>(false);
   isCanceling$ = this.isCanceling.asObservable();
   private loadingFile = new BehaviorSubject<boolean>(false);
@@ -74,6 +77,14 @@ export class EditComponent implements OnInit {
   readonly DataState = DataState;
   private dataSubjects = new BehaviorSubject<Order>(null);
   idmanager = localStorage.getItem('uid')
+  private mySubscription: Subscription;
+  private mySubscription2: Subscription;
+  private mySubscription3: Subscription;
+  private mySubscription4: Subscription;
+  private mySubscription5: Subscription;
+  private mySubscription6: Subscription;
+  private mySubscription7: Subscription;
+  private mySubscription8: Subscription;
   constructor(private orderService: OrderService, private notifsService: NotifsService, private route: ActivatedRoute,
               private clientService: ClientService, private storeService: StoreService, private productService: ProductService,
               private voucherService: VoucherService, private paymentService: PaiementService, private fb: FormBuilder,
@@ -214,9 +225,11 @@ export class EditComponent implements OnInit {
   }
 
   getPaymentMethods() {
-    this.paymentService.getPaymentMethods().subscribe(
+    this.load = true
+    this.mySubscription = this.paymentService.getPaymentMethods().subscribe(
       resp => {
         this.paymentMethods = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content
+        this.load = false
       },
     )
   }
@@ -358,7 +371,7 @@ export class EditComponent implements OnInit {
 
   getProforma() {
     this.openLoader()
-    this.orderService.getProforma(this.IdParam).subscribe(
+    this.mySubscription2 = this.orderService.getProforma(this.IdParam).subscribe(
       response => {
         this.closeLoader()
         const file = new Blob([response], {type: 'application/pdf'});
@@ -374,7 +387,7 @@ export class EditComponent implements OnInit {
     const docType = 'pdf'
     const type = 'INVOICE'
     this.openLoader()
-    this.orderService.getFile(this.IdParam, type, docType).subscribe(
+    this.mySubscription3 = this.orderService.getFile(this.IdParam, type, docType).subscribe(
       response => {
         this.closeLoader()
         const file = new Blob([response], {type: 'application/pdf'});
@@ -390,7 +403,7 @@ export class EditComponent implements OnInit {
     this.loadingFile.next(true)
     this.openLoader()
     const type = 'INVOICE'
-    this.orderService.getReçu(this.IdParam, type).subscribe(
+    this.mySubscription4 = this.orderService.getReçu(this.IdParam, type).subscribe(
       response => {
         this.loadingFile.next(false)
         this.closeLoader()
@@ -407,7 +420,7 @@ export class EditComponent implements OnInit {
   generateBonLivraison() {
     const type = 'DELIVERY'
     this.openLoader()
-    this.orderService.getReçu(this.IdParam, type).subscribe(
+    this.mySubscription5 = this.orderService.getReçu(this.IdParam, type).subscribe(
       response => {
         this.closeLoader()
         const file = new Blob([response], {type: 'application/pdf'});
@@ -427,7 +440,7 @@ export class EditComponent implements OnInit {
     // while (rout.includes('/')){
     //   rout = aesUtil.encrypt(key, this.order.internalReference.toString())
     // }
-    this.orderService.getFile(this.IdParam, type, docType).subscribe(
+    this.mySubscription6 = this.orderService.getFile(this.IdParam, type, docType).subscribe(
       response => {
         this.closeLoader()
         const file = new Blob([response], {type: 'application/pdf'});
@@ -556,12 +569,13 @@ export class EditComponent implements OnInit {
   }
 
   addCoupon() {
+    this.isVerifying.next(true)
     let str = parseInt(this.addCouponClientForm.controls['coupon'].value).toString();
     let rout = aesUtil.encrypt(key, str.toString())
     while (rout.includes('/')){
       rout = aesUtil.encrypt(key, str.toString())
     }
-    this.couponService.getCouponsBySerialNumber(rout.toString()).subscribe(
+    this.mySubscription8 = this.couponService.getCouponsBySerialNumber(rout.toString()).subscribe(
       res => {
         if (JSON.parse(aesUtil.decrypt(key,res.key.toString())).status.name !== 'AVAILABLE') {
           this.notifsService.onWarning('Ce coupon n\'une plus dans notre espace de stockage')
@@ -569,8 +583,10 @@ export class EditComponent implements OnInit {
           this.listVouchers.push(+str)
           this.addCouponClientForm.controls['coupon'].reset()
         }
+        this.isVerifying.next(false)
       }, error => {
         this.notifsService.onError("Ce coupon n'existe pas", '')
+        this.isVerifying.next(false)
       }
     )
   }
@@ -590,5 +606,15 @@ export class EditComponent implements OnInit {
 
   formatNumber(amount: any): string {
     return parseInt(amount).toFixed(0).replace(/(\d)(?=(\d{3})+\b)/g, '$1 ');
+  }
+
+  ngOnDestroy(): void {
+    this.mySubscription ? this.mySubscription.unsubscribe() : null;
+    this.mySubscription2 ? this.mySubscription2.unsubscribe() : null;
+    this.mySubscription3 ? this.mySubscription3.unsubscribe() : null;
+    this.mySubscription4 ? this.mySubscription4.unsubscribe() : null;
+    this.mySubscription5 ? this.mySubscription5.unsubscribe() : null;
+    this.mySubscription6 ? this.mySubscription6.unsubscribe() : null;
+    this.mySubscription8 ? this.mySubscription8.unsubscribe() : null;
   }
 }

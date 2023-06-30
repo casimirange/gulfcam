@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Order} from "../../../_model/order";
 import {Store} from "../../../_model/store";
 import {ClientService} from "../../../_services/clients/client.service";
@@ -16,7 +16,7 @@ import {VoucherService} from "../../../_services/voucher/voucher.service";
 import Swal from "sweetalert2";
 import {StatusService} from "../../../_services/status/status.service";
 import {aesUtil, key} from "../../../_helpers/aes.js";
-import {BehaviorSubject, Observable, of} from "rxjs";
+import {BehaviorSubject, Observable, of, Subscription} from "rxjs";
 import {AppState} from "../../../_interfaces/app-state";
 import {CustomResponse} from "../../../_interfaces/custom-response";
 import {Carnet} from "../../../_model/carnet";
@@ -33,7 +33,7 @@ export class Un{
   templateUrl: './details-magasin.component.html',
   styleUrls: ['./details-magasin.component.css']
 })
-export class DetailsMagasinComponent implements OnInit {
+export class DetailsMagasinComponent implements OnInit, OnDestroy {
 
   store: Store;
   storeHouses: StoreHouse[] = [];
@@ -46,6 +46,8 @@ export class DetailsMagasinComponent implements OnInit {
   isLoading$ = this.isLoading.asObservable();
   page = 1;
   size = 20;
+  load: boolean
+  private mySubscription: Subscription;
   constructor(private activatedRoute: ActivatedRoute, private router: Router, private notifService: NotifsService, private storeService: StoreService,
               private storeHouseService: StoreHouseService, private _location: Location, private statusService: StatusService, ) {
     this.store = new Store()
@@ -61,6 +63,7 @@ export class DetailsMagasinComponent implements OnInit {
 
 
   getStoreInfos(){
+    this.load = true
     this.activatedRoute.params.subscribe(params => {
       // this.storeState$ = this.storeHouseService.storeHouseByInternalRef$(params['id'].toString())
       //   .pipe(
@@ -73,10 +76,13 @@ export class DetailsMagasinComponent implements OnInit {
       //       return of({dataState: DataState.ERROR_STATE, error: error})
       //     })
       //   )
-      this.storeService.getStoreByInternalref(params['id']).subscribe(
+      this.mySubscription = this.storeService.getStoreByInternalref(params['id']).subscribe(
         res => {
           // console.log(JSON.parse(aesUtil.decrypt(key,res.key.toString())))
           this.store = JSON.parse(aesUtil.decrypt(key,res.key.toString()));
+          this.load = false
+        }, error => {
+          this.load = false
         }
       )
     })
@@ -124,5 +130,9 @@ export class DetailsMagasinComponent implements OnInit {
   pageChange(event: number){
     this.page = event
     this.getStoreHousesByStore()
+  }
+
+  ngOnDestroy(): void {
+    this.mySubscription ? this.mySubscription.unsubscribe() : null
   }
 }

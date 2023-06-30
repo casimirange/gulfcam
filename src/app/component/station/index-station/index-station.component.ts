@@ -50,6 +50,8 @@ export class IndexStationComponent implements OnInit, OnDestroy {
   localisation? = ''
   idManagerStation? = ''
   pinCode? = ''
+  private mySubscription: Subscription;
+  load: boolean
 
   constructor(private fb: FormBuilder, private modalService: NgbModal, private stationService: StationService,
               private notifService: NotifsService, private statusService: StatusService, private router: Router,
@@ -97,10 +99,12 @@ export class IndexStationComponent implements OnInit, OnDestroy {
 
   //récupération de la liste des stations
   getUsers(){
+    this.load = true
     const type = 'MANAGER_STATION';
-    this.userService.getUsersByTypeAccount(type.toString()).subscribe(
+    this.mySubscription = this.userService.getUsersByTypeAccount(type.toString()).subscribe(
       resp => {
         this.users = JSON.parse(aesUtil.decrypt(key,resp.key.toString()))
+        this.load = false
       },
     )
   }
@@ -219,7 +223,7 @@ export class IndexStationComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // this.suscription.unsubscribe()
+    this.mySubscription ? this.mySubscription.unsubscribe() : null
   }
 
   showFilter() {

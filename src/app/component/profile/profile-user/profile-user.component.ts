@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ICredentialsSignup, ISignup} from "../../../_model/signup";
 import {Store} from "../../../_model/store";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
-import {BehaviorSubject} from "rxjs";
+import {BehaviorSubject, Subscription} from "rxjs";
 import {UsersService} from "../../../_services/users/users.service";
 import {NotifsService} from "../../../_services/notifications/notifs.service";
 import {ActivatedRoute, Router} from "@angular/router";
@@ -17,7 +17,7 @@ import {aesUtil, key} from "../../../_helpers/aes.js";
   templateUrl: './profile-user.component.html',
   styleUrls: ['./profile-user.component.css']
 })
-export class ProfileUserComponent implements OnInit {
+export class ProfileUserComponent implements OnInit, OnDestroy {
 
   user: ISignup = new ISignup();
   store: Store = new Store();
@@ -30,6 +30,7 @@ export class ProfileUserComponent implements OnInit {
   private isLoading = new BehaviorSubject<boolean>(false);
   isLoading$ = this.isLoading.asObservable();
   id: any
+  private mySubscription: Subscription;
   constructor(private userService: UsersService,  private notifsService: NotifsService, private route: ActivatedRoute,
               private router: Router, private fb: FormBuilder) {
     this.changePwd = this.fb.group({
@@ -51,7 +52,7 @@ export class ProfileUserComponent implements OnInit {
   getUser() {
     // this.id = aesUtil.encrypt(key, (aesUtil.decrypt(key, this.route.snapshot.paramMap.get('id').toString()) as string));
 
-    this.userService.getUser(this.id).subscribe(
+    this.mySubscription = this.userService.getUser(this.id).subscribe(
       resp => {
         // console.log(JSON.parse(aesUtil.decrypt(key,resp.key.toString())))
         this.user = JSON.parse(aesUtil.decrypt(key,resp.key.toString()))
@@ -81,7 +82,7 @@ export class ProfileUserComponent implements OnInit {
         // console.log(resp)
         this.isLoading.next(false);
         localStorage.removeItem('bearerToken')
-        this.notifsService.onSuccess('mot de passe modifié')
+        this.notifsService.onSuccess('mot de passe modifié, veuillez vous reconnecter')
         this.router.navigate(['auth/']);
       },
       error => {
@@ -89,6 +90,10 @@ export class ProfileUserComponent implements OnInit {
         // this.errorMessage = error.error.message;
       }
     )
+  }
+
+  ngOnDestroy(): void {
+    this.mySubscription ? this.mySubscription.unsubscribe() : null;
   }
 
 

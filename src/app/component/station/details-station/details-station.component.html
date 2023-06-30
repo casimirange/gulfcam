@@ -1,5 +1,12 @@
 <div class="app-page-title" *ngIf="roleUser === 'MANAGER_STATION' || role.includes('ROLE_SUPERADMIN')">
-  <div class="page-title-wrapper">
+  <ng-container class="bg-white" *ngIf="load">
+    <div class="col-md-12 text-center my-3">
+      <div class="ball-clip-rotate">
+        <div style="background-color: rgb(68, 64, 84);"></div>
+      </div>
+    </div>
+  </ng-container>
+  <div class="page-title-wrapper" *ngIf="!load">
     <div class="page-title-heading">
       <div class="page-title-icon">
         <i class="pe-7s-paint-bucket icon-gradient bg-danger">

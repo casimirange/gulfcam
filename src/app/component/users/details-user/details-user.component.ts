@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {OrderService} from "../../../_services/order/order.service";
 import {NotifsService} from "../../../_services/notifications/notifs.service";
 import {ActivatedRoute, Router} from "@angular/router";
@@ -8,7 +8,7 @@ import {StoreService} from "../../../_services/store/store.service";
 import {Store} from "../../../_model/store";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {IToken} from "../../../_model/token";
-import {BehaviorSubject, Observable, of} from "rxjs";
+import {BehaviorSubject, Observable, of, Subscription} from "rxjs";
 import {StatusAccountService} from "../../../_services/status/status-account.service";
 import {StatusUserService} from "../../../_services/status/status-user.service";
 import {RoleUserService} from "../../../_services/role/role-user.service";
@@ -24,7 +24,7 @@ import {DataState} from "../../../_enum/data.state.enum";
   templateUrl: './details-user.component.html',
   styleUrls: ['./details-user.component.css']
 })
-export class DetailsUserComponent implements OnInit {
+export class DetailsUserComponent implements OnInit, OnDestroy {
 
   user: ISignup = new ISignup();
   store: Store = new Store();
@@ -58,6 +58,9 @@ export class DetailsUserComponent implements OnInit {
     {name : "Simple Utilisateur" , value : "ROLE_USER"},
     {name : "Super Administrateur" , value : "ROLE_SUPERADMIN"}
   ]
+  private mySubscription: Subscription;
+  private mySubscription2: Subscription;
+  load: boolean;
   constructor(private userService: UsersService,  private notifsService: NotifsService, private route: ActivatedRoute, private router: Router,
               private storeService: StoreService, private fb: FormBuilder, private statusAccountService: StatusAccountService,
               private statusUserService: StatusUserService, private roleUserService: RoleUserService, private _location: Location) {
@@ -86,9 +89,11 @@ export class DetailsUserComponent implements OnInit {
   }
 
   getStores(){
-    this.storeService.getStore().subscribe(
+    this.load = true
+    this.mySubscription = this.storeService.getStore().subscribe(
       resp => {
         this.stores = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content
+        this.load = false
       },
       error => {
 
@@ -132,7 +137,7 @@ export class DetailsUserComponent implements OnInit {
     this.activeUser = this.user.status.name != 'USER_ENABLED'
     this.isLoading.next(true);
     const id = this.route.snapshot.paramMap.get('id')
-    this.userService.enableDesable(id.toString(), this.activeUser).subscribe(
+    this.mySubscription2 = this.userService.enableDesable(id.toString(), this.activeUser).subscribe(
       resp => {
         this.isLoading.next(false);
         this.notifsService.onSuccess(resp.message)
@@ -192,6 +197,11 @@ export class DetailsUserComponent implements OnInit {
 
   back() {
     this._location.back()
+  }
+
+  ngOnDestroy(): void {
+    this.mySubscription ? this.mySubscription.unsubscribe() : null
+    this.mySubscription2 ? this.mySubscription2.unsubscribe() : null
   }
 
 }

@@ -1,9 +1,9 @@
-import {Component, OnInit, TemplateRef} from '@angular/core';
+import {Component, OnDestroy, OnInit, TemplateRef} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {Store} from "../../../_model/store";
 import {Unite} from "../../../_model/unite";
 import {TypeVoucher} from "../../../_model/typeVoucher";
-import {BehaviorSubject, Observable, of} from "rxjs";
+import {BehaviorSubject, Observable, of, Subscription} from "rxjs";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {StoreService} from "../../../_services/store/store.service";
 import {Router} from "@angular/router";
@@ -32,7 +32,7 @@ import {aesUtil, key} from "../../../_helpers/aes.js";
   templateUrl: './index-request-opposition.component.html',
   styleUrls: ['./index-request-opposition.component.scss']
 })
-export class IndexRequestOppositionComponent implements OnInit {
+export class IndexRequestOppositionComponent implements OnInit, OnDestroy {
 
   requestForm: FormGroup;
   stores: Store[] = [];
@@ -66,6 +66,13 @@ export class IndexRequestOppositionComponent implements OnInit {
   private clientNotFound: boolean;
   onFilter = false;
   idmanager = localStorage.getItem('uid')
+  private isVerifying = new BehaviorSubject<boolean>(false);
+  isVerifying$ = this.isVerifying.asObservable();
+  private mySubscription: Subscription;
+  private mySubscription2: Subscription;
+  private mySubscription3: Subscription;
+  private mySubscription4: Subscription;
+  private mySubscription5: Subscription;
   constructor(private modalService: NgbModal, private fb: FormBuilder, private storeService: StoreService, private router: Router,
               private notifService: NotifsService, private unitService: UnitsService, private voucherService: VoucherService,
               private clientService: ClientService, private userService: UsersService, private requestService: OppositionService,
@@ -182,7 +189,7 @@ export class IndexRequestOppositionComponent implements OnInit {
 
   findClients(event: string): Client[]{
     if (event != '' && event.length >= 3){
-      this.clientService.searchClient(event) .subscribe(
+      this.mySubscription5 = this.clientService.searchClient(event) .subscribe(
         resp => {
           this.clients = JSON.parse(aesUtil.decrypt(key,resp.key.toString()));
           if (!JSON.parse(aesUtil.decrypt(key,resp.key.toString())).length){
@@ -201,7 +208,7 @@ export class IndexRequestOppositionComponent implements OnInit {
 
   getUsers() {
     const type = 'SALES_MANAGER'
-    this.userService.getUsersByTypeAccount(type).subscribe(
+    this.mySubscription3 = this.userService.getUsersByTypeAccount(type).subscribe(
       resp => {
         this.users = JSON.parse(aesUtil.decrypt(key,resp.key.toString()))
       },
@@ -210,7 +217,7 @@ export class IndexRequestOppositionComponent implements OnInit {
 
   getUsersCA() {
     const type = 'COMMERCIAL_ATTACHE'
-    this.userService.getUsersByTypeAccount(type).subscribe(
+    this.mySubscription4 = this.userService.getUsersByTypeAccount(type).subscribe(
       resp => {
         this.usersCA = JSON.parse(aesUtil.decrypt(key,resp.key.toString()))
       },
@@ -263,6 +270,7 @@ export class IndexRequestOppositionComponent implements OnInit {
 
   addCoupon() {
     // let str= this.requestForm.controls['serialNumber'].value.toString();
+    this.isVerifying.next(true)
     let str = parseInt(this.requestForm.controls['serialNumber'].value.toString());
     let rout = aesUtil.encrypt(key, str.toString())
     while (rout.includes('/')){
@@ -271,26 +279,32 @@ export class IndexRequestOppositionComponent implements OnInit {
     let client;
     if (this.requestForm.controls['idClient'].value) {
       client = this.clients.find(client => client.completeName === this.requestForm.controls['idClient'].value)
-      this.couponService.getCouponsBySerialNumber(rout).subscribe(
+      this.mySubscription = this.couponService.getCouponsBySerialNumber(rout).subscribe(
         res => {
+          // this.isVerifying.next(false)
           if (JSON.parse(aesUtil.decrypt(key,res.key.toString())).status.name === 'ACTIVATED') {
             if (JSON.parse(aesUtil.decrypt(key,res.key.toString())).idClient === client.internalReference) {
               this.vouchers.push(this.requestForm.controls['serialNumber'].value)
               this.vouchers1.push(rout)
               // console.log('coupons', this.vouchers1)
               this.requestForm.controls['serialNumber'].reset()
+              this.isVerifying.next(false)
             } else {
               this.notifService.onWarning('Ce coupon n\'appartient pas à ce client')
+              this.isVerifying.next(false)
             }
           } else {
+            this.isVerifying.next(false)
             this.notifService.onWarning(`Seuls les coupons activés peuvent être utilisés. statut du coupon: ${this.getStatuts(JSON.parse(aesUtil.decrypt(key,res.key.toString())).status.name)}`)
           }
         }, error => {
+          this.isVerifying.next(false)
           this.notifService.onError("Ce coupon n'existe pas", '')
         }
       )
     } else {
       this.notifService.onWarning('Veuillez sélectionner un client')
+      this.isVerifying.next(false)
     }
   }
 
@@ -333,7 +347,7 @@ export class IndexRequestOppositionComponent implements OnInit {
 
   findClientsForFilter(event: string): Client[]{
     if (event != '' && event.length >= 3){
-      this.clientService.searchClient(event) .subscribe(
+      this.mySubscription2 = this.clientService.searchClient(event) .subscribe(
         resp => {
           this.clients = JSON.parse(aesUtil.decrypt(key,resp.key.toString()));
           if (this.clients.length <= 1){
@@ -352,5 +366,13 @@ export class IndexRequestOppositionComponent implements OnInit {
       this.clients = []
     }
     return this.clients
+  }
+
+  ngOnDestroy(): void {
+    this.mySubscription ? this.mySubscription.unsubscribe() : null;
+    this.mySubscription2 ? this.mySubscription2.unsubscribe() : null;
+    this.mySubscription3 ? this.mySubscription3.unsubscribe() : null;
+    this.mySubscription4 ? this.mySubscription4.unsubscribe() : null;
+    this.mySubscription5 ? this.mySubscription5.unsubscribe() : null;
   }
 }

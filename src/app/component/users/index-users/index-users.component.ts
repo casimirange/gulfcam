@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {UsersService} from "../../../_services/users/users.service";
 import {ISignup} from "../../../_model/signup";
@@ -9,7 +9,7 @@ import {StatusService} from "../../../_services/status/status.service";
 import {StatusAccountService} from "../../../_services/status/status-account.service";
 import {Router} from "@angular/router";
 import {StatusUserService} from "../../../_services/status/status-user.service";
-import {BehaviorSubject, Observable, of} from "rxjs";
+import {BehaviorSubject, Observable, of, Subscription} from "rxjs";
 import {AppState} from "../../../_interfaces/app-state";
 import {CustomResponse} from "../../../_interfaces/custom-response";
 import {DataState} from "../../../_enum/data.state.enum";
@@ -21,7 +21,7 @@ import {AESUtil, aesUtil, key} from "../../../_helpers/aes.js";
   templateUrl: './index-users.component.html',
   styleUrls: ['./index-users.component.scss']
 })
-export class IndexUsersComponent implements OnInit {
+export class IndexUsersComponent implements OnInit, OnDestroy {
 
   users: ISignup[] = []
   stores: Store[] = []
@@ -43,6 +43,8 @@ export class IndexUsersComponent implements OnInit {
   lastNameFilter? = ''
   aes = aesUtil;
   keys = key
+  private mySubscription2: Subscription;
+  load: boolean;
   constructor(private modalService: NgbModal, private userService: UsersService, private notifsService: NotifsService,
               private storeService: StoreService, private statusAccountService: StatusAccountService,
               private statusUserService: StatusUserService, private router: Router,) {
@@ -128,9 +130,11 @@ export class IndexUsersComponent implements OnInit {
   }
 
   getStores(){
-    this.storeService.getStore().subscribe(
+    this.load = true
+    this.mySubscription2 = this.storeService.getStore().subscribe(
       resp => {
         this.stores = JSON.parse(aesUtil.decrypt(key,resp.key.toString())).content
+        this.load = false
       },
       error => {
         // this.notifsService.onError(error.error.message, 'échec chargement magasins')
@@ -148,5 +152,9 @@ export class IndexUsersComponent implements OnInit {
 
   decryptData(data: any) : string{
     return aesUtil.decrypt(key, data.toString()) as string;
+  }
+
+  ngOnDestroy(): void {
+    this.mySubscription2 ? this.mySubscription2.unsubscribe() : null
   }
 }

@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {aesUtil, key} from "../../../_helpers/aes";
 import {catchError, map, startWith} from "rxjs/operators";
-import {Observable, of} from "rxjs";
+import {Observable, of, Subscription} from "rxjs";
 import {Unite} from "../../../_model/unite";
 import {AppState} from "../../../_interfaces/app-state";
 import {UnitsService} from "../../../_services/units/units.service";
@@ -17,10 +17,12 @@ import {StoreHouse} from "../../../_model/storehouse";
   templateUrl: './items.component.html',
   styleUrls: ['./items.component.css']
 })
-export class ItemsComponent implements OnInit {
+export class ItemsComponent implements OnInit, OnDestroy {
   storeHouse: StoreHouse = new StoreHouse();
   appState$: Observable<AppState<Piece[]>>;
   readonly DataState = DataState;
+  private mySubscription: Subscription;
+  private mySubscription2: Subscription;
   constructor(private activatedRoute: ActivatedRoute, private storeHouseService: StoreHouseService,) { }
 
   ngOnInit(): void {
@@ -30,7 +32,7 @@ export class ItemsComponent implements OnInit {
 
   getStoreHouseInfos(){
     this.activatedRoute.params.subscribe(params => {
-      this.storeHouseService.getStoreHouseByInternalRef(params['id']).subscribe(
+      this.mySubscription = this.storeHouseService.getStoreHouseByInternalRef(params['id']).subscribe(
         res => {
           this.storeHouse = JSON.parse(aesUtil.decrypt(key,res.key.toString()));
         }
@@ -55,5 +57,9 @@ export class ItemsComponent implements OnInit {
 
   formatNumber(amount: number): string{
     return amount.toFixed(0).replace(/(\d)(?=(\d{3})+\b)/g,'$1 ');
+  }
+
+  ngOnDestroy(): void {
+    this.mySubscription ? this.mySubscription.unsubscribe() : null;
   }
 }

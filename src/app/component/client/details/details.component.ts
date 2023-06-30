@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ClientService} from "../../../_services/clients/client.service";
 import {Client, TypeClient} from "../../../_model/client";
 import {ActivatedRoute, Router} from "@angular/router";
@@ -9,7 +9,7 @@ import {Store} from "../../../_model/store";
 import {StoreService} from "../../../_services/store/store.service";
 import {CouponService} from "../../../_services/coupons/coupon.service";
 import {StatusOrderService} from "../../../_services/status/status-order.service";
-import {BehaviorSubject, Observable, of} from "rxjs";
+import {BehaviorSubject, Observable, of, Subscription} from "rxjs";
 import {AppState} from "../../../_interfaces/app-state";
 import {CustomResponse} from "../../../_interfaces/custom-response";
 import {DataState} from "../../../_enum/data.state.enum";
@@ -23,7 +23,7 @@ import {aesUtil, key} from "../../../_helpers/aes.js";
   templateUrl: './details.component.html',
   styleUrls: ['./details.component.scss']
 })
-export class DetailsComponent implements OnInit {
+export class DetailsComponent implements OnInit, OnDestroy {
   client: Client;
   orders: Order[] = [];
   order: Order = new Order();
@@ -50,6 +50,8 @@ export class DetailsComponent implements OnInit {
   totalPages: number;
   totalElements: number;
   size: number = 10;
+  private mySubscription: Subscription;
+  private mySubscription2: Subscription;
   constructor(private clientService: ClientService, private activatedRoute: ActivatedRoute, private route: ActivatedRoute,
               private orderService: OrderService, private notifService: NotifsService, private storeService: StoreService,
               private couponService: CouponService, private statusService: StatusOrderService, private router: Router) {
@@ -117,7 +119,7 @@ export class DetailsComponent implements OnInit {
 
   sendClientOrders(){
     this.isLoading.next(true)
-    this.orderService.sendOrderByClient(this.IdParam).subscribe(
+   this.mySubscription =  this.orderService.sendOrderByClient(this.IdParam).subscribe(
       res => {
         this.isLoading.next(false)
         this.notifService.onSuccess('Mail des commandes envoyé au client')
@@ -131,7 +133,7 @@ export class DetailsComponent implements OnInit {
 
   sendClientCoupons(){
     this.isSendding.next(true)
-      this.couponService.sendCouponByClient(this.IdParam).subscribe(
+      this.mySubscription2 = this.couponService.sendCouponByClient(this.IdParam).subscribe(
         res => {
           this.isSendding.next(false)
           this.notifService.onSuccess('Mail des coupons envoyé au client')
@@ -167,5 +169,10 @@ export class DetailsComponent implements OnInit {
       rout = aesUtil.encrypt(key, id.toString())
     }
     this.router.navigate(['/commandes/complete-order/', rout])
+  }
+
+  ngOnDestroy(): void {
+    this.mySubscription ? this.mySubscription.unsubscribe() : null;
+    this.mySubscription2 ? this.mySubscription2.unsubscribe() : null;
   }
 }

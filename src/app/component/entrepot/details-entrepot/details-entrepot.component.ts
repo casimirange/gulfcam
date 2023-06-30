@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Store} from "../../../_model/store";
 import {Order} from "../../../_model/order";
 import {StoreHouse} from "../../../_model/storehouse";
@@ -22,7 +22,7 @@ import {Carnet} from "../../../_model/carnet";
 import {Un} from "../../magasin/details-magasin/details-magasin.component";
 import {StatusService} from "../../../_services/status/status.service";
 import {catchError, map, startWith} from "rxjs/operators";
-import {BehaviorSubject, Observable, of} from "rxjs";
+import {BehaviorSubject, Observable, of, Subscription} from "rxjs";
 import {AppState} from "../../../_interfaces/app-state";
 import {CustomResponse} from "../../../_interfaces/custom-response";
 import {DataState} from "../../../_enum/data.state.enum";
@@ -33,7 +33,7 @@ import {aesUtil, key} from "../../../_helpers/aes.js";
   templateUrl: './details-entrepot.component.html',
   styleUrls: ['./details-entrepot.component.css']
 })
-export class DetailsEntrepotComponent implements OnInit {
+export class DetailsEntrepotComponent implements OnInit, OnDestroy {
 
   store: Store;
   storeHouse: StoreHouse = new StoreHouse();
@@ -63,6 +63,9 @@ export class DetailsEntrepotComponent implements OnInit {
   isLoadingCarton$ = this.isLoadingCarton.asObservable();
   roleUser = aesUtil.decrypt(key, localStorage.getItem('userAccount').toString())
   role: string[] = []
+  private mySubscription: Subscription;
+  private mySubscription2: Subscription;
+  load: boolean
   constructor(private clientService: ClientService, private activatedRoute: ActivatedRoute, private router: Router,
               private orderService: OrderService, private notifService: NotifsService, private storeService: StoreService,
               private storeHouseService: StoreHouseService, private unitService: UnitsService, private _location: Location,
@@ -127,10 +130,12 @@ export class DetailsEntrepotComponent implements OnInit {
   }
 
   getStoreHouseInfos(){
+    this.load = true
     this.activatedRoute.params.subscribe(params => {
-      this.storeHouseService.getStoreHouseByInternalRef(params['id']).subscribe(
+      this.mySubscription = this.storeHouseService.getStoreHouseByInternalRef(params['id']).subscribe(
         res => {
           this.storeHouse = JSON.parse(aesUtil.decrypt(key,res.key.toString()));
+          this.load = false
         }
       )
     })
@@ -138,7 +143,7 @@ export class DetailsEntrepotComponent implements OnInit {
 
   getItemsByStoreHouse(){
     this.activatedRoute.params.subscribe(params => {
-      this.storeHouseService.getItemByStoreHouse(params['id']).subscribe(
+      this.mySubscription2 = this.storeHouseService.getItemByStoreHouse(params['id']).subscribe(
         res => {
           this.items = JSON.parse(aesUtil.decrypt(key,res.key.toString()));
         }
@@ -186,5 +191,10 @@ export class DetailsEntrepotComponent implements OnInit {
 
   formatNumber(amount: number): string{
     return amount.toFixed(0).replace(/(\d)(?=(\d{3})+\b)/g,'$1 ');
+  }
+
+  ngOnDestroy(): void {
+    this.mySubscription ? this.mySubscription.unsubscribe() : null;
+    this.mySubscription2 ? this.mySubscription2.unsubscribe() : null;
   }
 }

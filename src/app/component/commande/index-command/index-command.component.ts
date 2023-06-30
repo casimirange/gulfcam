@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {Client} from "../../../_model/client";
 
@@ -15,7 +15,7 @@ import {StoreService} from "../../../_services/store/store.service";
 import {Order} from "../../../_model/order";
 import {ProductService} from "../../../_services/product/product.service";
 import {OrderService} from "../../../_services/order/order.service";
-import {BehaviorSubject, Observable, of} from "rxjs";
+import {BehaviorSubject, Observable, of, Subscription} from "rxjs";
 import {StatusService} from "../../../_services/status/status.service";
 import {StatusOrderService} from "../../../_services/status/status-order.service";
 import {AppState} from "../../../_interfaces/app-state";
@@ -37,7 +37,7 @@ export class Product {
   templateUrl: './index-command.component.html',
   styleUrls: ['./index-command.component.scss']
 })
-export class IndexCommandComponent implements OnInit {
+export class IndexCommandComponent implements OnInit, OnDestroy {
 
   title = 'Enregistrer nouvelle commande';
   clients: Client[] = [];
@@ -56,6 +56,7 @@ export class IndexCommandComponent implements OnInit {
   totalOrder: number = 0;
   totalTTC: number = 0;
   vouchers: TypeVoucher[] = [];
+  load: boolean
   voucher: TypeVoucher = new TypeVoucher()
   orders: Order[] = [];
   filtredOrders: Order[] = [];
@@ -82,7 +83,14 @@ export class IndexCommandComponent implements OnInit {
   role: string[] = []
   clientNotFound: boolean = false;
   onFilter: boolean = false;
-
+  private mySubscription: Subscription;
+  private mySubscription2: Subscription;
+  private mySubscription3: Subscription;
+  private mySubscription4: Subscription;
+  private mySubscription5: Subscription;
+  private mySubscription6: Subscription;
+  private mySubscription7: Subscription;
+  private mySubscription8: Subscription;
   constructor(private fb: FormBuilder, private modalService: NgbModal, private clientService: ClientService,
               private voucherService: VoucherService, private notifsService: NotifsService, private storeService: StoreService,
               private productService: ProductService, private orderService: OrderService, private statusService: StatusOrderService,
@@ -127,7 +135,7 @@ export class IndexCommandComponent implements OnInit {
 
   findClients(event: string): Client[] {
     if (event != '' && event.length >= 3) {
-      this.clientService.searchClient(event).subscribe(
+      this.mySubscription = this.clientService.searchClient(event).subscribe(
         resp => {
           this.clients = JSON.parse(aesUtil.decrypt(key, resp.key.toString()));
           if (!this.clients.length) {
@@ -145,7 +153,7 @@ export class IndexCommandComponent implements OnInit {
   }
 
   getStores() {
-    this.storeService.getStore().subscribe(
+    this.mySubscription2 = this.storeService.getStore().subscribe(
       resp => {
         this.stores = JSON.parse(aesUtil.decrypt(key, resp.key.toString())).content
       },
@@ -156,9 +164,13 @@ export class IndexCommandComponent implements OnInit {
   }
 
   getTypeVoucher(): void {
-    this.voucherService.getTypevoucher().subscribe(
+    this.load = true
+    this.mySubscription3 = this.voucherService.getTypevoucher().subscribe(
       resp => {
         this.vouchers = JSON.parse(aesUtil.decrypt(key, resp.key.toString())).content
+        this.load = false
+      }, error => {
+        this.load = false
       }
     )
   }
@@ -413,7 +425,7 @@ export class IndexCommandComponent implements OnInit {
 
   findClientsForFilter(event: string): Client[] {
     if (event != '' && event.length >= 3) {
-      this.clientService.searchClient(event).subscribe(
+      this.mySubscription4 = this.clientService.searchClient(event).subscribe(
         resp => {
           this.clients = JSON.parse(aesUtil.decrypt(key, resp.key.toString()));
           if (this.clients.length <= 1) {
@@ -440,5 +452,12 @@ export class IndexCommandComponent implements OnInit {
       rout = aesUtil.encrypt(key, id.toString())
     }
     this.router.navigate(['/commandes/complete-order/', rout])
+  }
+
+  ngOnDestroy(): void {
+    this.mySubscription ? this.mySubscription.unsubscribe() : null;
+    this.mySubscription2 ? this.mySubscription2.unsubscribe() : null;
+    this.mySubscription3 ? this.mySubscription3.unsubscribe() : null;
+    this.mySubscription4 ? this.mySubscription4.unsubscribe() : null;
   }
 }
