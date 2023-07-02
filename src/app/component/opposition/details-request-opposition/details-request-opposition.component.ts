@@ -59,6 +59,8 @@ export class DetailsRequestOppositionComponent implements OnInit {
       this.appState$ = this.requestService.requestByInternalRef$(params['id'].toString())
         .pipe(
           map(response => {
+            this.statut = JSON.parse(aesUtil.decrypt(key,response.key.toString())).status.name
+            // console.log(this.statut)
             return {dataState: DataState.LOADED_STATE, appData: JSON.parse(aesUtil.decrypt(key,response.key.toString()))}
           }),
           startWith({dataState: DataState.LOADING_STATE, appData: null}),
@@ -125,7 +127,7 @@ export class DetailsRequestOppositionComponent implements OnInit {
   validRequest() {
     this.isLoading.next(true);
     this.activatedRoute.params.subscribe(params => {
-      this.requestService.validOppositionRequest(params['id']).subscribe(
+      this.requestService.validOppositionRequest(params['id'], localStorage.getItem('uid')).subscribe(
         resp => {
           this.isLoading.next(false);
           this.getRequestInfos()

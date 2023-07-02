@@ -19,8 +19,8 @@ export class OppositionService {
     return this.http.post<any>(environment.requestOpposition, product)
   }
 
-  validOppositionRequest(internalRef: string): Observable<any>{
-    return this.http.post<any>(environment.requestOpposition+`/${internalRef}`, null)
+  validOppositionRequest(internalRef: string, idSalesManager: string): Observable<any>{
+    return this.http.post<any>(environment.requestOpposition+`/${internalRef}?manager=${idSalesManager}`, null)
   }
 
   getRequestByInternalRef(internalRef: string): Observable<any>{
