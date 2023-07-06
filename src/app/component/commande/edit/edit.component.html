@@ -249,7 +249,7 @@
                                   name="text" rows="1" id="exampleText" class="form-control" formControlName="reason"
                                   placeholder="raison d'annulation de la commande" ngModel="{{order.reasonForCancellation}}"
                                   [disabled]="statut == 'ORDER_CANCEL' || statut != 'CLOSED'"></textarea>
-                        <textarea *ngIf="roleUser != 'COMMERCIAL_ATTACHE' || roleUser != 'SALES_MANAGER' && !role.includes('ROLE_ADMIN') && !role.includes('ROLE_SUPERADMIN')" rows="1" class="form-control"
+                        <textarea *ngIf="(roleUser != 'COMMERCIAL_ATTACHE' || roleUser != 'SALES_MANAGER') && !role.includes('ROLE_SUPERADMIN')" rows="1" class="form-control"
                                   [value]="order.reasonForCancellation" placeholder="raison d'annulation de la commande"
                                   disabled></textarea>
                       </div>

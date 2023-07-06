@@ -54,9 +54,9 @@ export class DetailsUserComponent implements OnInit, OnDestroy {
     {name : "Gestionnaire de station" , value : "MANAGER_STATION"},
   ]
   roles = [
-    {name : "Administrateur" , value : "ROLE_ADMIN"},
+    {name : "Administrateur" , value : "ROLE_SUPERADMIN"},
     {name : "Simple Utilisateur" , value : "ROLE_USER"},
-    {name : "Super Administrateur" , value : "ROLE_SUPERADMIN"}
+    // {name : "Super Administrateur" , value : "ROLE_SUPERADMIN"}
   ]
   private mySubscription: Subscription;
   private mySubscription2: Subscription;

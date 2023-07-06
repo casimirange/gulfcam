@@ -299,8 +299,8 @@
                 <div class="col-md-12">
                   <div class="position-relative form-group">
                     <label for="delais" class="">Délais de livraison</label>
-                    <input placeholder="délais" type="date" id="delais" autocomplete="off" class="form-control"
-                           formControlName="delais">
+                    <input placeholder="délais" type="date" id="delais" autocomplete="off" class="form-control" [min]="minDate"
+                           formControlName="delais" min="">
                   </div>
                   <div
                     *ngIf="orderForm.controls['delais'].invalid && (orderForm.controls['delais'].dirty || orderForm.controls['delais'].touched)"

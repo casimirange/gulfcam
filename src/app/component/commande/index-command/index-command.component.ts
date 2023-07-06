@@ -91,6 +91,7 @@ export class IndexCommandComponent implements OnInit, OnDestroy {
   private mySubscription6: Subscription;
   private mySubscription7: Subscription;
   private mySubscription8: Subscription;
+  minDate: string;
   constructor(private fb: FormBuilder, private modalService: NgbModal, private clientService: ClientService,
               private voucherService: VoucherService, private notifsService: NotifsService, private storeService: StoreService,
               private productService: ProductService, private orderService: OrderService, private statusService: StatusOrderService,
@@ -101,6 +102,8 @@ export class IndexCommandComponent implements OnInit, OnDestroy {
     JSON.parse(localStorage.getItem('Roles').toString()).forEach(authority => {
       this.role.push(aesUtil.decrypt(key, authority));
     });
+    const today = new Date();
+    this.minDate = today.toISOString().split('T')[0];
   }
 
   //initialisation de création du formulaire de commande

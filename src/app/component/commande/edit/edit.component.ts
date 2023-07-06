@@ -366,7 +366,18 @@ export class EditComponent implements OnInit, OnDestroy {
   }
 
   selectFile(event) {
-    this.selectedFiles = event.target.files;
+    const file = event.target.files;
+    const fileSizeInBytes = file.size;
+    const maxSizeInBytes = 1 * 1024 * 1024; // 10MB
+
+    if (fileSizeInBytes > maxSizeInBytes) {
+      // Afficher une erreur ou prendre une action appropriée
+      console.log("La taille du fichier dépasse la limite maximale autorisée.");
+    } else {
+      // Le fichier est dans les limites de taille acceptables, poursuivre le traitement
+
+      this.selectedFiles = event.target.files;
+    }
   }
 
   getProforma() {
