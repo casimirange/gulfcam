@@ -260,10 +260,12 @@ export class DetailsStationComponent implements OnInit, OnDestroy {
     const body = {
       "idStation": 0,
       "modulo": 0,
+      "idPompist": "",
       "productionDate": "2022-12-16"
     }
     const modulo = 0
     body.idStation = this.idParam as number
+    body.idPompist = localStorage.getItem("uid")
     body.modulo = aesUtil.encrypt(key, modulo.toString()) as number
     // body.idStation = this.couponForm.controls['idStation'].value
     // body.productionDate = new Date().toLocaleString().toString()

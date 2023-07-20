@@ -251,6 +251,7 @@
                     <th>Client</th>
                     <th>Carnet</th>
                     <th>Statut</th>
+                    <th>Pompiste</th>
                     <th>Note credit</th>
                     <th>Date Cr.</th>
                     <th>Date Mod.</th>
@@ -268,6 +269,7 @@
                     <td>{{coupon.nameClient}}</td>
                     <td>{{coupon.idNotebook}}</td>
                     <td>{{getStatuts(coupon.status.name)}}</td>
+                    <td>{{coupon.pompisteName}}</td>
                     <td>{{coupon.idCreditNote}}</td>
                     <td>{{coupon.createdAt | formatDateHour}}</td>
                     <td>{{coupon.updateAt | formatDateHour}}</td>

@@ -8,6 +8,7 @@ export class CreditNote{
   // idClient:	number
   idStation:	string
   coupon:	Coupon[]
+  coupons:	Coupon[]
   station:	Station
   status?:	Status
   createdAt?:	string

@@ -24,6 +24,8 @@ export class StatusAccountService {
         break;
       case 'COMMERCIAL_ATTACHE': this.status = 'ATTACHE COMMERCIAL'
         break;
+      case 'POMPIST': this.status = 'POMPISTE'
+        break;
       case 'COMPTABLE': this.status = 'COMPTABLE'
         break;
     }

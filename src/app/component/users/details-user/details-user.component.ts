@@ -52,6 +52,7 @@ export class DetailsUserComponent implements OnInit, OnDestroy {
     {name : "Gestionnaire espace 1" , value : "MANAGER_SPACES_1"},
     {name : "Gestionnaire espace 2" , value : "MANAGER_SPACES_2"},
     {name : "Gestionnaire de station" , value : "MANAGER_STATION"},
+    {name : "Pompiste" , value : "POMPIST"},
   ]
   roles = [
     {name : "Administrateur" , value : "ROLE_SUPERADMIN"},

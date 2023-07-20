@@ -93,10 +93,12 @@
                 <th>Carnet</th>
                 <th>Statut</th>
                 <th>Note credit</th>
-<!--                <th>Date</th>-->
+                <th>Station</th>
+                <th>Pompiste</th>
+                <th>Date</th>
               </tr>
               </thead>
-              <tbody *ngFor="let coupon of appState.appData.coupon; let i = index">
+              <tbody *ngFor="let coupon of appState.appData.coupons; let i = index">
 
               <tr>
                 <td>{{i + 1}}</td>
@@ -105,7 +107,9 @@
                 <td>{{coupon.idNotebook}}</td>
                 <td>{{getStatuts(coupon.status.name)}}</td>
                 <td>{{coupon.idCreditNote}}</td>
-<!--                <td>{{coupon.createdAt | date: 'dd/MM/yyyy'}}</td>-->
+                <td>{{coupon.nameStation}}</td>
+                <td>{{coupon.pompisteName}}</td>
+                <td>{{coupon.updateAt | formatDateHour}}</td>
               </tr>
               </tbody>
             </table>
@@ -115,7 +119,7 @@
       <div class="card-footer">
         <div class="btn-actions-pane-left">
           <div role="group" class="btn-group-sm btn-group">
-            Total: <b>{{ appState.appData.coupon.length }} </b>
+            Total: <b>{{ appState.appData.coupons.length }} </b>
           </div>
         </div>
       </div>
