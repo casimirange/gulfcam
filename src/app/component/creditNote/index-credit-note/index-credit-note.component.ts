@@ -296,10 +296,12 @@ export class IndexCreditNoteComponent implements OnInit, OnDestroy {
   getCouponByStation() {
     this.selectedStation = true
     let stationId = this.creditForm.controls['idStation'].value
-    let rout = aesUtil.encrypt(key, stationId.toString())
-    while (rout.includes('/') || rout.includes(' ')){
-      rout = aesUtil.encrypt(key, stationId.toString())
-    }
+    // console.log(stationId)
+    let rout = stationId.toString()
+    // let rout = aesUtil.encrypt(key, stationId.toString())
+    // while (rout.includes('/') || rout.includes(' ')){
+    //   rout = aesUtil.encrypt(key, stationId.toString())
+    // }
     // console.log(stationId)
     this.vouchers = []
     this.couponsFiltered = []

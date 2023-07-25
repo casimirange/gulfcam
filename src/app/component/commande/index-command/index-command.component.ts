@@ -321,7 +321,7 @@ export class IndexCommandComponent implements OnInit, OnDestroy {
             // )
             this.isLoading.next(false)
             this.saveProductsOrder(JSON.parse(aesUtil.decrypt(key,response.key.toString())))
-            // this.getProforma(JSON.parse(aesUtil.decrypt(key, response.key.toString())));
+            this.getProforma(JSON.parse(aesUtil.decrypt(key, response.key.toString())));
             this.annuler()
             this.getOrders()
             return {dataState: DataState.LOADED_STATE, appData: this.dataSubjects.value}
@@ -360,7 +360,7 @@ export class IndexCommandComponent implements OnInit, OnDestroy {
 
   }
 
-  saveProductsOrder(order: Order) {
+  async saveProductsOrder(order: Order) {
     //une fois la commande enregistrée, on enregistre les produits liés à cette commande
     for (let prod of this.tabProducts) {
       this.voucher = this.vouchers.find(v => v.amount == prod.voucher)
@@ -371,7 +371,7 @@ export class IndexCommandComponent implements OnInit, OnDestroy {
     }
   }
 
-  getProforma(order: Order) {
+  async getProforma(order: Order) {
     this.orderService.getProforma(aesUtil.encrypt(key, order.internalReference.toString())).subscribe(
       respProd => {
         const file = new Blob([respProd], {type: 'application/pdf'});
