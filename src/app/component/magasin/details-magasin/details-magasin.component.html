@@ -1,0 +1,156 @@
+
+<div class="app-page-title" *ngIf="(roleUser === 'MANAGER_SPACES_2' || roleUser === 'SALES_MANAGER' || roleUser === 'MANAGER_SPACES_1' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))">
+  <ng-container class="bg-white" *ngIf="load">
+    <div class="col-md-12 text-center my-3">
+      <div class="ball-clip-rotate">
+        <div style="background-color: rgb(68, 64, 84);"></div>
+      </div>
+    </div>
+  </ng-container>
+  <div class="page-title-wrapper" *ngIf="!load">
+    <div class="page-title-heading">
+      <div class="page-title-icon">
+        <i class="pe-7s-home icon-gradient bg-danger">
+        </i>
+      </div>
+      <div>Magasin de {{store.localization}}
+        <div class="page-title-subheading">Réference interne: #{{store.internalReference}}</div>
+      </div>
+    </div>
+    <div class="page-title-actions">
+      <button (click)="back()" type="button" data-toggle="tooltip" title="cartons" data-placement="bottom"
+              class="btn-shadow mr-3 btn btn-outline-dark">
+           <span class="btn-icon-wrapper pr-2 opacity-7">
+                                            <i class="fa fa-backward fa-w-20"></i>
+                                        </span>
+        Retour
+      </button>
+    </div>
+  </div>
+</div>
+
+<app-unites *ngIf="(roleUser === 'MANAGER_SPACES_2' || roleUser === 'SALES_MANAGER' || roleUser === 'MANAGER_SPACES_1' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))"></app-unites>
+
+<div class="row" *ngIf="(roleUser === 'MANAGER_SPACES_2' || roleUser === 'SALES_MANAGER' || roleUser === 'MANAGER_SPACES_1' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))">
+  <div class="col-md-12"  *ngIf="(roleUser === 'MANAGER_SPACES_2' || roleUser === 'SALES_MANAGER' || roleUser === 'MANAGER_SPACES_1' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))">
+    <div class="main-card mb-3 card " id="htmlData" #htmlData>
+      <div class="card-header">
+        Liste de ses espaces
+      </div>
+
+      <ng-container class="bg-white" *ngIf="(storeHouseState$ | async) as appState" [ngSwitch]="appState.dataState">
+        <div class="table-responsive">
+          <ng-container class="bg-white" *ngSwitchCase="DataState.LOADING_STATE">
+            <div class="col-md-12 text-center my-3">
+              <!--                <div class="spinner-border text-primary my-3" role="status"></div>-->
+              <div class="ball-clip-rotate">
+                <div style="background-color: rgb(68, 64, 84);"></div>
+              </div>
+            </div>
+          </ng-container>
+          <ng-container class="bg-white py-1 px-1" *ngSwitchCase="DataState.LOADED_STATE">
+            <table class="table table-hover bg-white">
+              <thead>
+              <tr>
+                <th>#</th>
+                <th>Ref. interne</th>
+                <th>Nom</th>
+                <th>Type</th>
+<!--                <th>Statut</th>-->
+                <th>Date création</th>
+                <th>Date modification</th>
+                <th >Actions</th>
+              </tr>
+              </thead>
+              <!--                <tbody *ngFor="let client of clients | clientNameFilter: name | clientRefFilter: internalRef | clientCompagnyFilter: compagny-->
+              <!--                 | clientDateFilter: date | paginate: { id: 'client', itemsPerPage: size, currentPage: page, totalItems: totalElements } ; let i = index">-->
+              <tbody *ngFor="let storeHouse of appState.appData.content | paginate: { id: 'shs', itemsPerPage: appState.appData.size, currentPage: page, totalItems: appState.appData.totalElements } ; let i = index">
+
+              <tr>
+                <td>{{i + 1}}</td>
+                <td>{{storeHouse.internalReference}}</td>
+                <td>{{storeHouse.name}}</td>
+                <td>{{storeHouse.type}}</td>
+<!--                <td>{{getStatuts(storeHouse.status.name)}}</td>-->
+                <td>{{storeHouse.createAt | formatDate }}</td>
+                <td>{{storeHouse.updateAt | formatDate}}</td>
+                <td >
+                  <button class="btn btn-sm btn-secondary mr-2" (click)="showDetails(storeHouse.internalReference)"
+                          *ngIf="role.includes('ROLE_SUPERADMIN') || (storeHouse.type == 'vente' ? roleUser == 'MANAGER_SPACES_2' : roleUser =='MANAGER_SPACES_1') "
+                  >
+                    <i class="pe-7s-look" title="consulter"></i>
+                  </button>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+            <div class="text-center">
+              <p *ngIf="!appState.appData.content.length" style="color: grey; font-size: 1.8rem;" class="mx-auto">Aucun espace trouvé !</p>
+            </div>
+            <div class="card-footer">
+              <div class="btn-actions-pane-left">
+                <div role="group" class="btn-group-sm btn-group">
+                  Total:&nbsp;<b>{{ appState.appData.totalElements }} </b>
+                </div>
+              </div>
+              <div class="btn-actions-pane-right">
+                <div role="group" class="btn-group-sm btn-group">
+                  <!--              <pagination-controls id="client" (pageChange)="pageChange($event)" ></pagination-controls>-->
+                  <pagination-controls
+                    id="shs"
+                    previousLabel="Précédent"
+                    nextLabel="Suivant"
+                    (pageChange)="pageChange($event)"></pagination-controls>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          <ng-container class="bg-white"  *ngSwitchCase="DataState.ERROR_STATE">
+            <div class="col-md-12 text-center">
+              <div class="text-danger" >{{appState.error}}</div>
+            </div>
+          </ng-container>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div>
+<!--<div class="row" >-->
+<!--  <div class="col-md-12">-->
+<!--    <div class="main-card mb-3 card " id="htmlData">-->
+<!--      <div class="card-header">-->
+<!--        Liste de ses espaces-->
+<!--      </div>-->
+
+<!--      <div class="table-responsive" >-->
+<!--        <table class="align-middle mb-0 table table-sm table-borderless table-hover" id="element-pannes">-->
+<!--          <thead>-->
+<!--          <tr>-->
+<!--            <th class="">Ref#</th>-->
+<!--            <th class="">Date</th>-->
+<!--            <th class="">Nom de l'espace</th>-->
+<!--            <th class="">Type</th>-->
+<!--            <th class="">Statut</th>-->
+<!--          </tr>-->
+<!--          </thead>-->
+<!--          <tbody>-->
+<!--          <tr style="cursor: pointer" *ngFor="let storeHouse of storeHouses" (click)="showDetails(storeHouse.internalReference)">-->
+<!--            <td class="text-left">{{storeHouse.internalReference}}</td>-->
+<!--            <td class="text-left">{{storeHouse.createAt | formatDate}}</td>-->
+<!--            <td class="text-left">{{storeHouse.name}}</td>-->
+<!--            <td class="text-left" >{{storeHouse.type}}</td>-->
+<!--            <td class="text-left" > <span class="text-focus">{{getStatuts(storeHouse.status.name)}}</span> </td>-->
+<!--          </tr>-->
+
+<!--          </tbody>-->
+
+<!--        </table>-->
+<!--        &lt;!&ndash;          dans le cas où aucune commande n'est trouvée&ndash;&gt;-->
+<!--        <ng-template [ngIf]="!storeHouses.length">-->
+<!--          <p style="color: grey; font-size: 1.8rem;" class="text-center" >Aucun espace trouvé pour ce magasin</p>-->
+<!--        </ng-template>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--</div>-->
+

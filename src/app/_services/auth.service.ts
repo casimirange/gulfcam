@@ -17,8 +17,8 @@ export class AuthService {
 
   constructor(private http: HttpClient) { }
 
-  login(credentials: ICredentials): Observable<IToken>{
-    return this.http.post<IToken>(environment.signin, credentials);
+  login(credentials: ICredentials): Observable<any>{
+    return this.http.post<any>(environment.signin, credentials);
   }
 
   // refreshToken(token: any): Observable<any>{

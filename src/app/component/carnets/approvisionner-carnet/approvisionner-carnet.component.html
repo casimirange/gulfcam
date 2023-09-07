@@ -1,0 +1,104 @@
+<div class="app-page-title"
+     *ngIf="roleUser === 'MANAGER_SPACES_1' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+  <div class="page-title-wrapper">
+    <div class="page-title-heading">
+      <div class="page-title-icon">
+        <i class="pe-7s-drawer icon-gradient bg-danger">
+        </i>
+      </div>
+      <div>Stock
+        <div class="page-title-subheading">Approvisionnement des carnets</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
+  <li class="nav-item">
+    <a role="tab" class="nav-link" routerLink="/stock/index" routerLinkActive="active">
+      <span>Stock</span>
+    </a>
+  </li>
+  <li class="nav-item"
+      *ngIf="roleUser === 'MANAGER_SPACES_1' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+    <a role="tab" class="nav-link" routerLink="/stock/supply" routerLinkActive="active">
+      <span>Ordre d'approvisionnement</span>
+    </a>
+  </li>
+  <li class="nav-item"
+      *ngIf="roleUser==='MANAGER_SPACES_1' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+    <a role="tab" class="nav-link" routerLink="/stock/forward" routerLinkActive="active">
+      <span>Ordre de transfert</span>
+    </a>
+  </li>
+</ul>
+
+<div *ngIf="roleUser === 'MANAGER_SPACES_1' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="main-card mb-3 card">
+        <div class="card-body">
+          <h5 class="card-title">Approvisionnement espace de vente</h5>
+          <div class="col-md-12 text-center my-3" *ngIf="loadCarton || loadStoreHouse; else approv">
+            <div class="ball-clip-rotate">
+              <div style="background-color: rgb(68, 64, 84);"></div>
+            </div>
+          </div>
+          <ng-template #approv>
+            <form [formGroup]="supplyForm">
+              <div class="form-row">
+                <div class="col-md-6">
+                  <div class="position-relative form-group">
+                    <label>Carton</label>
+                    <select formControlName="idCarton" class="form-control">
+                      <option disabled selected hidden value="">Sélectionner un carton</option>
+                      <option *ngFor="let carton of cartons"
+                              [value]="carton.internalReference">{{carton.number}}</option>
+                      <option *ngIf="!cartons.length" disabled value="">Aucun carton disponible</option>
+                    </select>
+                  </div>
+                  <div *ngIf="form['idCarton'].invalid && (form['idCarton'].dirty || form['idCarton'].touched)"
+                       class="mb-2" style="color: #f65656; font-style: italic;">
+
+                    <div *ngIf="form['idCarton'].errors?.['required']" class="ml-3">
+                      le carton est requis.
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="position-relative form-group">
+                    <label>Espace de vente</label>
+                    <select formControlName="idStoreHouseSell" class="form-control">
+                      <option disabled selected hidden value="">Sélectionner un espace</option>
+                      <option *ngFor="let store of storeHouses2"
+                              [value]="store.internalReference">{{store.name}}</option>
+                      <option *ngIf="!storeHouses2.length" disabled value="">Aucun espace trouvé</option>
+                    </select>
+                  </div>
+                  <div
+                    *ngIf="form['idStoreHouseSell'].invalid && (form['idStoreHouseSell'].dirty || form['idStoreHouseSell'].touched)"
+                    class="mb-2" style="color: #f65656; font-style: italic;">
+
+                    <div *ngIf="form['idStoreHouseSell'].errors?.['required']" class="ml-3">
+                      l'entrepôt est requis.
+                    </div>
+                  </div>
+                </div>
+                <div class="float-right">
+                  <button type="submit" class="btn btn-primary" [disabled]="supplyForm.invalid || (isLoading$ | async)">
+                    <i *ngIf="isLoading$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
+                    <span *ngIf="isLoading$ | async">Approvisionnement...</span>
+                    <span *ngIf="!(isLoading$ | async)" (click)="supplyNoteBook()">Approvisionner</span>
+                  </button>
+                </div>
+              </div>
+            </form>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+

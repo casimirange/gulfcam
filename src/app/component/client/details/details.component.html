@@ -1,0 +1,165 @@
+<div *ngIf="roleUser === 'COMMERCIAL_ATTACHE' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+
+
+<ng-container
+  *ngIf="(appState$ | async) as appState"
+  [ngSwitch]="appState.dataState">
+  <ng-container class="bg-white" *ngSwitchCase="DataState.LOADING_STATE">
+    <div class="col-md-12 text-center my-3">
+      <div class="ball-clip-rotate">
+        <div style="background-color: rgb(68, 64, 84);"></div>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-container *ngSwitchCase="DataState.LOADED_STATE">
+    <div class="app-page-title">
+      <div class="page-title-wrapper">
+        <div class="page-title-heading">
+          <div>
+            <div class="page-title-head center-elem">
+<span class="d-inline-block pr-2">
+<i class="lnr-user icon-gradient bg-danger"></i>
+</span>
+              <span class="d-inline-block">{{appState.appData.completeName | titlecase}}</span>
+            </div>
+            <div class="page-title-subheading opacity-10">
+              <nav class="" aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                  <li class="breadcrumb-item" *ngIf="appState.appData.companyName">
+                    <a>
+                      <i aria-hidden="true" class="fa fa-home"></i>: &nbsp; {{appState.appData.companyName}}
+                    </a>
+                  </li>
+                  <li class="breadcrumb-item">
+                    <a>
+                      <i class="fa fa-phone"></i>&nbsp; {{appState.appData.phone}}
+                    </a>
+                  </li>
+                  <li class="active breadcrumb-item" aria-current="page" *ngIf="appState.appData.email" [ngClass]="">
+                    <a>
+                      <i class="fa fa-envelope"></i>&nbsp; {{appState.appData.email}}
+                    </a>
+                  </li>
+                </ol>
+              </nav>
+            </div>
+          </div>
+        </div>
+        <div class="page-title-actions">
+          <div class="d-inline-block pr-3">
+            <button type="button" data-toggle="tooltip" data-placement="left" class="btn btn-primary"
+                    title="envoyer la liste des commandes au client"
+                    (click)="sendClientOrders()" data-original-title="envoyer la liste des commandes au client"
+                    [disabled]="isLoading$ | async">
+              <i *ngIf="isLoading$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
+              <span *ngIf="isLoading$ | async">Envoi du mail ...</span>
+              <span *ngIf="!(isLoading$ | async)"><i class="fa fa-file-excel"></i> Mail Commandes</span>
+
+            </button>
+          </div>
+          <button type="button" data-toggle="tooltip" data-placement="bottom" class="btn btn-primary"
+                  title="envoyer la liste des coupons au client"
+                  (click)="sendClientCoupons()" data-original-title="envoyer la liste des coupons au client"
+                  [disabled]="isSending$ | async">
+            <i *ngIf="isSending$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
+            <span *ngIf="isSending$ | async">Envoi du mail ...</span>
+            <span *ngIf="!(isSending$ | async)"><i class="fa fa-file-excel"></i> Mail Coupons</span>
+          </button>
+
+        </div>
+      </div>
+    </div>
+  </ng-container>
+  <ng-container class="bg-white" *ngSwitchCase="DataState.ERROR_STATE">
+    <div class="col-md-12 text-center">
+      <div class="text-danger">{{appState.error}}</div>
+    </div>
+  </ng-container>
+</ng-container>
+
+
+<div class="row" >
+  <div class="col-md-12">
+    <div class="main-card mb-3 card " id="htmlData">
+      <div class="card-header">
+        Liste de ses commandes
+<!--        <div class="btn-actions-pane-right">-->
+<!--          <div role="group" class="btn-group-sm btn-group">-->
+<!--            <input type="date" placeholder="Rechercher date" [(ngModel)]="date"-->
+<!--                   class="form-control form-control-sm mr-3">-->
+<!--            <input type="text" placeholder="Rechercher ref commande" [(ngModel)]="internalRef"-->
+<!--                   class="form-control form-control-sm mr-3">-->
+<!--          </div>-->
+<!--        </div>-->
+      </div>
+      <ng-container *ngIf="(clientOrder$ | async) as clientOrder" [ngSwitch]="clientOrder.dataState">
+        <ng-container *ngSwitchCase="DataState.LOADING_STATE">
+          <div class="col-md-12 text-center my-3">
+            <div class="ball-clip-rotate">
+              <div style="background-color: rgb(68, 64, 84);"></div>
+            </div>
+          </div>
+        </ng-container>
+        <ng-container *ngSwitchCase="DataState.LOADED_STATE">
+          <div class="table-responsive">
+            <table class="align-middle mb-0 table table-sm table-borderless table-hover" id="element-pannes">
+              <thead>
+              <tr>
+                <th class="">Ref#</th>
+                <th class="">Date</th>
+                <th class="">Magasin</th>
+                <th class="">Canal</th>
+                <th class="">Mode de paiement</th>
+                <th class="">Montant</th>
+                <th class="">Statut</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr style="cursor: pointer" (click)="detailsOrder(order.internalReference)" *ngFor="let order of clientOrder.appData.content | paginate: { id: 'clientorder', itemsPerPage: size, currentPage: page, totalItems: clientOrder.appData.totalElements}">
+                <td class="text-left">{{order.internalReference}}</td>
+<!--                <td class="text-left">{{order.createdAt | date: 'dd/MM/yyyy'}}</td>-->
+                <td class="text-left">{{order.createdAt | formatDate}}</td>
+                <td class="text-left">{{order.store.localization }}</td>
+                <td class="text-left">{{order.channel }}</td>
+                <td class="text-left">{{order.paymentMethod.designation }}</td>
+                <td class="text-left">{{order.ttcaggregateAmount | formatNumber}} <small>Fcfa</small></td>
+                <td class="text-left"><span class="text-focus">{{getStatuts(order.status.name)}}</span></td>
+              </tr>
+
+              </tbody>
+
+            </table>
+            <div class="text-center">
+              <p *ngIf="clientOrder.appData.content.length == 0" style="color: grey; font-size: 1.8rem;" class="mx-auto">Aucune
+                commande trouvée !</p>
+            </div>
+            <div class="card-footer">
+              <div class="btn-actions-pane-left">
+                <div role="group" class="btn-group-sm btn-group">
+                  Total : &nbsp;<b>{{ clientOrder.appData.totalElements }} </b>
+                </div>
+              </div>
+              <div class="btn-actions-pane-right">
+                <div role="group" class="btn-group-sm btn-group">
+                  <pagination-controls
+                    id="clientorder"
+                    previousLabel="Précédent"
+                    nextLabel="Suivant"
+                    (pageChange)="pageChange($event)"></pagination-controls>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+        <ng-container class="bg-white" *ngSwitchCase="DataState.ERROR_STATE">
+          <div class="col-md-12 text-center">
+            <div class="text-danger">{{clientOrder.error}}</div>
+          </div>
+        </ng-container>
+      </ng-container>
+    </div>
+  </div>
+</div>
+</div>
+

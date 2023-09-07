@@ -6,6 +6,7 @@ import {AuthService} from "../../../_services/auth.service";
 import {NotifsService} from "../../../_services/notifications/notifs.service";
 import {Router} from "@angular/router";
 import {ForgetPassword} from "../../../_interfaces/forget-password";
+import {aesUtil, key} from "../../../_helpers/aes";
 
 @Component({
   selector: 'app-forget-password',
@@ -44,10 +45,9 @@ export class ForgetPasswordComponent implements OnInit {
 
   onSubmit() {
     this.isLoading.next(true);
-    this.credentials.login = this.forgetForm.controls['username'].value;
+    this.credentials.login = aesUtil.encrypt(key, this.forgetForm.controls['username'].value.toString());
     this.authService.forgetPassword(this.credentials).subscribe(
       (data) => {
-        console.log(data)
         this.notifsService.onSuccess(data.message)
         this.isLoading.next(false)
         this.email = this.forgetForm.controls['username'].value

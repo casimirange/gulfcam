@@ -50,6 +50,12 @@ export class SignupComponent implements OnInit {
   onSubmit() {
     this.isLoading.next(true);
     this.credentials = this.signup.value;
+<<<<<<< HEAD
+=======
+    // on recherche l'id du magasin dans la liste des magasins
+    const store = this.stores.filter(store => store.localization === this.signup.controls['idStore'].value)
+    this.credentials.idStore = store[0].internalReference.toString();
+>>>>>>> 37d14d372724acd031f893c0236343c371360e75
 
     this.authService.signup(this.credentials).subscribe(
       resp => {

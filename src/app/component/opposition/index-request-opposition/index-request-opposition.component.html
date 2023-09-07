@@ -1,0 +1,354 @@
+<div class="app-page-title" *ngIf="roleUser === 'SALES_MANAGER' || roleUser === 'COMMERCIAL_ATTACHE' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+  <div class="page-title-wrapper">
+    <div class="page-title-heading">
+      <div class="page-title-icon">
+        <i class="pe-7s-close-circle icon-gradient bg-danger">
+        </i>
+      </div>
+      <div>Requêtes d'opposition
+        <div class="page-title-subheading">Gérez toutes les requêtes d'opposition
+        </div>
+      </div>
+    </div>
+    <div class="page-title-actions" *ngIf="roleUser === 'COMMERCIAL_ATTACHE' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+      <button (click)="open(mymodal)" type="button" data-toggle="tooltip" title="nouvelle requête d'opposition" data-placement="bottom"
+              class="btn-shadow mr-3 btn btn-primary">
+           <span class="btn-icon-wrapper pr-2 opacity-7">
+                                            <i class="fa fa-plus fa-w-20"></i>
+                                        </span>
+        Requête d'opposition
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="row" *ngIf="roleUser === 'SALES_MANAGER' || roleUser === 'COMMERCIAL_ATTACHE' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+  <div class="col-md-12">
+    <div class="main-card mb-3 card " id="htmlData" #htmlData>
+      <div class="card-header">
+        Liste des demandes d'opposition
+        <div class="btn-actions-pane-right">
+          <div role="group" class="btn-group-sm btn-group">
+            <button class="btn btn-icon btn-pill border-0 btn-transition" [ngClass]="onFilter? 'btn-outline-light' : 'btn-light'" (click)="showFilter()">
+              <i class="fa btn-icon-wrapper fa-sliders-h"></i>
+              {{!onFilter ? "Filtrer" : "Annuler"}}
+            </button>
+          </div>
+        </div>
+<!--        <div class="btn-actions-pane-right">-->
+<!--          <div role="group" class="btn-group-sm btn-group">-->
+<!--            <select name="stat" id="stat" class="form-control form-control-sm mr-3" [(ngModel)]="statusFilter" (ngModelChange)="filterRequests()">-->
+<!--              <option value="" selected disabled hidden>Choix statut</option>-->
+<!--              <option value="CREATED">CREEE</option>-->
+<!--              <option value="ACTIVATED">ACTIVEE</option>-->
+<!--              <option value="">Tout afficher</option>-->
+<!--            </select>-->
+<!--            <input type="text" placeholder="Rechercher nom client" [(ngModel)]="clientName" (ngModelChange)="filterRequests()"-->
+<!--                   class="form-control form-control-sm mr-3">-->
+<!--            <input type="date" placeholder="Rechercher date" [(ngModel)]="date" (ngModelChange)="filterRequests()"-->
+<!--                   class="form-control form-control-sm mr-3">-->
+<!--            &lt;!&ndash;            <button class="btn btn-sm mr-3 text-primary" (click)="filterOrders()"><i class="fa fa-search"></i></button>&ndash;&gt;-->
+<!--          </div>-->
+<!--        </div>-->
+
+      </div>
+      <div class="card-body bg-tempting-azure card-header-tab-animation fadeInLeft"  *ngIf="onFilter">
+
+        <div class="menu-header-subtitle">
+          <div role="group" class="btn-group-sm btn-group">
+            <form class="form-row">
+              <div class="position-relative form-group mr-2">
+                <label for="stats" class="text-dark font-weight-bold">Statut de la Requête</label>
+                <select name="stat" id="stats" class="form-control form-control-sm mr-3" [(ngModel)]="statusFilter" (ngModelChange)="getRequests()">
+                  <option value="" selected disabled hidden>Choix du statut</option>
+                  <option value="CREATED">NON VALIDEE</option>
+                  <option value="ACTIVATED">VALIDEE</option>
+                  <option value="">Tout afficher</option>
+                </select>
+              </div>
+              <div class="position-relative form-group mr-2">
+                <label for="dc" class="text-dark font-weight-bold">Recherche Directeur Commercial</label>
+                <select name="dc" id="dc" class="form-control form-control-sm mr-3" [(ngModel)]="saleManagerFilter" (ngModelChange)="getRequests()">
+                  <option value="" selected disabled hidden>Choix du statut</option>
+                  <option value="{{user.internalReference}}" *ngFor="let user of users">{{user.firstName}} {{ user.lastName}}</option>
+                  <option value="">Tout afficher</option>
+                </select>
+              </div>
+              <div class="position-relative form-group mr-2">
+                <label for="ac" class="text-dark font-weight-bold">Recherche Attaché Commercial</label>
+                <select name="ac" id="ac" class="form-control form-control-sm mr-3" [(ngModel)]="attacheComFilter" (ngModelChange)="getRequests()">
+                  <option value="" selected disabled hidden>Choix du statut</option>
+                  <option value="{{user.internalReference}}" *ngFor="let user of usersCA">{{user.firstName}} {{ user.lastName}}</option>
+                  <option value="">Tout afficher</option>
+                </select>
+              </div>
+              <div class="position-relative form-group  mr-2">
+                <label for="nameClient" class="text-dark font-weight-bold">Recherche par client</label>
+                <input type="text" id="nameClient" name="nameClient" [(ngModel)]="clientName" (ngModelChange)="findClientsForFilter($event); " autocomplete="off"
+                       class="form-control form-control-sm mr-3" list="clientListOption" placeholder="Entrer le nom">
+                <datalist id="clientListOption">
+                  <option *ngFor="let client of clients" [value]="client.completeName"></option>
+<!--                  <option *ngIf="!clients.length" [value]="">Aucun client trouvé</option>-->
+                </datalist>
+              </div>
+              <div class="position-relative form-group  mr-2">
+                <label for="date" class="text-dark font-weight-bold">Recherche par compagnie</label>
+                <input type="date" id="date" name="date" placeholder="Rechercher date" [(ngModel)]="date" (ngModelChange)="getRequests()"
+                       class="form-control form-control-sm mr-3">
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <ng-container class="bg-white" *ngIf="(appState$ | async) as appState" [ngSwitch]="appState.dataState">
+        <div class="table-responsive">
+          <ng-container class="bg-white" *ngSwitchCase="DataState.LOADING_STATE">
+            <div class="col-md-12 text-center my-3">
+              <div class="ball-clip-rotate">
+                <div style="background-color: rgb(68, 64, 84);"></div>
+              </div>
+            </div>
+          </ng-container>
+          <ng-container class="bg-white py-1 px-1" *ngSwitchCase="DataState.LOADED_STATE">
+            <table class="table table-hover bg-white" >
+              <thead>
+              <tr>
+                <th>#</th>
+                <th>Ref. interne</th>
+                <th>Description</th>
+                <th>Raison</th>
+                <th>Client</th>
+                <th>Directeur Commercial</th>
+                <th>Attaché commercial</th>
+                <th>Statut</th>
+                <th>Date creation</th>
+                <th>Date Modification</th>
+                <th>Action</th>
+              </tr>
+              </thead>
+              <tbody *ngFor="let request of appState.appData.content | paginate: { id: 'request', itemsPerPage: size, currentPage: page, totalItems: appState.appData.totalElements } ; let i = index">
+
+              <tr>
+                <td>{{i + 1}}</td>
+                <td>{{request.internalReference}}</td>
+                <td>{{request.description}} </td>
+                <td>{{request.reason}} </td>
+                <td>{{request.nameClient}} </td>
+                <td>{{request.nameSaleManager}} </td>
+                <td>{{request.nameCommercialAttache}} </td>
+                <td>
+                  <span class="mb-2 mr-2 badge " [ngClass]="getStatuts(request.status.name) == 'ACTIVE(E)' ? 'badge-success' : 'badge-warning'">
+                    {{getStatuts(request.status.name) == 'ACTIVE(E)' ? 'VALIDEE' : 'NON VALIDE'}}
+                  </span>
+                </td>
+                <td>{{request.createdAt | formatDateHour}}</td>
+                <td>{{request.updateAt | formatDateHour}}</td>
+                <td>
+                  <button class="btn btn-sm btn-secondary mr-2" (click)="requestDetails(request)">
+                    <i class="pe-7s-look" title="consulter"></i>
+                  </button>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+            <div class="text-center">
+              <p *ngIf="appState.appData.totalElements == 0" style="color: grey; font-size: 1.8rem;" class="mx-auto">Aucune demande trouvée !</p>
+            </div>
+            <div class="card-footer">
+              <div class="btn-actions-pane-left">
+                <div role="group" class="btn-group-sm btn-group">
+                  Total:&nbsp;<b>{{ appState.appData.totalElements }} </b>
+                </div>
+              </div>
+              <div class="btn-actions-pane-right">
+                <div role="group" class="btn-group-sm btn-group">
+                  <!--              <pagination-controls id="client" (pageChange)="pageChange($event)" ></pagination-controls>-->
+                  <pagination-controls
+                    id="request"
+                    previousLabel="Précédent"
+                    nextLabel="Suivant"
+                    (pageChange)="pageChange($event)"></pagination-controls>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          <ng-container class="bg-white"  *ngSwitchCase="DataState.ERROR_STATE">
+            <div class="col-md-12 text-center">
+              <div class="text-danger" >{{appState.error}}</div>
+            </div>
+          </ng-container>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div>
+
+<ng-template #mymodal let-modal>
+  <div class="modal-header">
+    <h6 class="modal-title timeline-title" id="modal-basic-title"><b>{{modalTitle}}</b></h6>
+    <div class="close vertical-timeline-element-content bounce-in" (click)=" annuler()">
+      <p><i class="fa fa-times"></i></p>
+    </div>
+  </div>
+  <div class="modal-body">
+    <div class="">
+      <div class="">
+        <form [formGroup]="requestForm">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="position-relative form-group">
+                <label for="client" class="">Client</label>
+                <input type="text" id="client" (ngModelChange)="findClients($event)" autocomplete="off"
+                       class="form-control" formControlName="idClient" list="clientsListOption"
+                       placeholder="cherchez un client">
+                <datalist id="clientsListOption">
+                  <option *ngFor="let client of clients" [value]="client.completeName"></option>
+                </datalist>
+<!--                <input type="text" id="client" autocomplete="off" class="form-control" formControlName="idClient"-->
+<!--                       placeholder="sélectionner client" list="clientsListOption">-->
+<!--                <datalist id="clientsListOption">-->
+<!--                  <option value="" selected disabled hidden>Sélectionner un client</option>-->
+<!--                  <option *ngFor="let client of clients" [value]="client.completeName"></option>-->
+<!--                </datalist>-->
+              </div>
+              <div
+                *ngIf="requestForm.controls['idClient'].invalid && (requestForm.controls['idClient'].dirty || requestForm.controls['idClient'].touched)"
+                class="mb-2" style="color: #f65656; font-style: italic;">
+
+                <div *ngIf="requestForm.controls['idClient'].errors?.['required']" class="ml-3">
+                  veuillez sélectionner un client.
+                </div>
+<!--                <div *ngIf="requestForm.controls['localization'].errors?.['minLength']" class="ml-3">-->
+<!--                  entrez une localisation valide-->
+<!--                </div>-->
+              </div>
+            </div>
+<!--            <div class="col-md-12">-->
+<!--              <div class="position-relative form-group">-->
+<!--                <label for="description" class="">Directeur Commercial</label>-->
+<!--                <select name="select" id="canal" class="form-control" formControlName="idManagerCoupon">-->
+<!--                  <option value="" selected disabled hidden>Sélectionner un utilisateur</option>-->
+<!--                  <option *ngFor="let user of users" value="{{user.internalReference}}">{{user.firstName}}</option>-->
+<!--                </select>-->
+<!--              </div>-->
+<!--              <div-->
+<!--                *ngIf="requestForm.controls['idManagerCoupon'].invalid && (requestForm.controls['idManagerCoupon'].dirty || requestForm.controls['idManagerCoupon'].touched)"-->
+<!--                class="mb-2" style="color: #f65656; font-style: italic;">-->
+
+<!--                <div *ngIf="requestForm.controls['idManagerCoupon'].errors?.['required']" class="ml-3">-->
+<!--                  veuillez sélectionner un gestionnaire-->
+<!--                </div>-->
+<!--                <div *ngIf="requestForm.controls['manager'].errors?.['minLength']" class="ml-3">-->
+<!--                  entrez une description valide-->
+<!--                </div>-->
+<!--              </div>-->
+<!--            </div>-->
+            <div class="col-md-12">
+              <div class="position-relative form-group">
+                <label for="description" class="">Decription</label>
+                <textarea name="amount" ngModel="{{store.localization}}" id="description" placeholder="description"
+                          type="text" class="form-control" formControlName="description"></textarea>
+              </div>
+              <div
+                *ngIf="requestForm.controls['description'].invalid && (requestForm.controls['description'].dirty || requestForm.controls['description'].touched)"
+                class="mb-2" style="color: #f65656; font-style: italic;">
+
+                <div *ngIf="requestForm.controls['description'].errors?.['required']" class="ml-3">
+                  la desccription est obligatoire.
+                </div>
+                <div *ngIf="requestForm.controls['description'].errors?.['minLength']" class="ml-3">
+                  la desccription doit avoir au moins 3 caractères
+                </div>
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="position-relative form-group">
+                <label for="reason" class="">Raison</label>
+                <textarea name="amount" ngModel="{{store.localization}}" id="reason" placeholder="raison"
+                          type="text" class="form-control" formControlName="reason"></textarea>
+              </div>
+              <div
+                *ngIf="requestForm.controls['reason'].invalid && (requestForm.controls['reason'].dirty || requestForm.controls['reason'].touched)"
+                class="mb-2" style="color: #f65656; font-style: italic;">
+
+                <div *ngIf="requestForm.controls['reason'].errors?.['required']" class="ml-3">
+                  la raison est obligatoire.
+                </div>
+                <div *ngIf="requestForm.controls['reason'].errors?.['minLength']" class="ml-3">
+                  la raison doit avoir au moins 3 caractères
+                </div>
+              </div>
+            </div>
+
+            <div class="row col-md-12">
+              <div class="col-md-10">
+                <div class="position-relative form-group">
+                  <label for="qte" class="">Coupon</label>
+                  <input name="email" id="qte" placeholder="Numéro de série du coupon" type="text" class="form-control"
+                         formControlName="serialNumber">
+                  <div
+                    *ngIf="requestForm.controls['serialNumber'].invalid && (requestForm.controls['serialNumber'].dirty || requestForm.controls['serialNumber'].touched)"
+                    class="mb-2" style="color: #f65656; font-style: italic;">
+
+                    <div *ngIf="requestForm.controls['serialNumber'].errors?.['required']" class="ml-3">
+                      le coupon est obligatoire.
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-2">
+                <div class="position-relative form-group">
+                  <label for="add" class="text-white">ajouter</label>
+                  <button id="add" class=" btn btn-primary float-right"
+                          [disabled]="requestForm.controls['serialNumber'].invalid || (isVerifying$ | async)"
+                          (click)="addCoupon()">
+                    <i *ngIf="isVerifying$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
+                    <span *ngIf="isVerifying$ | async">Vérif ...</span>
+                    <span *ngIf="!(isVerifying$ | async)">Ajouter</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-12 position-relative form-group">
+              <h5 class="card-title">Liste des coupons</h5>
+              <table class="mb-0 table table-sm">
+                <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Coupon</th>
+                  <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr *ngFor="let prod of vouchers; let i = index">
+                  <th scope="row">{{i + 1}}</th>
+                  <td>{{prod}}</td>
+                  <td><i class="pe-7s-trash text-danger" (click)="removeCoupon(prod)"></i></td>
+                </tr>
+                </tbody>
+              </table>
+              <div class="text-center">
+                <p *ngIf="vouchers.length === 0" style="color: grey; font-size: 0.9rem;" class="mx-auto" >Ajouter des coupons à la demande</p>
+              </div>
+              <div class="card-subtitle float-right">Total: {{vouchers.length}} coupon(s)</div>
+            </div>
+
+          </div>
+
+          <button class="mt-1 btn btn-secondary float-right ml-3" (click)="annuler()"><i class="pe-7s-back"></i>Annuler
+          </button>
+          <button class="mt-1 btn btn-primary float-right"
+                  [disabled]="(vouchers.length == 0 || requestForm.controls['idClient'].invalid
+                  || requestForm.controls['description'].invalid || requestForm.controls['reason'].invalid)  || (isLoading$ | async)"
+                  (click)="createRequest()">
+            <i *ngIf="isLoading$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
+            <span *ngIf="isLoading$ | async">Enregistrement ...</span>
+            <span
+              *ngIf="!(isLoading$ | async)">Enregistrer requête</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</ng-template>

@@ -1,0 +1,135 @@
+<ng-container class="bg-white" *ngIf="(appState$ | async) as appState" [ngSwitch]="appState.dataState">
+  <ng-container class="bg-white" *ngSwitchCase="DataState.LOADING_STATE">
+    <div class="col-md-12 text-center my-3">
+      <!--                <div class="spinner-border text-primary my-3" role="status"></div>-->
+      <div class="ball-clip-rotate">
+        <div style="background-color: rgb(68, 64, 84);"></div>
+      </div>
+    </div>
+  </ng-container>
+  <ng-container class="bg-white py-1 px-1" *ngSwitchCase="DataState.LOADED_STATE">
+<div class="app-page-title"
+     *ngIf="roleUser === 'COMPTABLE' || roleUser === 'DSI_AUDIT'  || roleUser === 'MANAGER_STATION' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+  <div class="page-title-wrapper">
+    <div class="page-title-heading">
+      <div class="page-title-icon">
+        <i class="pe-7s-close-circle icon-gradient bg-danger">
+        </i>
+      </div>
+      <div>Note de crédit N° {{appState.appData.internalReference}}
+        <div class="page-title-subheading">
+          <!--          Date :{{creditNote.createdAt | date: 'dd/MM/yyyy'}}&nbsp;-->
+          <nav class="" aria-label="breadcrumb">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item">
+                <a>
+                  <i aria-hidden="true" class="fa fa-calendar"></i> Date:
+                  &nbsp; {{appState.appData.createdAt | formatDate}}
+                </a>
+              </li>
+              <li class="active breadcrumb-item" aria-current="page">
+                <a>
+                  <i class="fa fa-charging-station"></i> Statut:&nbsp; <span class="text-success font-weight-bold">{{getStatuts(appState.appData.status.name) == 'ACTIVE(E)' ? 'VALIDEE' : 'NON VALIDEE' }}</span>
+                </a>
+              </li>
+            </ol>
+          </nav>
+        </div>
+      </div>
+    </div>
+    <div class="page-title-actions">
+      <button (click)="back()" type="button" data-toggle="tooltip" title="Retour à la page précédente"
+              data-placement="bottom"
+              class="btn-shadow mr-3 btn btn-outline-dark">
+           <span class="btn-icon-wrapper pr-2 opacity-7">
+                                            <i class="fa fa-backward fa-w-20"></i>
+                                        </span>
+        Retour
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="row"
+     *ngIf="roleUser === 'COMPTABLE' || roleUser === 'DSI_AUDIT' || roleUser === 'MANAGER_STATION' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+  <div class="col-md-12">
+    <div class="main-card mb-3 card">
+      <div class="card-header">
+        Liste de ses coupons
+        <div class="btn-actions-pane-right">
+          <div role="group" class="btn-group-sm btn-group">
+            <button
+              *ngIf="appState.appData.status.name == 'CREATED' && (roleUser === 'DSI_AUDIT' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))"
+              class="btn btn-outline-primary" [disabled]="(isLoading$ | async)"
+              title="valider une note de crédit" (click)="validCreditNote()">
+              <i *ngIf="isLoading$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
+              <span *ngIf="isLoading$ | async">Validation ...</span>
+              <span
+                *ngIf="!(isLoading$ | async)"><i class="pe-7s-check"></i> Valider</span>
+            </button> &nbsp;
+            <button class="btn btn-outline-alternate" [disabled]="(isExtracting$ | async)"
+                    *ngIf="roleUser === 'DSI_AUDIT' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')"
+                    title="exporter une note de crédit" (click)="exportCreditNote()">
+              <i *ngIf="isExtracting$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
+              <span *ngIf="isExtracting$ | async">Exportation ...</span>
+              <span
+                *ngIf="!(isExtracting$ | async)"><i class="fa fa-file-pdf"></i> Exporter</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="table-responsive">
+
+        <ng-container class="bg-white">
+          <ng-container class="bg-white py-1 px-1">
+            <table class="table table-hover bg-white">
+              <thead>
+              <tr>
+                <th>#</th>
+                <th>Ref. interne</th>
+                <th>Numéro de série</th>
+                <th>Carnet</th>
+                <th>Statut</th>
+                <th>Note credit</th>
+                <th>Station</th>
+                <th>Pompiste</th>
+                <th>Date</th>
+              </tr>
+              </thead>
+              <tbody *ngFor="let coupon of appState.appData.coupons; let i = index">
+
+              <tr>
+                <td>{{i + 1}}</td>
+                <td>{{coupon.internalReference}}</td>
+                <td>{{padWithZero(coupon.serialNumber, 7)}}</td>
+                <td>{{coupon.idNotebook}}</td>
+                <td>{{getStatuts(coupon.status.name)}}</td>
+                <td>{{coupon.idCreditNote}}</td>
+                <td>{{coupon.nameStation}}</td>
+                <td>{{coupon.pompisteName}}</td>
+                <td>{{coupon.updateAt | formatDateHour}}</td>
+              </tr>
+              </tbody>
+            </table>
+          </ng-container>
+        </ng-container>
+      </div>
+      <div class="card-footer">
+        <div class="btn-actions-pane-left">
+          <div role="group" class="btn-group-sm btn-group">
+            Total: <b>{{ appState.appData.coupons.length }} </b>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+  </ng-container>
+  <ng-container class="bg-white"  *ngSwitchCase="DataState.ERROR_STATE">
+    <div class="col-md-12 text-center">
+      <div class="text-danger" >{{appState.error}}</div>
+    </div>
+  </ng-container>
+</ng-container>

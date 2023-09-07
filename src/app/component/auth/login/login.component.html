@@ -75,7 +75,7 @@
                   <button type="submit" class="btn btn-primary" [disabled]="loginForm.invalid || (isLoading$ | async)" (click)="login()">
                     <i *ngIf="isLoading$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
                     <span *ngIf="isLoading$ | async">Connexion ...</span>
-                    <span *ngIf="!(isLoading$ | async)">Login</span>
+                    <span *ngIf="!(isLoading$ | async)">Se Connecter</span>
                   </button>
                 </div>
               </div>

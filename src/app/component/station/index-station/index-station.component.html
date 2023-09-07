@@ -1,0 +1,325 @@
+<div class="app-page-title" *ngIf="roleUser === 'MANAGER_STATION' || role.includes('ROLE_SUPERADMIN')">
+  <div class="page-title-wrapper">
+    <div class="page-title-heading">
+      <div class="page-title-icon">
+        <i class="pe-7s-paint-bucket icon-gradient bg-danger">
+        </i>
+      </div>
+      <div>Gestion des stations
+        <div class="page-title-subheading">Managez vos stations</div>
+      </div>
+    </div>
+    <div class="page-title-actions" *ngIf="role.includes('ROLE_SUPERADMIN')">
+      <div class="d-inline-block ">
+        <button type="button" *ngIf="!load" data-toggle="tooltip" title="nouvelle station" class="btn-shadow mr-3 btn btn-primary" (click)="open(mymodal)">
+                                        <span class="btn-icon-wrapper pr-2 opacity-7">
+                                            <i class="fa fa-plus fa-w-20"></i>
+                                        </span>
+          station
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row" *ngIf="roleUser === 'MANAGER_STATION' || role.includes('ROLE_SUPERADMIN')">
+  <div class="col-md-12">
+    <div class="main-card mb-3 card " id="htmlData" #htmlData>
+      <div class="card-header">
+        Liste des stations
+        <div class="btn-actions-pane-right">
+          <div role="group" class="btn-group-sm btn-group">
+            <button class="btn btn-icon btn-pill border-0 btn-transition" [ngClass]="onFilter? 'btn-outline-light' : 'btn-light'" (click)="showFilter()">
+              <i class="fa btn-icon-wrapper fa-sliders-h"></i>
+              {{!onFilter ? "Filtrer" : "Annuler"}}
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="card-body bg-tempting-azure card-header-tab-animation fadeInLeft"  *ngIf="onFilter">
+
+        <div class="menu-header-subtitle">
+          <div role="group" class="btn-group-sm btn-group">
+            <form class="form-row">
+              <div class="position-relative form-group  mr-2 ">
+                <label for="typ" class="text-dark font-weight-bold">Gestionnaire de station</label>
+                <select name="stat" id="typ" class="form-control form-control-sm mr-3" [(ngModel)]="idManagerStation" (ngModelChange)="getStations()">
+                  <option value="" selected disabled hidden>choix du manager</option>
+                  <option value="{{user.internalReference}}" *ngFor="let user of users">{{user.lastName}} {{user.firstName}}</option>
+                  <option value="" disabled *ngIf="!load && !users.length">Aucun gestionnaire trouvé</option>
+                  <option value="">Tout afficher</option>
+                </select>
+              </div>
+              <div class="position-relative form-group  mr-2">
+                <label for="client" class="text-dark font-weight-bold">Recherche par nom</label>
+                <input type="text" name="client" id="client" placeholder="Rechercher nom station" [(ngModel)]="designation" (ngModelChange)="getStations()"
+                       class="form-control form-control-sm mr-3">
+              </div>
+              <div class="position-relative form-group  mr-2">
+                <label for="loc" class="text-dark font-weight-bold">Recherche par localisation</label>
+                <input type="text" name="loc" id="loc" placeholder="Rechercher localisation" [(ngModel)]="localisation" (ngModelChange)="getStations()"
+                       class="form-control form-control-sm mr-3">
+              </div>
+              <div class="position-relative form-group  mr-2">
+                <label for="serial" class="text-dark font-weight-bold">Recherche par code</label>
+                <input type="text" name="serial" id="serial" placeholder="Rechercher code pin" [(ngModel)]="pinCode" (ngModelChange)="getStations()"
+                       class="form-control form-control-sm mr-3">
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <ng-container class="bg-white" *ngIf="(appState$ | async) as appState" [ngSwitch]="appState.dataState">
+      <div class="table-responsive" >
+
+        <ng-container class="bg-white" *ngSwitchCase="DataState.LOADING_STATE">
+          <div class="col-md-12 text-center my-3">
+            <div class="ball-clip-rotate">
+              <div style="background-color: rgb(68, 64, 84);"></div>
+            </div>
+          </div>
+        </ng-container>
+
+
+        <ng-container class="bg-white py-1 px-1" *ngSwitchCase="DataState.LOADED_STATE">
+          <table class="table table-hover bg-white" >
+            <thead>
+            <tr>
+              <th>#</th>
+              <th>Ref. interne</th>
+              <th>Nom</th>
+              <th>Localisation</th>
+              <th>Code pin</th>
+              <th>Gestionnaire</th>
+              <th>Solde</th>
+              <th>Statut</th>
+              <th>Date création</th>
+              <th>Date modification</th>
+              <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody *ngFor="let station of appState.appData.content | paginate: { id: 'station', itemsPerPage: size, currentPage: page, totalItems: appState.appData.totalElements }; let i = index">
+
+            <tr>
+              <td>{{i + 1}}</td>
+              <td>{{station.internalReference}}</td>
+              <td >{{station.designation}} </td>
+              <td >{{station.localization}} </td>
+              <td>{{station.pinCode}}</td>
+              <td>{{station.nameManagerStation}}</td>
+              <td>{{station.balance}}</td>
+              <td>{{getStatuts(station.status.name)}}</td>
+              <td>{{station.createdAt | formatDateHour}}</td>
+              <td>{{station.updateAt | formatDateHour}}</td>
+              <td>
+                <!--                  <a style="cursor: pointer"  class="delete text-danger" (click)="deleteStation(station, i)" >-->
+                <!--                    <i class="pe-7s-trash" title="supprimer"></i>-->
+                <!--                  </a>&nbsp;-->
+
+                <button class="btn btn-sm btn-secondary mr-2" (click)="showDetails(station)">
+                  <i class="pe-7s-look" title="consulter"></i>
+                </button>
+                <button class="btn btn-sm btn-primary" (click)="updateStationModal(mymodal, station)" *ngIf="role.includes('ROLE_SUPERADMIN')">
+                  <i class="pe-7s-eyedropper" title="modifier"></i>
+                </button>
+              </td>
+            </tr>
+          </table>
+          <div class="text-center">
+            <p *ngIf="appState.appData.totalElements == 0" style="color: grey; font-size: 1.8rem;" class="mx-auto">Aucune station trouvée !</p>
+          </div>
+          <div class="card-footer">
+            <div class="btn-actions-pane-left">
+              <div role="group" class="btn-group-sm btn-group">
+                Total:&nbsp;<b>{{ appState.appData.totalElements }} </b>
+              </div>
+            </div>
+            <div class="btn-actions-pane-right">
+              <div role="group" class="btn-group-sm btn-group">
+                <pagination-controls
+                  id="station"
+                  previousLabel="Précédent"
+                  nextLabel="Suivant"
+                  (pageChange)="pageChange($event)"></pagination-controls>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+        <ng-container class="bg-white"  *ngSwitchCase="DataState.ERROR_STATE">
+          <div class="col-md-12 text-center">
+            <div class="text-danger" >{{appState.error}}</div>
+          </div>
+        </ng-container>
+
+<!--        <ng-container class="bg-white">-->
+<!--          &lt;!&ndash;            <ng-container *ngSwitchCase="DataState.LOADING_STATE" class="bg-white py-1 px-1">&ndash;&gt;-->
+<!--          &lt;!&ndash;              <div class="col-md-12 single-note-item text-center bg-white">&ndash;&gt;-->
+<!--          &lt;!&ndash;                <div class="spinner-border text-primary" role="status"></div>&ndash;&gt;-->
+<!--          &lt;!&ndash;              </div>&ndash;&gt;-->
+<!--          &lt;!&ndash;            </ng-container>&ndash;&gt;-->
+<!--          <ng-container class="bg-white py-1 px-1">-->
+<!--            <table class="table table-hover bg-white" >-->
+<!--              <thead>-->
+<!--              <tr>-->
+<!--                <th>#</th>-->
+<!--                <th>Ref. interne</th>-->
+<!--                <th>Nom</th>-->
+<!--                <th>Localisation</th>-->
+<!--                <th>Code pin</th>-->
+<!--                <th>Gestionnaire</th>-->
+<!--                <th>Solde</th>-->
+<!--                <th>Statut</th>-->
+<!--                <th>Date création</th>-->
+<!--                <th>Date modification</th>-->
+<!--                <th>Actions</th>-->
+<!--              </tr>-->
+<!--              </thead>-->
+<!--              <tbody *ngFor="let station of role.includes('ROLE_SUPERADMIN') ? stations : userStations | paginate: { id: 'station', itemsPerPage: size, currentPage: page, totalItems: totalElements }; let i = index">-->
+
+<!--              <tr>-->
+<!--                <td>{{i + 1}}</td>-->
+<!--                <td>{{station.internalReference}}</td>-->
+<!--                <td >{{station.designation}} </td>-->
+<!--                <td >{{station.localization}} </td>-->
+<!--                <td>{{station.pinCode}}</td>-->
+<!--                <td>{{station.nameManagerStation}}</td>-->
+<!--                <td>{{station.balance}}</td>-->
+<!--                <td>{{getStatuts(station.status.name)}}</td>-->
+<!--                <td>{{station.createdAt}}</td>-->
+<!--                <td>{{station.updateAt}}</td>-->
+<!--                <td>-->
+<!--&lt;!&ndash;                  <a style="cursor: pointer"  class="delete text-danger" (click)="deleteStation(station, i)" >&ndash;&gt;-->
+<!--&lt;!&ndash;                    <i class="pe-7s-trash" title="supprimer"></i>&ndash;&gt;-->
+<!--&lt;!&ndash;                  </a>&nbsp;&ndash;&gt;-->
+
+<!--                  <button class="btn btn-sm btn-secondary mr-2" (click)="showDetails(station)">-->
+<!--                    <i class="pe-7s-look" title="consulter"></i>-->
+<!--                  </button>-->
+<!--                  <button class="btn btn-sm btn-primary" (click)="updateStationModal(mymodal, station)" *ngIf="role.includes('ROLE_SUPERADMIN')">-->
+<!--                    <i class="pe-7s-eyedropper" title="modifier"></i>-->
+<!--                  </button>-->
+<!--                </td>-->
+<!--              </tr>-->
+<!--            </table>-->
+<!--            <div class="text-center">-->
+<!--              <p *ngIf="role.includes('ROLE_SUPERADMIN') ? stations.length === 0 : userStations.length === 0 " style="color: grey; font-size: 1.8rem;" class="mx-auto" >Aucune station trouvée !</p>-->
+<!--            </div>-->
+<!--            <div class="card-footer">-->
+<!--              <div class="btn-actions-pane-left">-->
+<!--                <div role="group" class="btn-group-sm btn-group">-->
+<!--                  Total Stations: <b>{{ totalElements }} </b>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--              <div class="btn-actions-pane-right">-->
+<!--                <div role="group" class="btn-group-sm btn-group">-->
+<!--                  &lt;!&ndash;              <pagination-controls id="client" (pageChange)="pageChange($event)" ></pagination-controls>&ndash;&gt;-->
+<!--                  <pagination-controls-->
+<!--                    id="station"-->
+<!--                    previousLabel="Précédent"-->
+<!--                    nextLabel="Suivant"-->
+<!--                    (pageChange)="pageChange($event)"></pagination-controls>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </ng-container>-->
+<!--        </ng-container>-->
+      </div>
+      </ng-container>
+    </div>
+  </div>
+</div>
+
+<ng-template #mymodal let-modal >
+  <div class="modal-header">
+    <h6 class="modal-title timeline-title" id="modal-basic-title"><b>{{modalTitle}}</b> </h6>
+    <div class="close vertical-timeline-element-content bounce-in" (click)=" modal.close('save click')" >
+      <p><i class="fa fa-times"></i></p>
+    </div>
+  </div>
+  <div class="modal-body">
+    <div class="">
+      <div class="">
+        <form [formGroup]="stationForm">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="position-relative form-group">
+                <label for="store" class="">Localisation</label>
+                <input type="text" ngModel="{{station.localization}}" autocomplete="off" id="store" class="form-control" formControlName="localization"
+                       placeholder="Localisation de la station">
+              </div>
+              <div *ngIf="stationForm.controls['localization'].invalid && (stationForm.controls['localization'].dirty || stationForm.controls['localization'].touched)"
+                   class="mb-2"  style="color: #f65656; font-style: italic;">
+
+                <div *ngIf="stationForm.controls['localization'].errors?.['required']" class="ml-3">
+                  la localisation est obligatoire.
+                </div>
+                <div *ngIf="stationForm.controls['localization'].errors?.['minLength']" class="ml-3">
+                  la localisation doit comporter au moins 4 lettres
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="position-relative form-group">
+                <label for="nom" class="">Nom de la station</label>
+                <input type="text" ngModel="{{station.designation}}" autocomplete="off" id="nom" class="form-control"
+                       formControlName="designation" placeholder="Nom de la station">
+              </div>
+              <div *ngIf="stationForm.controls['designation'].invalid && (stationForm.controls['designation'].dirty || stationForm.controls['designation'].touched)"
+                   class="mb-2"  style="color: #f65656; font-style: italic;">
+
+                <div *ngIf="stationForm.controls['designation'].errors?.['required']" class="ml-3">
+                  le nom est obligatoire.
+                </div>
+                <div *ngIf="stationForm.controls['designation'].errors?.['minLength']" class="ml-3">
+                  le nom doit comporter au moins 4 lettres
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="position-relative form-group">
+                <label for="pinCode" class="">Code pin</label>
+                <input type="text" ngModel="{{station.pinCode}}" autocomplete="off" id="pinCode" class="form-control"
+                       formControlName="pinCode" placeholder="Code de la staion">
+              </div>
+              <div *ngIf="stationForm.controls['pinCode'].invalid && (stationForm.controls['pinCode'].dirty || stationForm.controls['pinCode'].touched)"
+                   class="mb-2"  style="color: #f65656; font-style: italic;">
+
+                <div *ngIf="stationForm.controls['pinCode'].errors?.['required']" class="ml-3">
+                  le code pin est obligatoire.
+                </div>
+                <div *ngIf="stationForm.controls['pinCode'].errors?.['pattern']" class="ml-3">
+                  le code pin doit être en chiffres
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="position-relative form-group">
+                <label for="solde" class="">Gestionnaire de station</label>
+                <select ngModel="{{station.idManagerStation}}" autocomplete="off" id="solde" class="form-control"
+                        formControlName="managerStagion" >
+                  <option value="" selected hidden disabled>Sélectionner un utilisateur</option>
+                  <option *ngFor="let user of users" value="{{user.internalReference}}">{{user.firstName}}&nbsp;{{user.lastName}}</option>
+                  <option value="" disabled *ngIf="!load && !users.length">Aucun gestionnaire trouvé</option>
+                </select>
+              </div>
+              <div *ngIf="stationForm.controls['managerStagion'].invalid && (stationForm.controls['managerStagion'].dirty || stationForm.controls['managerStagion'].touched)"
+                   class="mb-2"  style="color: #f65656; font-style: italic;">
+
+                <div *ngIf="stationForm.controls['managerStagion'].errors?.['required']" class="ml-3">
+                  le gestionnaire est obligatoire.
+                </div>
+              </div>
+            </div>
+          </div>
+          <button class="mt-1 btn btn-secondary float-right ml-3" (click)="annuler()" ><i class="pe-7s-back"></i> Annuler</button>
+          <button class="mt-1 btn btn-primary float-right" [disabled]="stationForm.invalid || (isLoading$ | async)"
+                  (click)="modalTitle == 'Enregistrer une nouvelle station' ? saveStation() : updateStation()">
+            <i *ngIf="isLoading$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
+            <span *ngIf="isLoading$ | async">Enregistrement ...</span>
+            <span *ngIf="!(isLoading$ | async)">{{modalTitle == 'Enregistrer une nouvelle station' ? 'Enregistrer station' : 'Modifier station'}}</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</ng-template>

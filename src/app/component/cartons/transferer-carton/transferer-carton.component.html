@@ -1,0 +1,117 @@
+<div class="app-page-title" *ngIf="roleUser === 'MANAGER_SPACES_1' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+  <div class="page-title-wrapper">
+    <div class="page-title-heading">
+      <div class="page-title-icon">
+        <i class="pe-7s-drawer icon-gradient bg-danger">
+        </i>
+      </div>
+      <div>Stock
+        <div class="page-title-subheading">Mouvement du stock</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
+  <li class="nav-item">
+    <a role="tab" class="nav-link" routerLink="/stock/index" routerLinkActive="active">
+      <span>Stock</span>
+    </a>
+  </li>
+  <li class="nav-item" *ngIf="roleUser === 'MANAGER_SPACES_1' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+    <a role="tab" class="nav-link" routerLink="/stock/supply" routerLinkActive="active">
+      <span>Ordre d'approvisionnement</span>
+    </a>
+  </li>
+  <li class="nav-item" *ngIf="roleUser === 'MANAGER_SPACES_1' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+    <a role="tab" class="nav-link" routerLink="/stock/forward" routerLinkActive="active">
+      <span>Ordre de transfert</span>
+    </a>
+  </li>
+</ul>
+
+<div *ngIf="roleUser === 'MANAGER_SPACES_1' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="main-card mb-3 card">
+        <div class="card-body">
+          <h5 class="card-title">Transfert de carton</h5>
+          <div class="col-md-12 text-center my-3" *ngIf="loadCarton || loadStoreHouse; else approv">
+            <div class="ball-clip-rotate">
+              <div style="background-color: rgb(68, 64, 84);"></div>
+            </div>
+          </div>
+          <ng-template #approv>
+          <form [formGroup]="tranfertForm">
+            <div class="form-row">
+              <div class="col-md-6">
+                <div class="position-relative form-group">
+                  <label>Espace de stockage d'arrivé</label>
+<!--                  <ng-container
+>-->
+                  <select formControlName="idStoreHouseStockage" class="form-control">
+                    <option disabled selected hidden value="">Sélectionner un espace de stockage</option>
+<!--                    <ng-container >-->
+<!--                      <ng-container class="bg-danger" *ngIf="!(isLoad$ | async)">-->
+<!--                        <div class="col-md-12 text-center my-3">-->
+<!--                          <div class="ball-clip-rotate">-->
+<!--                            <div style="background-color: rgb(68, 64, 84);"></div>-->
+<!--                          </div>-->
+<!--                        </div>-->
+<!--                      </ng-container>-->
+<!--                      <ng-container class="bg-white" *ngIf="!(isLoad$ | async)">-->
+                        <option *ngFor="let store of storeHouses1" [value]="store.internalReference">{{store.name}}</option>
+                        <option *ngIf="!storeHouses1.length" value="" disabled>Aucun espace trouvé</option>
+<!--                      </ng-container>-->
+<!--                    </ng-container>-->
+<!--                    <option *ngFor="let store of storeHouses1" [value]="store.internalReference">{{store.name}}</option>-->
+                  </select>
+                  <div
+                    *ngIf="form['idStoreHouseStockage'].invalid && (form['idStoreHouseStockage'].dirty || form['idStoreHouseStockage'].touched)"
+                    class="mb-2" style="color: #f65656; font-style: italic;">
+
+                    <div *ngIf="form['idStoreHouseStockage'].errors?.['required']" class="ml-3">
+                      le carton est obligatoire.
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="position-relative form-group">
+                  <label for="serialnumber" class="">Carton</label>
+                  <!--                  <input type="text" >-->
+                  <select id="serialnumber" formControlName="idCarton" class="form-control">
+                    <option disabled selected hidden value="">Sélectionner un carton</option>
+                    <option *ngFor="let carton of cartons" value="{{carton.internalReference}}">{{carton.number}}</option>
+                    <option *ngIf="!cartons.length" disabled value="">Aucun carton disponible</option>
+                  </select>
+                </div>
+                <div *ngIf="form['idCarton'].invalid && (form['idCarton'].dirty || form['idCarton'].touched)"
+                     class="mb-2" style="color: #f65656; font-style: italic;">
+
+                  <div *ngIf="form['idCarton'].errors?.['required']" class="ml-3">
+                    le carton est obligatoire.
+                  </div>
+
+                </div>
+              </div>
+
+              <div class="float-right">
+
+                <button type="submit" class="btn btn-primary" [disabled]="tranfertForm.invalid || (isLoading$ | async)">
+                  <i *ngIf="isLoading$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
+                  <span *ngIf="isLoading$ | async">Transfert...</span>
+                  <span *ngIf="!(isLoading$ | async)" (click)="transfertCarton()">Transférer</span>
+                </button>
+              </div>
+            </div>
+          </form>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+

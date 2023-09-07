@@ -1,0 +1,134 @@
+<ng-container class="bg-white" *ngIf="(appState$ | async) as appState" [ngSwitch]="appState.dataState">
+  <ng-container class="bg-white" *ngSwitchCase="DataState.LOADING_STATE">
+    <div class="col-md-12 text-center my-3">
+      <!--                <div class="spinner-border text-primary my-3" role="status"></div>-->
+      <div class="ball-clip-rotate">
+        <div style="background-color: rgb(68, 64, 84);"></div>
+      </div>
+    </div>
+  </ng-container>
+  <ng-container class="bg-white py-1 px-1" *ngSwitchCase="DataState.LOADED_STATE">
+<div class="app-page-title" *ngIf="roleUser === 'SALES_MANAGER' || roleUser === 'COMMERCIAL_ATTACHE' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+  <div class="page-title-wrapper">
+    <div class="page-title-heading">
+      <div class="page-title-icon">
+        <i class="pe-7s-close-circle icon-gradient bg-danger">
+        </i>
+      </div>
+      <div>Demande d'opposition N° {{appState.appData.internalReference}}
+        <div class="page-title-subheading">Description :{{appState.appData.description}}&nbsp;</div>
+      </div>
+    </div>
+    <div class="page-title-actions">
+      <button (click)="back()" type="button" data-toggle="tooltip" title="Retour à la page précédente" data-placement="bottom"
+              class="btn-shadow mr-3 btn btn-outline-dark">
+           <span class="btn-icon-wrapper pr-2 opacity-7">
+                                            <i class="fa fa-backward fa-w-20"></i>
+                                        </span>
+        Retour
+      </button>
+    </div>
+  </div>
+</div>
+  </ng-container>
+  <ng-container class="bg-white"  *ngSwitchCase="DataState.ERROR_STATE">
+    <div class="col-md-12 text-center">
+      <div class="text-danger" >{{appState.error}}</div>
+    </div>
+  </ng-container>
+</ng-container>
+
+<ng-container class="bg-white" *ngIf="(appStateTicket$ | async) as appStateTicket" [ngSwitch]="appStateTicket.dataState">
+  <ng-container class="bg-white" *ngSwitchCase="DataState.LOADING_STATE">
+    <div class="col-md-12 text-center my-3">
+      <!--                <div class="spinner-border text-primary my-3" role="status"></div>-->
+      <div class="ball-clip-rotate">
+        <div style="background-color: rgb(68, 64, 84);"></div>
+      </div>
+    </div>
+  </ng-container>
+  <ng-container class="bg-white py-1 px-1" *ngSwitchCase="DataState.LOADED_STATE">
+<div class="row" *ngIf="roleUser === 'SALES_MANAGER' || roleUser === 'COMMERCIAL_ATTACHE' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+  <div class="col-md-12">
+    <div class="main-card mb-3 card">
+      <div class="card-header">
+        Liste de ses tickets
+        <div class="btn-actions-pane-right" *ngIf="roleUser === 'SALES_MANAGER' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+          <div role="group" class="btn-group-sm btn-group">
+            <button *ngIf="statut == 'CREATED'" class="btn btn-success" [disabled]="(isLoading$ | async)"
+                    title="valider une requête d'opposition" (click)="validRequest()">
+              <i *ngIf="isLoading$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
+              <span *ngIf="isLoading$ | async">Validation ...</span>
+              <span
+                *ngIf="!(isLoading$ | async)"><i class="pe-7s-check" ></i> Valider</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="table-responsive"  >
+
+        <ng-container class="bg-white">
+          <ng-container class="bg-white py-1 px-1">
+            <table class="table table-hover bg-white" >
+              <thead>
+              <tr>
+                <th>#</th>
+                <th>Ref. interne</th>
+                <th>N° du coupon</th>
+                <th>Type de Coupon</th>
+                <th>Client</th>
+                <th>Carnet</th>
+                <th>Statut du coupon</th>
+                <th>Date</th>
+              </tr>
+              </thead>
+              <tbody *ngFor="let ticket of appStateTicket.appData.content | paginate: { id: 'ticket', itemsPerPage: size, currentPage: page, totalItems: appStateTicket.appData.totalElements } ; let i = index">
+
+              <tr>
+                <td>{{i + 1}}</td>
+                <td>{{ticket.internalReference}}</td>
+                <td>{{padWithZero(ticket.serialNumber, 7)}}</td>
+                <td>{{formatNumber(ticket.amount.toString())}}</td>
+                <td>{{ticket.nameClient}}</td>
+                <td>{{ticket.notebookNumber}}</td>
+                <td>{{getStatuts(ticket.status.name)}}</td>
+                <td>{{ticket.createdAt | formatDateHour}}</td>
+              </tr>
+              </tbody>
+            </table>
+            <div class="text-center">
+              <p *ngIf="appStateTicket.appData.totalElements === 0" style="color: grey; font-size: 1.8rem;" class="mx-auto" >Aucun Ticket trouvé !</p>
+            </div>
+          </ng-container>
+        </ng-container>
+      </div>
+      <div class="card-footer">
+        <div class="btn-actions-pane-left">
+          <div role="group" class="btn-group-sm btn-group">
+            Total: <b>{{ appStateTicket.appData.totalElements}} </b>
+          </div>
+        </div>
+        <div class="btn-actions-pane-right">
+          <div role="group" class="btn-group-sm btn-group">
+            <!--              <pagination-controls id="client" (pageChange)="pageChange($event)" ></pagination-controls>-->
+            <pagination-controls
+              id="ticket"
+              previousLabel="Précédent"
+              nextLabel="Suivant"
+              (pageChange)="pageChange($event)"></pagination-controls>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+  </ng-container>
+  <ng-container class="bg-white"  *ngSwitchCase="DataState.ERROR_STATE">
+    <div class="col-md-12 text-center">
+      <div class="text-danger" >{{appStateTicket.error}}</div>
+    </div>
+  </ng-container>
+</ng-container>
+

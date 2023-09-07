@@ -16134,6 +16134,12 @@ body {
   border-color: #eee
 }
 
+.btn-green {
+  color: #212529;
+  background-color: #e0ffed;
+  border-color: #eee
+}
+
 .btn-light:hover {
   color: #212529;
   background-color: #dbdbdb;

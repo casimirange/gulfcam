@@ -1,0 +1,199 @@
+
+<div class="app-page-title"  *ngIf="(roleUser === 'MANAGER_SPACES_2' || roleUser === 'SALES_MANAGER' || roleUser === 'MANAGER_SPACES_1' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))">
+  <div class="page-title-wrapper">
+    <div class="page-title-heading">
+      <div class="page-title-icon">
+        <i class="pe-7s-server icon-gradient bg-danger">
+        </i>
+      </div>
+      <div>Gestion des espaces
+        <div class="page-title-subheading">Managez vos espaces de stockage et de vente</div>
+      </div>
+    </div>
+    <div class="page-title-actions"  *ngIf="role.includes('ROLE_SUPERADMIN')">
+      <div class="d-inline-block ">
+        <button *ngIf="!load" type="button" data-toggle="tooltip" title="nouvel espace de stockage" class="btn-shadow mr-3 btn btn-primary" (click)="open(mymodal)">
+                                        <span class="btn-icon-wrapper pr-2 opacity-7">
+                                            <i class="fa fa-plus fa-w-20"></i>
+                                        </span>
+          Espace
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-12"  *ngIf="(roleUser === 'MANAGER_SPACES_2' || roleUser === 'SALES_MANAGER' || roleUser === 'MANAGER_SPACES_1' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))">
+    <div class="main-card mb-3 card " id="htmlData" #htmlData>
+      <div class="card-header">
+        Liste des espaces
+      </div>
+
+      <ng-container class="bg-white" *ngIf="(appState$ | async) as appState" [ngSwitch]="appState.dataState">
+        <div class="table-responsive">
+          <ng-container class="bg-white" *ngSwitchCase="DataState.LOADING_STATE">
+            <div class="col-md-12 text-center my-3">
+              <!--                <div class="spinner-border text-primary my-3" role="status"></div>-->
+              <div class="ball-clip-rotate">
+                <div style="background-color: rgb(68, 64, 84);"></div>
+              </div>
+            </div>
+          </ng-container>
+          <ng-container class="bg-white py-1 px-1" *ngSwitchCase="DataState.LOADED_STATE">
+            <table class="table table-hover bg-white">
+              <thead>
+              <tr>
+                <th>#</th>
+                <th>Ref. interne</th>
+                <th>Magasin</th>
+                <th>Nom</th>
+                <th>Type</th>
+                <th>Statut</th>
+                <th>Date création</th>
+                <th>Date modification</th>
+                <th >Actions</th>
+              </tr>
+              </thead>
+              <!--                <tbody *ngFor="let client of clients | clientNameFilter: name | clientRefFilter: internalRef | clientCompagnyFilter: compagny-->
+              <!--                 | clientDateFilter: date | paginate: { id: 'client', itemsPerPage: size, currentPage: page, totalItems: totalElements } ; let i = index">-->
+              <tbody *ngFor="let storeHouse of appState.appData.content | paginate: { id: 'entrepot', itemsPerPage: appState.appData.size, currentPage: page, totalItems: appState.appData.totalElements } ; let i = index">
+
+              <tr>
+                <td>{{i + 1}}</td>
+                <td>{{storeHouse.internalReference}}</td>
+                <td>{{storeHouse.localisationStore}}</td>
+                <td>{{storeHouse.name}}</td>
+                <td>{{storeHouse.type}}</td>
+                <td>{{getStatuts(storeHouse.status.name)}}</td>
+                <td>{{storeHouse.createAt | formatDate }}</td>
+                <td>{{storeHouse.updateAt | formatDate}}</td>
+                <td >
+                  <button class="btn btn-sm btn-secondary mr-2" (click)="showDetails(storeHouse)"
+                          *ngIf="role.includes('ROLE_SUPERADMIN') || (storeHouse.type == 'vente' ? roleUser == 'MANAGER_SPACES_2' : roleUser =='MANAGER_SPACES_1') "
+                  >
+                    <i class="pe-7s-look" title="consulter"></i>
+                  </button>
+                  <button class="btn btn-sm btn-primary" (click)="updateStoreHouseModal(mymodal, storeHouse)"  *ngIf="role.includes('ROLE_SUPERADMIN')">
+                    <i class="pe-7s-eyedropper" title="modifier"></i>
+                  </button>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+            <div class="text-center">
+              <p *ngIf="!appState.appData.content.length" style="color: grey; font-size: 1.8rem;" class="mx-auto">Aucun espace trouvé !</p>
+            </div>
+            <div class="card-footer">
+              <div class="btn-actions-pane-left">
+                <div role="group" class="btn-group-sm btn-group">
+                  Total:&nbsp;<b>{{ appState.appData.totalElements }} </b>
+                </div>
+              </div>
+              <div class="btn-actions-pane-right">
+                <div role="group" class="btn-group-sm btn-group">
+                  <!--              <pagination-controls id="client" (pageChange)="pageChange($event)" ></pagination-controls>-->
+                  <pagination-controls
+                    id="entrepot"
+                    previousLabel="Précédent"
+                    nextLabel="Suivant"
+                    (pageChange)="pageChange($event)"></pagination-controls>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          <ng-container class="bg-white"  *ngSwitchCase="DataState.ERROR_STATE">
+            <div class="col-md-12 text-center">
+              <div class="text-danger" >{{appState.error}}</div>
+            </div>
+          </ng-container>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div>
+
+<ng-template #mymodal let-modal >
+  <div class="modal-header">
+    <h6 class="modal-title timeline-title" id="modal-basic-title"><b>{{modalTitle}}</b> </h6>
+    <div class="close vertical-timeline-element-content bounce-in" (click)=" modal.close('save click')" >
+      <p><i class="fa fa-times"></i></p>
+    </div>
+  </div>
+  <div class="modal-body">
+    <div class="">
+      <div class="">
+        <form [formGroup]="storeHouseForm">
+          <div class="row">
+            <div class="col-md-4">
+              <div class="position-relative form-group">
+                <label for="store" class="">Magasin</label>
+<!--                <input type="text"  autocomplete="off"  placeholder="choisir un magasin" list="storeListOption">-->
+                <select name="select" ngModel="{{storeHouse.store?.internalReference}}" id="store" class="form-control" formControlName="store">
+                  <option value="" selected disabled hidden>Sélectionner un canal</option>
+                  <option *ngFor="let store of stores" value="{{store.internalReference}}">{{store.localization}}</option>
+                  <option *ngIf="!stores.length">aucun magasin</option>
+                </select>
+              </div>
+              <div *ngIf="storeHouseForm.controls['store'].invalid && (storeHouseForm.controls['store'].dirty || storeHouseForm.controls['store'].touched)"
+                   class="mb-2"  style="color: #f65656; font-style: italic;">
+
+                <div *ngIf="storeHouseForm.controls['store'].errors?.['required']" class="ml-3">
+                  le magasin est obligatoire.
+                </div>
+<!--                <div *ngIf="storeHouseForm.controls['store'].errors?.['email']" class="ml-3">-->
+<!--                  entrez une email valide : example@example.com-->
+<!--                </div>-->
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="position-relative form-group">
+                <label for="type" class="">Type</label>
+                <select name="select" ngModel="{{storeHouse?.type}}" id="type" class="form-control" formControlName="type">
+                  <option value="" selected disabled hidden>Sélectionner un type</option>
+                  <option *ngFor="let type of storeHouseType" value="{{type}}">{{type}}</option>
+                </select>
+              </div>
+              <div *ngIf="storeHouseForm.controls['type'].invalid && (storeHouseForm.controls['type'].dirty || storeHouseForm.controls['type'].touched)"
+                   class="mb-2"  style="color: #f65656; font-style: italic;">
+
+                <div *ngIf="storeHouseForm.controls['type'].errors?.['required']" class="ml-3">
+                  le nom est obligatoire.
+                </div>
+                <div *ngIf="storeHouseForm.controls['type'].errors?.['minLength']" class="ml-3">
+                  entrez un nom valide : example@example.com
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="position-relative form-group">
+                <label for="name" class="">Nom de l'entrepôt</label>
+                <input type="text" ngModel="{{storeHouse.name}}" id="name" class="form-control" formControlName="name" placeholder="Entrer un nom">
+<!--                <select name="select" ngModel="{{storeHouse.name}}" id="name" class="form-control" formControlName="name">-->
+<!--                  <option value="" selected disabled hidden>Sélectionner un type</option>-->
+<!--                  <option *ngFor="let type of storeHouseType" value="{{type}}">{{type}}</option>-->
+<!--                </select>-->
+              </div>
+              <div *ngIf="storeHouseForm.controls['name'].invalid && (storeHouseForm.controls['name'].dirty || storeHouseForm.controls['name'].touched)"
+                   class="mb-2"  style="color: #f65656; font-style: italic;">
+
+                <div *ngIf="storeHouseForm.controls['name'].errors?.['required']" class="ml-3">
+                  le nom est obligatoire.
+                </div>
+                <div *ngIf="storeHouseForm.controls['name'].errors?.['minLength']" class="ml-3">
+                  entrez un nom d'au moins 4 lettres
+                </div>
+              </div>
+            </div>
+          </div>
+          <button class="mt-1 btn btn-secondary float-right ml-3" (click)="annuler()" ><i class="pe-7s-back"></i> Annuler</button>
+          <button class="mt-1 btn btn-primary float-right" [disabled]="storeHouseForm.invalid || (isLoading$ | async)"
+                  (click)="modalTitle == 'Enregistrer un nouvel entrepot' ? saveStoreHouse() : updateStoreHouse()">
+            <i *ngIf="isLoading$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
+            <span *ngIf="isLoading$ | async">Enregistrement ...</span>
+            <span *ngIf="!(isLoading$ | async)">{{modalTitle == 'Enregistrer un nouvel entrepot' ? 'Enregistrer entrepot' : 'Modifier entrepot'}}</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</ng-template>

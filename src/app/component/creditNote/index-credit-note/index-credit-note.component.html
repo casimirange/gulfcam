@@ -1,0 +1,388 @@
+<div class="app-page-title"
+     *ngIf="roleUser === 'COMPTABLE' || roleUser === 'DSI_AUDIT' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+  <div class="page-title-wrapper">
+    <div class="page-title-heading">
+      <div class="page-title-icon">
+        <i class="pe-7s-cash icon-gradient bg-danger">
+        </i>
+      </div>
+      <div>Note de crédit
+        <div class="page-title-subheading">Gérez toutes les notes de crédit
+        </div>
+      </div>
+    </div>
+    <div class="page-title-actions"
+         *ngIf="roleUser === 'COMPTABLE' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+      <button (click)="open(mymodal)" type="button" data-toggle="tooltip" title="nouvelle note de crédit"
+              data-placement="bottom"
+              class="btn-shadow mr-3 btn btn-primary">
+           <span class="btn-icon-wrapper pr-2 opacity-7">
+                                            <i class="fa fa-plus fa-w-20"></i>
+                                        </span>
+        note
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="row" *ngIf="roleUser === 'COMPTABLE' || roleUser === 'DSI_AUDIT' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+  <div class="col-md-12">
+    <div class="main-card mb-3 card " id="htmlData" #htmlData>
+      <div class="card-header">
+        Liste des notes de crédit
+        <div class="btn-actions-pane-right">
+          <div role="group" class="btn-group-sm btn-group">
+            <button class="btn btn-icon btn-pill border-0 btn-transition"
+                    [ngClass]="onFilter? 'btn-outline-light' : 'btn-light'" (click)="showFilter()">
+              <i class="fa btn-icon-wrapper fa-sliders-h"></i>
+              {{!onFilter ? "Filtrer" : "Annuler"}}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-body bg-tempting-azure card-header-tab-animation fadeInLeft" *ngIf="onFilter">
+
+        <div class="menu-header-subtitle">
+          <div role="group" class="btn-group-sm btn-group">
+            <form class="form-row">
+              <div class="position-relative form-group mr-2">
+                <label for="stats" class="text-dark font-weight-bold">Recherche par statut</label>
+                <select name="stat" id="stats" class="form-control form-control-sm mr-3" [(ngModel)]="statutFilter"
+                        (ngModelChange)="getCreditNote()">
+                  <option value="" selected disabled hidden>Choix du statut</option>
+                  <option value="CREATED">NON VALIDEE</option>
+                  <option value="ACTIVATED">VALIDEE</option>
+                  <option value="">Tout afficher</option>
+                </select>
+              </div>
+              <div class="position-relative form-group  mr-2">
+                <label for="stationName" class="text-dark font-weight-bold">Recherche par station</label>
+                <input type="text" id="stationName" name="stationNama" [(ngModel)]="stationName"
+                       (ngModelChange)="findStation($event); " autocomplete="off"
+                       class="form-control form-control-sm mr-3" list="stationsListOption"
+                       placeholder="cherchez une station">
+                <datalist id="stationsListOption">
+                  <option *ngFor="let station of stations" [value]="station.designation"></option>
+                </datalist>
+              </div>
+              <div class="position-relative form-group  mr-2">
+                <label for="compagnie" class="text-dark font-weight-bold">Recherche par référence</label>
+                <input type="text" name="compagnie" id="compagnie" placeholder="Rechercher compagnie"
+                       [(ngModel)]="internalRef" (ngModelChange)="getCreditNote()"
+                       class="form-control form-control-sm mr-3">
+              </div>
+              <div class="position-relative form-group  mr-2">
+                <label for="serial" class="text-dark font-weight-bold">Recherche par date</label>
+                <input type="date" name="serial" id="serial" placeholder="Rechercher numéro" [(ngModel)]="dateFilter"
+                       (ngModelChange)="getCreditNote()"
+                       class="form-control form-control-sm mr-3">
+              </div>
+              <!--            <button class="btn btn-sm mr-3 text-primary" (click)="filterOrders()"><i class="fa fa-search"></i></button>-->
+            </form>
+          </div>
+        </div>
+      </div>
+      <ng-container class="bg-white" *ngIf="(appState$ | async) as appState" [ngSwitch]="appState.dataState">
+        <div class="table-responsive">
+          <ng-container class="bg-white" *ngSwitchCase="DataState.LOADING_STATE">
+            <div class="col-md-12 text-center my-3">
+              <!--                <div class="spinner-border text-primary my-3" role="status"></div>-->
+              <div class="ball-clip-rotate">
+                <div style="background-color: rgb(68, 64, 84);"></div>
+              </div>
+            </div>
+          </ng-container>
+          <ng-container class="bg-white py-1 px-1" *ngSwitchCase="DataState.LOADED_STATE">
+            <table class="table table-hover bg-white" id="servers">
+              <thead>
+              <tr>
+                <th>#</th>
+                <th>Ref. interne</th>
+                <th>Station</th>
+                <!--                <th>Coupon</th>-->
+                <th>Statut</th>
+                <th>Date creation</th>
+                <th>Date modification</th>
+                <th>Actions</th>
+              </tr>
+              </thead>
+              <tbody
+                *ngFor="let credit of appState.appData.content | paginate: { id: 'creditnote', itemsPerPage: size, currentPage: page, totalItems: appState.appData.totalElements }; let i = index">
+              <tr>
+                <td>{{i + 1}}</td>
+                <td>{{credit.internalReference}}</td>
+                <td>{{credit.station.designation}} </td>
+                <!--                <td>{{credit.coupon[0].serialNumber}} </td>-->
+                <td>
+            <span class="mb-2 mr-2 badge "
+                  [ngClass]="getStatuts(credit.status.name) == 'ACTIVE(E)' ? 'badge-success' : 'badge-warning'">
+            {{getStatuts(credit.status.name) == 'ACTIVE(E)' ? 'VALIDEE' : 'NON VALIDE'}}
+            </span>
+                </td>
+                <td>{{credit.createdAt | formatDateHour}}</td>
+                <td>{{credit.updateAt | formatDateHour}}</td>
+                <!--                <td>{{credit.updateAt | date: 'dd/MM/yyyy'}}</td>-->
+                <td>
+                  <!--            <a  style="cursor: pointer" class=" text-success" data-toggle="tooltip" title="valider une note de crédit"-->
+                  <!--               (click)="valid(credit.internalReference, i)">-->
+                  <!--              <i class="pe-7s-check" ></i>-->
+                  <!--            </a>-->
+                  <!--            <a  style="cursor: pointer" class="delete text-danger" (click)="deleteStore(credit, i)">-->
+                  <!--              <i class="pe-7s-trash" title="supprimer"></i>-->
+                  <!--            </a>&nbsp;-->
+                  <!--            <a  style="cursor: pointer" class="text-primary" (click)="updateStoreModal(mymodal, credit)">-->
+                  <!--              <i class="pe-7s-eyedropper" title="modifier"></i>-->
+                  <!--            </a>-->
+                  <!--            <button *ngIf="credit.status.name != 'ACTIVATED'" class="btn btn-sm btn-success mr-2" (click)="valid(credit.internalReference, i)">-->
+                  <!--              <i class="pe-7s-check" title="valider la note de crédit"></i>-->
+                  <!--            </button>-->
+                  <!--            <button class="btn btn-sm btn-primary" (click)="updateStoreModal(mymodal, credit)">-->
+                  <!--              <i class="pe-7s-eyedropper" title="modifier"></i>-->
+                  <!--            </button>-->
+                  <button class="btn btn-sm btn-secondary mr-2" (click)="creditNoteDetails(credit)">
+                    <i class="pe-7s-look" title="consulter"></i>
+                  </button>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+            <div class="text-center">
+              <p *ngIf="!appState.appData.content.length" style="color: grey; font-size: 1.8rem;" class="mx-auto">Aucune
+                note de crédit trouvée !</p>
+            </div>
+            <div class="card-footer">
+              <div class="btn-actions-pane-left">
+                <div role="group" class="btn-group-sm btn-group">
+                  Total:&nbsp;<b>{{ appState.appData.totalElements }} </b>
+                </div>
+              </div>
+              <div class="btn-actions-pane-right">
+                <div role="group" class="btn-group-sm btn-group">
+                  <!--              <pagination-controls id="client" (pageChange)="pageChange($event)" ></pagination-controls>-->
+                  <pagination-controls
+                    id="creditnote"
+                    previousLabel="Précédent"
+                    nextLabel="Suivant"
+                    (pageChange)="pageChange($event)"></pagination-controls>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          <ng-container class="bg-white" *ngSwitchCase="DataState.ERROR_STATE">
+            <div class="col-md-12 text-center">
+              <div class="text-danger">{{appState.error}}</div>
+            </div>
+          </ng-container>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div>
+<!--<div class="col-lg-12 col-xl-12" *ngIf="roleUser === 'COMPTABLE' || roleUser === 'DSI_AUDIT' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">-->
+<!--  <div class="main-card mb-3 card">-->
+<!--    <div class="card-body">-->
+<!--      <h5 class="card-title">Liste des notes de crédit</h5>-->
+<!--      <table class="table table-hover bg-white" id="servers">-->
+<!--        <thead>-->
+<!--        <tr>-->
+<!--          <th>#</th>-->
+<!--          <th>Ref. interne</th>-->
+<!--          <th>Station</th>-->
+<!--          <th>Coupon</th>-->
+<!--          <th>Statut</th>-->
+<!--          <th>Date creation</th>-->
+<!--          <th>Date modification</th>-->
+<!--          <th >Actions</th>-->
+<!--        </tr>-->
+<!--        </thead>-->
+<!--        <tbody *ngFor="let credit of creditNotes | paginate: { id: 'creditnote', itemsPerPage: size, currentPage: page, totalItems: totalElements }; let i = index">-->
+
+<!--        <tr>-->
+<!--          <td>{{i + 1}}</td>-->
+<!--          <td>{{credit.internalReference}}</td>-->
+<!--          <td>{{credit.station.designation}} </td>-->
+<!--          <td>{{credit.coupon[0].serialNumber}} </td>-->
+<!--          <td>-->
+<!--            <span class="mb-2 mr-2 badge " [ngClass]="getStatuts(credit.status.name) == 'ACTIVE(E)' ? 'badge-success' : 'badge-warning'">-->
+<!--            {{getStatuts(credit.status.name) == 'ACTIVE(E)' ? 'VALIDEE' : 'NON VALIDE'}}-->
+<!--            </span>-->
+<!--          </td>-->
+<!--          <td>{{credit.createdAt | date: 'dd/MM/yyyy'}}</td>-->
+<!--          <td>{{credit.updateAt | date: 'dd/MM/yyyy'}}</td>-->
+<!--          <td>-->
+<!--&lt;!&ndash;            <a  style="cursor: pointer" class=" text-success" data-toggle="tooltip" title="valider une note de crédit"&ndash;&gt;-->
+<!--&lt;!&ndash;               (click)="valid(credit.internalReference, i)">&ndash;&gt;-->
+<!--&lt;!&ndash;              <i class="pe-7s-check" ></i>&ndash;&gt;-->
+<!--&lt;!&ndash;            </a>&ndash;&gt;-->
+<!--&lt;!&ndash;            <a  style="cursor: pointer" class="delete text-danger" (click)="deleteStore(credit, i)">&ndash;&gt;-->
+<!--&lt;!&ndash;              <i class="pe-7s-trash" title="supprimer"></i>&ndash;&gt;-->
+<!--&lt;!&ndash;            </a>&nbsp;&ndash;&gt;-->
+<!--&lt;!&ndash;            <a  style="cursor: pointer" class="text-primary" (click)="updateStoreModal(mymodal, credit)">&ndash;&gt;-->
+<!--&lt;!&ndash;              <i class="pe-7s-eyedropper" title="modifier"></i>&ndash;&gt;-->
+<!--&lt;!&ndash;            </a>&ndash;&gt;-->
+<!--&lt;!&ndash;            <button *ngIf="credit.status.name != 'ACTIVATED'" class="btn btn-sm btn-success mr-2" (click)="valid(credit.internalReference, i)">&ndash;&gt;-->
+<!--&lt;!&ndash;              <i class="pe-7s-check" title="valider la note de crédit"></i>&ndash;&gt;-->
+<!--&lt;!&ndash;            </button>&ndash;&gt;-->
+<!--&lt;!&ndash;            <button class="btn btn-sm btn-primary" (click)="updateStoreModal(mymodal, credit)">&ndash;&gt;-->
+<!--&lt;!&ndash;              <i class="pe-7s-eyedropper" title="modifier"></i>&ndash;&gt;-->
+<!--&lt;!&ndash;            </button>&ndash;&gt;-->
+<!--            <button class="btn btn-sm btn-secondary mr-2" (click)="creditNoteDetails(credit)">-->
+<!--              <i class="pe-7s-look" title="consulter"></i>-->
+<!--            </button>-->
+<!--          </td>-->
+<!--        </tr>-->
+<!--        </tbody>-->
+<!--      </table>-->
+<!--      <div class="text-center">-->
+<!--        <p *ngIf="creditNotes.length === 0" style="color: grey; font-size: 1.8rem;" class="mx-auto" >Aucune note de crédit trouvée !</p>-->
+<!--      </div>-->
+<!--      <div class="card-footer">-->
+<!--        <div class="btn-actions-pane-left">-->
+<!--          <div role="group" class="btn-group-sm btn-group">-->
+<!--            Total : <b>{{ creditNotes.length }} </b>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        <div class="btn-actions-pane-right">-->
+<!--          <div role="group" class="btn-group-sm btn-group">-->
+<!--            <pagination-controls-->
+<!--              id="creditnote"-->
+<!--              previousLabel="Précédent"-->
+<!--              nextLabel="Suivant"-->
+<!--              (pageChange)="pageChange($event)"></pagination-controls>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </div>-->
+
+<!--    </div>-->
+<!--  </div>-->
+<!--</div>-->
+
+
+<ng-template #mymodal let-modal>
+  <div class="modal-header">
+    <h6 class="modal-title timeline-title" id="modal-basic-title"><b>{{modalTitle}}</b></h6>
+    <div class="close vertical-timeline-element-content bounce-in" (click)=" modal.close('save click'); annuler()">
+      <p><i class="fa fa-times"></i></p>
+    </div>
+  </div>
+  <div class="modal-body">
+    <div class="">
+      <div class="">
+        <form [formGroup]="creditForm">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="position-relative form-group">
+                <label for="station" class="">Station</label>
+                <select name="select" id="station" class="form-control" formControlName="idStation"
+                        (ngModelChange)="getCouponByStation()">
+                  <option value="" selected disabled hidden>Sélectionner une station</option>
+                  <ng-container *ngIf="(appStateStation$ | async) as appState" [ngSwitch]="appState.dataState">
+                    <ng-container class="bg-white" *ngSwitchCase="DataState.LOADING_STATE">
+                      <div class="col-md-12 text-center my-3">
+                        <div class="ball-clip-rotate">
+                          <div style="background-color: rgb(68, 64, 84);"></div>
+                        </div>
+                      </div>
+                    </ng-container>
+                    <ng-container class="bg-white" *ngSwitchCase="DataState.LOADED_STATE">
+                      <option *ngFor="let station of appState.appData.content"
+                              value="{{station.internalReference}}">{{station.designation}}</option>
+                      <option *ngIf="appState.appData.totalElements == 0" value="" disabled>Aucune station trouvée
+                      </option>
+                    </ng-container>
+                  </ng-container>
+                  <!--                  <option *ngFor="let station of stations" value="{{station.internalReference}}">{{station.designation}}</option>-->
+                  <!--                  <option *ngIf="ap" value="{{station.internalReference}}">{{station.designation}}</option>-->
+                </select>
+              </div>
+            </div>
+            <!--            </div>-->
+
+            <ng-container class="bg-white" *ngIf="(appStateCoupon$ | async) as appState" [ngSwitch]="appState.dataState">
+              <ng-container class="bg-white" *ngSwitchCase="DataState.LOADING_STATE">
+                <div class="col-md-12 text-center my-3">
+                  <div class="ball-clip-rotate">
+                    <div style="background-color: rgb(68, 64, 84);"></div>
+                  </div>
+                </div>
+              </ng-container>
+              <ng-container class="bg-white py-1 px-1" *ngSwitchCase="DataState.LOADED_STATE">
+                <div class="col-md-12 position-relative form-group" >
+                  <h5 class="card-title">Liste des coupons</h5>
+                  <table class="mb-0 table table-sm">
+                    <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>N°</th>
+                      <th>Ref. interne</th>
+                      <th>Numéro de série</th>
+                      <th>coupon</th>
+                      <th>client</th>
+                      <th>statut</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr *ngFor="let prod of appState.appData.content; let i = index">
+                      <th scope="row">
+                        <div class="widget-content-left mr-2">
+                          <div class="custom-checkbox custom-control">
+                            <input type="checkbox" id="exampleCustomCheckbox{{i}}" class="custom-control-input"
+                                   (click)="vouchers.includes(prod.serialNumber) ? removeCoupons(prod.serialNumber) : addCoupons(prod.serialNumber)">
+                            <label class="custom-control-label" for="exampleCustomCheckbox{{i}}">&nbsp;</label>
+                          </div>
+                        </div>
+                      </th>
+                      <th scope="row">{{i + 1}}</th>
+                      <td>{{prod.internalReference}}</td>
+                      <td>{{padWithZero(prod.serialNumber, 7)}}</td>
+                      <td>{{formatNumber(prod.amount)}}</td>
+                      <td>{{prod.nameClient}}</td>
+                      <td>{{getStatuts(prod.status.name)}}</td>
+                    </tr>
+                    </tbody>
+                  </table>
+                  <div class="text-center" *ngIf="appState.appData.totalElements > 0">
+                    <p style="color: grey; font-size: 0.9rem;" class="mx-auto">Sélectionner des coupons à ajouter à la
+                      note de crédit</p>
+                  </div>
+                  <div class="text-center" *ngIf="appState.appData.totalElements == 0">
+                    <p style="color: grey; font-size: 1.8rem;" class="mx-auto">Aucun
+                      Coupon utilisé dans cette station !</p>
+                  </div>
+                  <div class="card-subtitle float-right">Total: {{vouchers.length}} coupon(s) sélectionné(s)</div>
+                </div>
+              </ng-container>
+              <ng-container class="bg-white" *ngSwitchCase="DataState.ERROR_STATE">
+                <div class="col-md-12 text-center">
+                  <div class="text-danger">{{appState.error}}</div>
+                </div>
+              </ng-container>
+            </ng-container>
+
+
+<!--                <div class="col-md-12 position-relative form-group" *ngIf="!couponsFiltered.length && selectedStation">-->
+<!--                  <h5 class="card-title">Liste des coupons</h5>-->
+
+<!--                  <div class="text-center">-->
+<!--                    <p style="color: grey; font-size: 1.2rem;" class="mx-auto">Aucun coupon utilisé dans cette-->
+<!--                      station</p>-->
+<!--                  </div>-->
+<!--                  <div class="card-subtitle float-right">Total: {{vouchers.length}} coupon(s)</div>-->
+<!--                </div>-->
+          </div>
+          <button class="mt-1 btn btn-secondary float-right ml-3" (click)="annuler()"><i class="pe-7s-back"></i>Annuler
+          </button>
+          <button class="mt-1 btn btn-primary float-right"
+                  [disabled]="creditForm.controls['idStation'].invalid || vouchers.length == 0 || (isLoading$ | async)"
+                  (click)=" createCreditNote()">
+            <i *ngIf="isLoading$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
+            <span *ngIf="isLoading$ | async">Enregistrement ...</span>
+            <span
+              *ngIf="!(isLoading$ | async)">{{modalTitle == 'Enregistrer nouvelle note de credit' ? 'Enregistrer note' : 'Modifier note'}}</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</ng-template>

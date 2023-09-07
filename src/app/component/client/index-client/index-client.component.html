@@ -1,0 +1,333 @@
+<ng-container *ngIf="roleUser === 'COMMERCIAL_ATTACHE' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+  <div class="app-page-title">
+    <div class="page-title-wrapper">
+      <div class="page-title-heading">
+        <div class="page-title-icon">
+          <i class="pe-7s-users icon-gradient bg-danger">
+          </i>
+        </div>
+        <div>Gestion des clients
+          <div class="page-title-subheading">Managez vos clients</div>
+        </div>
+      </div>
+      <div class="page-title-actions">
+        <div class="d-inline-block ">
+          <button type="button" data-toggle="tooltip" title="nouveau client" class="btn-shadow mr-3 btn btn-primary"
+                  (click)="open(mymodals)">
+                                        <span class="btn-icon-wrapper pr-2 opacity-7">
+                                            <i class="fa fa-plus fa-w-20"></i>
+                                        </span>
+            Client
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="main-card mb-3 card " id="htmlData" #htmlData>
+        <div class="card-header">
+          Liste des clients
+          <div class="btn-actions-pane-right">
+            <div role="group" class="btn-group-sm btn-group">
+              <button class="btn btn-icon btn-pill border-0 btn-transition" [ngClass]="onFilter? 'btn-outline-light' : 'btn-light'" (click)="showFilter()">
+                <i class="fa btn-icon-wrapper fa-sliders-h"></i>
+                {{!onFilter ? "Filtrer" : "Annuler"}}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body bg-tempting-azure card-header-tab-animation fadeInLeft"  *ngIf="onFilter">
+
+          <div class="menu-header-subtitle">
+            <div role="group" class="btn-group-sm btn-group">
+              <form class="form-row">
+                <div class="position-relative form-group mr-2">
+                  <label for="stats" class="text-dark font-weight-bold">Type de Client</label>
+                  <select name="stat" id="stats" class="form-control form-control-sm mr-3" [(ngModel)]="typeFilter" (ngModelChange)="filterClients()">
+                    <option value="" selected disabled hidden>Choix du type</option>
+                    <option value="ADMINISTRATION">Administration</option>
+                    <option value="ENTREPRISE">Entreprise</option>
+                    <option value="PARTICULAR">Particulier</option>
+                    <option value="">Tout afficher</option>
+                  </select>
+                </div>
+                <div class="position-relative form-group  mr-2">
+                  <label for="nameClient" class="text-dark font-weight-bold">Recherche par nom</label>
+                  <input type="text" name="nameClient" id="nameClient" placeholder="Rechercher nom" [(ngModel)]="clientNameFilter" (ngModelChange)="filterClients()"
+                         class="form-control form-control-sm mr-3">
+                </div>
+                <div class="position-relative form-group  mr-2">
+                  <label for="compagnie" class="text-dark font-weight-bold">Recherche par compagnie</label>
+                  <input type="text" name="compagnie" id="compagnie" placeholder="Rechercher compagnie" [(ngModel)]="companyNameFilter" (ngModelChange)="filterClients()"
+                         class="form-control form-control-sm mr-3">
+                </div>
+                <div class="position-relative form-group  mr-2">
+                  <label for="serial" class="text-dark font-weight-bold">Recherche par date</label>
+                  <input type="date" name="serial" id="serial" placeholder="Rechercher numéro" [(ngModel)]="dateFilter" (ngModelChange)="filterClients()"
+                         class="form-control form-control-sm mr-3">
+                </div>
+                <!--            <button class="btn btn-sm mr-3 text-primary" (click)="filterOrders()"><i class="fa fa-search"></i></button>-->
+              </form>
+            </div>
+          </div>
+        </div>
+        <ng-container class="bg-white" *ngIf="(appState$ | async) as appState" [ngSwitch]="appState.dataState">
+          <div class="table-responsive">
+            <ng-container class="bg-white" *ngSwitchCase="DataState.LOADING_STATE">
+              <div class="col-md-12 text-center my-3">
+<!--                <div class="spinner-border text-primary my-3" role="status"></div>-->
+                <div class="ball-clip-rotate">
+                  <div style="background-color: rgb(68, 64, 84);"></div>
+                </div>
+              </div>
+            </ng-container>
+            <ng-container class="bg-white py-1 px-1" *ngSwitchCase="DataState.LOADED_STATE">
+              <table class="table table-hover bg-white">
+                <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Ref. interne</th>
+                  <th>Date</th>
+                  <th>Nom client&nbsp;</th>
+                  <th>Nom compagnie</th>
+                  <th>Addresse</th>
+                  <th>Téléphone</th>
+                  <th>Email</th>
+                  <th>N° compte</th>
+                  <th>NIU</th>
+                  <th>Type</th>
+                  <th>RCCM</th>
+                  <th>Actions</th>
+                </tr>
+                </thead>
+<!--                <tbody *ngFor="let client of clients | clientNameFilter: name | clientRefFilter: internalRef | clientCompagnyFilter: compagny-->
+<!--                 | clientDateFilter: date | paginate: { id: 'client', itemsPerPage: size, currentPage: page, totalItems: totalElements } ; let i = index">-->
+                <tbody *ngFor="let client of appState.appData.content | paginate: { id: 'client', itemsPerPage: appState.appData.size, currentPage: page, totalItems: appState.appData.totalElements } ; let i = index">
+
+                <tr>
+                  <td>{{i + 1}}</td>
+                  <td>{{client.internalReference}}</td>
+                  <td>{{client.createdAt | formatDate}}</td>
+                  <td>{{client.completeName}}</td>
+                  <td>{{client.companyName}}</td>
+                  <td>{{client.address}}</td>
+                  <td>{{client.phone}}</td>
+                  <td>{{client.email}}</td>
+                  <td>{{client.gulfcamAccountNumber}}</td>
+                  <td>{{client.niu}}</td>
+                  <td>{{client.typeClient.name === 'PARTICULAR' ? 'PARTICULIER' : client.typeClient.name }}</td>
+                  <td>{{client.rccm}}</td>
+                  <td>
+                    <!--                    pour supprimer un client-->
+                    <!--                    <a style="cursor: pointer"  class="delete text-danger" (click)="deleteClient(client, i)" >-->
+                    <!--                      <i class="pe-7s-trash" title="supprimer"></i>-->
+                    <!--                    </a>&nbsp;-->
+                    <button class="btn btn-sm btn-secondary mr-2" (click)="detailsClient(client)">
+                      <i class="pe-7s-look" title="consulter"></i>
+                    </button>
+                    <button class="btn btn-sm btn-primary" (click)="updateClientModal(mymodals, client)">
+                      <i class="pe-7s-eyedropper" title="modifier"></i>
+                    </button>
+                  </td>
+                </tr>
+                </tbody>
+              </table>
+              <div class="text-center">
+                <p *ngIf="!appState.appData.content.length" style="color: grey; font-size: 1.8rem;" class="mx-auto">Aucun
+                  Client trouvé !</p>
+              </div>
+              <div class="card-footer">
+                <div class="btn-actions-pane-left">
+                  <div role="group" class="btn-group-sm btn-group">
+                    Total:&nbsp;<b>{{ appState.appData.totalElements }} </b>
+<!--                    <b>{{ (clients | clientNameFilter: name | clientRefFilter: internalRef | clientCompagnyFilter: compagny-->
+<!--                      | clientDateFilter: date).length }} </b>-->
+                  </div>
+                </div>
+                <div class="btn-actions-pane-right">
+                  <div role="group" class="btn-group-sm btn-group">
+                    <!--              <pagination-controls id="client" (pageChange)="pageChange($event)" ></pagination-controls>-->
+                    <pagination-controls
+                      id="client"
+                      previousLabel="Précédent"
+                      nextLabel="Suivant"
+                      (pageChange)="pageChange($event)"></pagination-controls>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+            <ng-container class="bg-white"  *ngSwitchCase="DataState.ERROR_STATE">
+              <div class="col-md-12 text-center">
+                <div class="text-danger" >{{appState.error}}</div>
+              </div>
+            </ng-container>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</ng-container>
+<ng-template #mymodals let-modal>
+  <div class="modal-header">
+    <h6 class="modal-title timeline-title" id="modal-basic-title"><b>{{modalTitle}}</b></h6>
+    <div class="close vertical-timeline-element-content bounce-in" (click)=" annuler()">
+      <p><i class="fa fa-times"></i></p>
+    </div>
+  </div>
+  <div class="modal-body">
+    <div class="">
+      <div class="">
+        <form [formGroup]="clientForm">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="position-relative form-group">
+                <label for="email" class="">Email</label>
+                <input name="email" id="email" placeholder="email" ngModel="{{client.email}}" type="email"
+                       class="form-control" formControlName="email">
+              </div>
+              <div
+                *ngIf="clientForm.controls['email'].invalid && (clientForm.controls['email'].dirty || clientForm.controls['email'].touched)"
+                class="mb-2" style="color: #f65656; font-style: italic;">
+                <div *ngIf="clientForm.controls['email'].errors?.['email']" class="ml-3">
+                  entrez une email valide : example@example.com
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="position-relative form-group">
+                <label for="name" class="">Nom complet <span class="text-danger">*</span></label>
+                <input id="name" ngModel="{{client.completeName}}" placeholder="nom du client" type="text"
+                       class="form-control" formControlName="completeName">
+              </div>
+              <div
+                *ngIf="clientForm.controls['completeName'].invalid && (clientForm.controls['completeName'].dirty || clientForm.controls['completeName'].touched)"
+                class="mb-2" style="color: #f65656; font-style: italic;">
+
+                <div *ngIf="clientForm.controls['completeName'].errors?.['required']" class="ml-3">
+                  le nom est obligatoire.
+                </div>
+                <div *ngIf="clientForm.controls['completeName'].errors?.['minLength']" class="ml-3">
+                  entrez un nom valide d'au moins 3 caractères
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="position-relative form-group">
+                <label for="reason" class="">Raison sociale</label>
+                <input name="email" id="reason" ngModel="{{client.companyName}}" placeholder="nom de la société"
+                       type="text" class="form-control" formControlName="companyName">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="position-relative form-group">
+                <label for="address" class="">Adresse <span class="text-danger">*</span></label>
+                <input name="email" id="address" ngModel="{{client.address}}" placeholder="adresse" type="text"
+                       class="form-control" formControlName="address">
+              </div>
+              <div
+                *ngIf="clientForm.controls['address'].invalid && (clientForm.controls['address'].dirty || clientForm.controls['address'].touched)"
+                class="mb-2" style="color: #f65656; font-style: italic;">
+
+                <div *ngIf="clientForm.controls['address'].errors?.['required']" class="ml-3">
+                  l'adresse est obligatoire.
+                </div>
+                <div *ngIf="clientForm.controls['address'].errors?.['minLength']" class="ml-3">
+                  entrez une adresse valide
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4">
+              <div class="position-relative form-group">
+                <label for="phone" class="">Numéro de téléphone <span class="text-danger">*</span></label>
+                <input name="email" id="phone" ngModel="{{client.phone}}"  type="text" placeholder="6937542108"
+                       class="form-control" formControlName="phone">
+              </div>
+              <div
+                *ngIf="clientForm.controls['phone'].invalid && ( clientForm.controls['phone'].touched)"
+                class="mb-2" style="color: #f65656; font-style: italic;">
+
+                <div *ngIf="clientForm.controls['phone'].errors?.['required']" class="ml-3">
+                  le numéro de téléphone est obligatoire.
+                </div>
+                <div *ngIf="clientForm.controls['phone'].errors?.['validatePhoneNumber']" class="ml-3">
+                  mauvais format de numéro
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="position-relative form-group">
+                <label for="rccm" class="">RCCM</label>
+                <input name="email" id="rccm" ngModel="{{client.rccm}}" placeholder="RCCM" type="text"
+                       class="form-control" formControlName="rccm">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="position-relative form-group">
+                <label for="niu" class="">NIU</label>
+                <input name="niu" id="niu" ngModel="{{client.niu}}" placeholder="numéro d'identifiant unique" type="text"
+                       class="form-control" formControlName="niu">
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="position-relative form-group">
+                <label for="comptnumber" class="">Numéro de compte Gulfcam <span class="text-danger">*</span></label>
+                <input name="email" ngModel="{{client.gulfcamAccountNumber}}" id="comptnumber"
+                       placeholder="Numéro de compte" type="text" class="form-control"
+                       formControlName="gulfcamAccountNumber">
+              </div>
+              <div
+                *ngIf="clientForm.controls['gulfcamAccountNumber'].invalid && (clientForm.controls['gulfcamAccountNumber'].dirty || clientForm.controls['gulfcamAccountNumber'].touched)"
+                class="mb-2" style="color: #f65656; font-style: italic;">
+
+                <div *ngIf="clientForm.controls['gulfcamAccountNumber'].errors?.['required']" class="ml-3">
+                  le numéro de compte est obligatoire.
+                </div>
+                <div *ngIf="clientForm.controls['gulfcamAccountNumber'].errors?.['pattern']" class="ml-3">
+                  Le numéro de compte doit être en chiffres
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="position-relative form-group">
+                <label for="typeClient" class="">Type de client <span class="text-danger">*</span></label>
+                <select name="select" ngModel="{{clientType}}" id="typeClient" class="form-control"
+                        formControlName="typeClient">
+                  <option value="" selected disabled hidden>Sélectionner un type de client</option>
+                  <option value="ADMINISTRATION">Administration</option>
+                  <option value="ENTREPRISE">Entreprise</option>
+                  <option value="PARTICULAR">Particulier</option>
+                </select>
+
+              </div>
+              <div
+                *ngIf="clientForm.controls['typeClient'].invalid && (clientForm.controls['typeClient'].dirty || clientForm.controls['typeClient'].touched)"
+                class="mb-2" style="color: #f65656; font-style: italic;">
+
+                <div *ngIf="clientForm.controls['typeClient'].errors?.['required']" class="ml-3">
+                  le type de client est obligatoire.
+                </div>
+              </div>
+            </div>
+          </div>
+          <button class="mt-1 btn btn-secondary float-right ml-3" (click)="annuler()"><i class="pe-7s-back"></i> Annuler
+          </button>
+          <button class="mt-1 btn btn-primary float-right" [disabled]="clientForm.invalid || (isLoading$ | async)"
+                  (click)="modalTitle == 'Enregistrer nouveau client' ? saveClient() : updateClient()">
+            <i *ngIf="isLoading$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
+            <span *ngIf="isLoading$ | async">Enregistrement ...</span>
+            <span
+              *ngIf="!(isLoading$ | async)">{{modalTitle == 'Enregistrer nouveau client' ? 'Enregistrer client' : 'Modifier client'}}</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</ng-template>

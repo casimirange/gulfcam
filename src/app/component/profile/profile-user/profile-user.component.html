@@ -1,5 +1,17 @@
+<<<<<<< HEAD
 <div class="app-page-title" *ngIf="user">
   <div class="page-title-wrapper">
+=======
+<div class="app-page-title" >
+  <ng-container class="bg-white" *ngIf="!user">
+    <div class="col-md-12 text-center my-3">
+      <div class="ball-clip-rotate">
+        <div style="background-color: rgb(68, 64, 84);"></div>
+      </div>
+    </div>
+  </ng-container>
+  <div class="page-title-wrapper" *ngIf="user">
+>>>>>>> 37d14d372724acd031f893c0236343c371360e75
     <div class="page-title-heading">
       <div class="page-title-icon">
         <i class="pe-7s-user icon-gradient bg-danger">
@@ -18,7 +30,11 @@
       <div class="col-md-6">
         <div class="main-card mb-3 card">
           <div class="card-body">
+<<<<<<< HEAD
             <h5 class="card-title">Modifier mot de passe</h5>
+=======
+            <h5 class="card-title">Modifier votre mot de passe</h5>
+>>>>>>> 37d14d372724acd031f893c0236343c371360e75
             <form [formGroup]="changePwd" class="align-content-center">
 
 

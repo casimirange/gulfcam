@@ -1,0 +1,187 @@
+<div class="app-page-title"
+     *ngIf="roleUser === 'SALES_MANAGER' || roleUser === 'COMMERCIAL_ATTACHE'  || roleUser === 'MANAGER_SPACES_2' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+  <div class="page-title-wrapper">
+    <div class="page-title-heading">
+      <div class="page-title-icon">
+        <i class="pe-7s-ribbon icon-gradient bg-danger">
+        </i>
+      </div>
+      <div>Gestion des coupons
+        <div class="page-title-subheading">Managez vos coupons</div>
+      </div>
+    </div>
+<!--    <div class="page-title-actions">-->
+<!--      <div class="d-inline-block ">-->
+<!--        <button type="button" data-toggle="tooltip" title="nouveau carton" class="btn-shadow mr-3 btn btn-primary"-->
+<!--                (click)="open(mymodal)">-->
+<!--                                                <span class="btn-icon-wrapper pr-2 opacity-7">-->
+<!--                                                    <i class="fa fa-plus fa-w-20"></i>-->
+<!--                                                </span>-->
+<!--          Accepter Coupon-->
+<!--        </button>-->
+<!--      </div>-->
+<!--    </div>-->
+  </div>
+</div>
+
+<div class="row"
+     *ngIf="roleUser === 'SALES_MANAGER' || roleUser === 'COMMERCIAL_ATTACHE' || roleUser === 'MANAGER_SPACES_2' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+  <div class="col-md-12">
+    <div class="main-card mb-3 card " id="htmlData" #htmlData>
+      <div class="card-header">
+        Liste des coupons
+        <div class="btn-actions-pane-right">
+          <div role="group" class="btn-group-sm btn-group">
+                <button class="btn btn-icon btn-pill border-0 btn-transition" [ngClass]="onFilter? 'btn-outline-light' : 'btn-light'" (click)="showFilter()">
+                  <i class="fa btn-icon-wrapper fa-sliders-h"></i>
+                  {{!onFilter ? "Filtrer" : "Annuler"}}
+                </button>
+          </div>
+        </div>
+      </div>
+      <div class="card-body bg-tempting-azure card-header-tab-animation fadeInLeft"  *ngIf="onFilter">
+
+        <div class="menu-header-subtitle">
+          <div role="group" class="btn-group-sm btn-group">
+            <form class="form-row">
+            <div class="position-relative form-group mr-2">
+            <label for="stats" class="text-dark font-weight-bold">Statut</label>
+            <select name="stat" id="stats" class="form-control form-control-sm mr-3" [(ngModel)]="statusFilter" (ngModelChange)="filterCoupons()">
+              <option value="" selected disabled hidden>Choix statut</option>
+              <!--              <option value="CREATED">CREE</option>-->
+              <option value="ACCEPTED">ACCEPTE</option>
+              <option value="CANCELED">ANNULE</option>
+              <option value="USED">UTILISE</option>
+              <option value="ACTIVATED">ACTIVE</option>
+              <option value="SUSPENDED">SUSPENDU</option>
+              <option value="AVAILABLE">DISPONIBLE</option>
+              <option value="">Tout afficher</option>
+            </select>
+            </div>
+            <div class="position-relative form-group  mr-2 ">
+              <label for="typ" class="text-dark font-weight-bold">Type de coupon</label>
+            <select name="stat" id="typ" class="form-control form-control-sm mr-3" [(ngModel)]="typeFilter" (ngModelChange)="filterCoupons()">
+              <option value="" selected disabled hidden>Type</option>
+              <option value="{{v.internalReference}}" *ngFor="let v of vouchers">{{v.amount}}</option>
+              <option value="">Tout afficher</option>
+            </select>
+            </div>
+              <div class="position-relative form-group  mr-2">
+                <label for="client" class="text-dark font-weight-bold">Recherche par client</label>
+<!--            <input type="text" name="client" id="client" placeholder="Rechercher client" [(ngModel)]="clientName" (ngModelChange)="filterCoupons()"-->
+<!--                   class="form-control form-control-sm mr-3">-->
+                <input type="text" id="client" name="client" [(ngModel)]="clientName" (ngModelChange)="findClients($event); " autocomplete="off"
+                       class="form-control form-control-sm mr-3" list="clientsListOption"
+                       placeholder="cherchez un client">
+                <datalist id="clientsListOption">
+                  <option *ngFor="let client of clients" [value]="client.completeName"></option>
+                </datalist>
+              </div>
+              <div class="position-relative form-group  mr-2">
+                <label for="station" class="text-dark font-weight-bold">Recherche par station</label>
+<!--            <input type="text" name="client" id="client" placeholder="Rechercher client" [(ngModel)]="clientName" (ngModelChange)="filterCoupons()"-->
+<!--                   class="form-control form-control-sm mr-3">-->
+                <input type="text" id="station" name="station" [(ngModel)]="stationName" (ngModelChange)="findStation($event); " autocomplete="off"
+                       class="form-control form-control-sm mr-3" list="stationsListOption"
+                       placeholder="cherchez une station">
+                <datalist id="stationsListOption">
+                  <option *ngFor="let station of stations" [value]="station.designation"></option>
+                </datalist>
+              </div>
+              <div class="position-relative form-group  mr-2">
+                <label for="serial" class="text-dark font-weight-bold">Recherche par N° Série</label>
+            <input type="text" name="serial" id="serial" placeholder="Rechercher numéro" [(ngModel)]="serialNumber" (ngModelChange)="filterCoupons()"
+                   class="form-control form-control-sm mr-3">
+              </div>
+            <!--            <button class="btn btn-sm mr-3 text-primary" (click)="filterOrders()"><i class="fa fa-search"></i></button>-->
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+
+        <ng-container class="bg-white" *ngIf="(appState$ | async) as appState" [ngSwitch]="appState.dataState">
+          <ng-container class="bg-white" *ngSwitchCase="DataState.LOADING_STATE">
+            <div class="col-md-12 text-center my-3">
+              <!--                <div class="spinner-border text-primary my-3" role="status"></div>-->
+              <div class="ball-clip-rotate">
+                <div style="background-color: rgb(68, 64, 84);"></div>
+              </div>
+            </div>
+          </ng-container>
+          <ng-container class="bg-white py-1 px-1" *ngSwitchCase="DataState.LOADED_STATE">
+            <table class="table table-hover bg-white">
+              <thead>
+              <tr>
+                <th>#</th>
+                <th>Ref. interne</th>
+                <th>Numéro de série</th>
+                <th>Coupon</th>
+                <th>Client</th>
+<!--                <th>Ticket</th>-->
+                <th>Carnet</th>
+                <th>Station</th>
+                <th>Statut</th>
+                <th>Pompiste</th>
+                <th>Note credit</th>
+                <th>Dde Oppo.</th>
+                <th>Date Cr.</th>
+                <th>Date Mod.</th>
+                <!--                <th>Actions</th>-->
+              </tr>
+              </thead>
+              <tbody
+                *ngFor="let coupon of appState.appData.content | paginate: { id: 'coupon',itemsPerPage: appState.appData.size, currentPage: page, totalItems: appState.appData.totalElements }; let i = index">
+
+              <tr>
+                <td>{{i + 1}}</td>
+                <td>{{coupon.internalReference}}</td>
+                <td>{{padWithZero(coupon.serialNumber, 7)}}</td>
+                <td>{{formatNumber(coupon.amount)}}</td>
+                <td>{{coupon.nameClient}}</td>
+<!--                <td>{{coupon.idTicket}}</td>-->
+                <td>{{coupon.idNotebook}}</td>
+                <td>{{coupon.nameStation}}</td>
+                <td>{{getStatuts(coupon.status.name)}}</td>
+                <td>{{coupon.pompisteName}}</td>
+                <td>{{coupon.idCreditNote}}</td>
+                <td>{{coupon.idRequestOpposition}}</td>
+                <td>{{coupon.createdAt | formatDateHour}}</td>
+                <td>{{coupon.updateAt | formatDateHour}}</td>
+              </tr>
+            </table>
+            <div class="text-center">
+              <p *ngIf="!appState.appData.content.length" style="color: grey; font-size: 1.8rem;" class="mx-auto">Aucun
+                Coupon trouvé !</p>
+            </div>
+            <div class="card-footer">
+              <div class="btn-actions-pane-left">
+                <div role="group" class="btn-group-sm btn-group">
+                  Total coupons: <b>{{ appState.appData.totalElements }} </b>
+                </div>
+              </div>
+              <div class="btn-actions-pane-right">
+                <div role="group" class="btn-group-sm btn-group">
+                  <!--              <pagination-controls id="client" (pageChange)="pageChange($event)" ></pagination-controls>-->
+                  <pagination-controls
+                    id="coupon"
+                    previousLabel="Précédent"
+                    nextLabel="Suivant"
+                    (pageChange)="pageChange($event)"></pagination-controls>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          <ng-container class="bg-white" *ngSwitchCase="DataState.ERROR_STATE">
+            <div class="col-md-12 text-center">
+              <div class="text-danger">{{appState.error}}</div>
+            </div>
+          </ng-container>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>
+
+

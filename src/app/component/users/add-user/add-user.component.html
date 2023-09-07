@@ -1,5 +1,5 @@
 
-<div class="app-page-title">
+<div class="app-page-title" *ngIf="role.includes('ROLE_SUPERADMIN')">
   <div class="page-title-wrapper">
     <div class="page-title-heading">
       <div class="page-title-icon">
@@ -9,6 +9,15 @@
       <div>Nouvel utilisateur
         <div class="page-title-subheading">Enregistrer de nouveaux utilisateurs</div>
       </div>
+    </div>
+    <div class="page-title-actions">
+      <button (click)="back()" type="button" data-toggle="tooltip" title="cartons" data-placement="bottom"
+              class="btn-shadow mr-3 btn btn-outline-dark">
+           <span class="btn-icon-wrapper pr-2 opacity-7">
+                                            <i class="fa fa-backward fa-w-20"></i>
+                                        </span>
+        Retour
+      </button>
     </div>
 <!--    <div class="page-title-actions">-->
 <!--      <div class="d-inline-block ">-->
@@ -38,7 +47,7 @@
 <!--  </li>-->
 <!--</ul>-->
 
-<div class="tab-content">
+<div class="tab-content" *ngIf="role.includes('ROLE_SUPERADMIN')">
   <div class="" id="tab-content-1" >
     <div class="row">
       <div class="col-md-12">
@@ -151,6 +160,7 @@
 <!--                                                 formControlName="typeAccount">-->
                     <select formControlName="typeAccount" class="form-control form-control-sm">
                       <option value="" selected disabled hidden>Sélectionner un type de compte</option>-->
+<<<<<<< HEAD
                       <option value="ADHERANT">ADHERANT </option>
                       <option value="COMISSAIRE_AU_COMPTE">COMISSAIRE AU COMPTE</option>
                       <option value="PORTE_PAROLE">PORTE PAROLE </option>
@@ -158,6 +168,17 @@
                       <option value="SECRETAIRE">SECRETAIRE</option>
                       <option value="SENSCEUR">SENSCEUR</option>
                       <option value="TRESORIER">TRESORIER</option>
+=======
+                      <option value="MANAGER_SPACES_1">Gestionnaire espace 1 </option>
+                      <option value="MANAGER_SPACES_2">Gestionnaire espace 2 </option>
+                      <option value="SALES_MANAGER">Directeur Commercial </option>
+                      <option value="COMMERCIAL_ATTACHE">Attaché Commercial </option>
+                      <option value="TREASURY">Caissier/Trésorier</option>
+                      <option value="COMPTABLE">Comptable</option>
+                      <option value="MANAGER_STATION">Gestionnaire de station</option>
+                      <option value="DSI_AUDIT">DSI/AUDIT</option>
+                      <option value="POMPIST">Pompiste</option>
+>>>>>>> 37d14d372724acd031f893c0236343c371360e75
                     </select>
                   </div>
                   <div *ngIf="form['typeAccount'].invalid && (form['typeAccount'].dirty || form['typeAccount'].touched)"
@@ -178,9 +199,16 @@
 <!--                                                 formControlName="role">-->
                     <select formControlName="roleName" class="form-control form-control-sm">
                       <option value="" selected disabled hidden>Sélectionner un rôle</option>
+<<<<<<< HEAD
 <!--                      <option value="ROLE_ADMIN">Admin </option>-->
                       <option value="ROLE_SUPERADMIN">Super admin</option>
                       <option value="ROLE_USER">simple utilisateur</option>
+=======
+                      <option value="ROLE_SUPERADMIN">Administrateur </option>
+<!--                      <option value="ROLE_AGENT">Agent </option>-->
+<!--                      <option value="ROLE_SUPERADMIN">Super admin</option>-->
+                      <option value="ROLE_USER">Simple utilisateur</option>
+>>>>>>> 37d14d372724acd031f893c0236343c371360e75
                     </select>
                   </div>
                   <div *ngIf="form['roleName'].invalid && (form['roleName'].dirty || form['roleName'].touched)"

@@ -1,0 +1,366 @@
+<div class="app-page-title" *ngIf="roleUser === 'MANAGER_STATION' || role.includes('ROLE_SUPERADMIN')">
+  <ng-container class="bg-white" *ngIf="load">
+    <div class="col-md-12 text-center my-3">
+      <div class="ball-clip-rotate">
+        <div style="background-color: rgb(68, 64, 84);"></div>
+      </div>
+    </div>
+  </ng-container>
+  <div class="page-title-wrapper" *ngIf="!load">
+    <div class="page-title-heading">
+      <div class="page-title-icon">
+        <i class="pe-7s-paint-bucket icon-gradient bg-danger">
+        </i>
+      </div>
+      <div>Station de {{station.designation}}
+        <div class="page-title-subheading">Réference interne: #{{station.internalReference}}</div>
+        <div class="page-title-subheading">Solde: {{station.balance}} XAF</div>
+      </div>
+    </div>
+    <div class="page-title-actions">
+      <div class="d-inline-block ">
+        <button type="button" data-toggle="tooltip" title="nouveau carton" class="btn-shadow mr-3 btn btn-primary"
+                (click)="open(mymodal)">
+          Accepter Coupon
+        </button>
+      </div>
+      <button (click)="back()" type="button" data-toggle="tooltip" title="cartons" data-placement="bottom"
+              class="btn-shadow mr-3 btn btn-outline-dark">
+           <span class="btn-icon-wrapper pr-2 opacity-7">
+                                            <i class="fa fa-backward fa-w-20"></i>
+                                        </span>
+        Retour
+      </button>
+    </div>
+  </div>
+</div>
+
+<ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav"
+    *ngIf="roleUser === 'MANAGER_STATION' || role.includes('ROLE_SUPERADMIN')">
+  <li class="nav-item">
+    <a role="tab" class="nav-link active" id="tab-0" data-toggle="tab" href="#tab-content-0">
+      <span>Notes de crédit</span>
+    </a>
+  </li>
+  <li class="nav-item">
+    <a role="tab" class="nav-link" id="tab-1" data-toggle="tab" href="#tab-content-1">
+      <span>Coupons</span>
+    </a>
+  </li>
+</ul>
+
+<div class="tab-content" *ngIf="roleUser === 'MANAGER_STATION' || role.includes('ROLE_SUPERADMIN')">
+  <div class="tab-pane tabs-animation fade show active" id="tab-content-0" role="tabpanel">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="main-card mb-3 card " >
+          <div class="card-header">
+            Liste des notes de crédit
+            <div class="btn-actions-pane-right">
+              <div role="group" class="btn-group-sm btn-group">
+                <button class="btn btn-icon btn-pill border-0 btn-transition" [ngClass]="onFilterCN? 'btn-outline-light' : 'btn-light'" (click)="showFilterCN()">
+                  <i class="fa btn-icon-wrapper fa-sliders-h"></i>
+                  {{!onFilterCN ? "Filtrer" : "Annuler"}}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-body bg-tempting-azure card-header-tab-animation fadeInLeft"  *ngIf="onFilterCN">
+
+            <div class="menu-header-subtitle">
+              <div role="group" class="btn-group-sm btn-group">
+                <form class="form-row">
+                  <div class="position-relative form-group mr-2">
+                    <label for="stats" class="text-dark font-weight-bold">Recherche par statut</label>
+                    <select name="stat" id="stats" class="form-control form-control-sm mr-3" [(ngModel)]="statutCNFilter" (ngModelChange)="getCreditNoteByStation()">
+                      <option value="" selected disabled hidden>Choix du statut</option>
+                      <option value="CREATED">NON VALIDEE</option>
+                      <option value="ACTIVATED">VALIDEE</option>
+                      <option value="">Tout afficher</option>
+                    </select>
+                  </div>
+<!--                  <div class="position-relative form-group  mr-2">-->
+<!--                    <label for="stationName" class="text-dark font-weight-bold">Recherche par station</label>-->
+<!--                    <input type="text" id="stationName" name="stationNama" [(ngModel)]="stationName" (ngModelChange)="findStation($event); " autocomplete="off"-->
+<!--                           class="form-control form-control-sm mr-3" list="stationsListOption"-->
+<!--                           placeholder="cherchez une station">-->
+<!--                    <datalist id="stationsListOption">-->
+<!--                      <option *ngFor="let station of stations" [value]="station.designation"></option>-->
+<!--                    </datalist>-->
+<!--                  </div>-->
+                  <div class="position-relative form-group  mr-2">
+                    <label for="compagnie" class="text-dark font-weight-bold">Recherche par référence</label>
+                    <input type="text" name="compagnie" id="compagnie" placeholder="Rechercher compagnie" [(ngModel)]="internalRefCNFilter" (ngModelChange)="getCreditNoteByStation()"
+                           class="form-control form-control-sm mr-3">
+                  </div>
+                  <div class="position-relative form-group  mr-2">
+                    <label for="serial" class="text-dark font-weight-bold">Recherche par date</label>
+                    <input type="date" name="serial" id="serial" placeholder="Rechercher numéro" [(ngModel)]="dateCNFilter" (ngModelChange)="getCreditNoteByStation()"
+                           class="form-control form-control-sm mr-3">
+                  </div>
+                  <!--            <button class="btn btn-sm mr-3 text-primary" (click)="filterOrders()"><i class="fa fa-search"></i></button>-->
+                </form>
+              </div>
+            </div>
+          </div>
+          <ng-container class="bg-white" *ngIf="(appStateCreditNote$ | async) as appState" [ngSwitch]="appState.dataState">
+            <div class="table-responsive">
+              <ng-container class="bg-white" *ngSwitchCase="DataState.LOADING_STATE">
+                <div class="col-md-12 text-center my-3">
+                  <!--                <div class="spinner-border text-primary my-3" role="status"></div>-->
+                  <div class="ball-clip-rotate">
+                    <div style="background-color: rgb(68, 64, 84);"></div>
+                  </div>
+                </div>
+              </ng-container>
+              <ng-container class="bg-white py-1 px-1" *ngSwitchCase="DataState.LOADED_STATE">
+                <table class="table table-hover bg-white" id="servers">
+                  <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Ref. interne</th>
+                    <th>Date</th>
+                    <th>Statut</th>
+                    <th>Date creation</th>
+                    <th>Date modification</th>
+                    <th >Actions</th>
+                  </tr>
+                  </thead>
+                  <tbody *ngFor="let credit of appState.appData.content | paginate: { id: 'creditnoteByStation', itemsPerPage: size, currentPage: pageCreditNote, totalItems: appState.appData.totalElements }; let i = index">
+                  <tr>
+                    <td>{{i + 1}}</td>
+                    <td>{{credit.internalReference}}</td>
+                    <td>{{credit.createdAt | formatDate}}</td>
+                    <td>
+            <span class="mb-2 mr-2 badge " [ngClass]="getStatuts(credit.status.name) == 'ACTIVE(E)' ? 'badge-success' : 'badge-warning'">
+            {{getStatuts(credit.status.name) == 'ACTIVE(E)' ? 'VALIDEE' : 'NON VALIDE'}}
+            </span>
+                    </td>
+                    <td>{{credit.createdAt | formatDateHour}}</td>
+                    <td>{{credit.updateAt | formatDateHour}}</td>
+                    <!--                <td>{{credit.updateAt | date: 'dd/MM/yyyy'}}</td>-->
+                    <td>
+                      <button class="btn btn-sm btn-secondary mr-2" (click)="creditNoteDetails(credit)">
+                        <i class="pe-7s-look" title="consulter"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  </tbody>
+                </table>
+                <div class="text-center">
+                  <p *ngIf="!appState.appData.content.length" style="color: grey; font-size: 1.8rem;" class="mx-auto">Aucune note de crédit trouvée !</p>
+                </div>
+                <div class="card-footer">
+                  <div class="btn-actions-pane-left">
+                    <div role="group" class="btn-group-sm btn-group">
+                      Total:&nbsp;<b>{{ appState.appData.totalElements }} </b>
+                    </div>
+                  </div>
+                  <div class="btn-actions-pane-right">
+                    <div role="group" class="btn-group-sm btn-group">
+                      <!--              <pagination-controls id="client" (pageChange)="pageChange($event)" ></pagination-controls>-->
+                      <pagination-controls
+                        id="creditnoteByStation"
+                        previousLabel="Précédent"
+                        nextLabel="Suivant"
+                        (pageChange)="pageChangeCN($event)"></pagination-controls>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+              <ng-container class="bg-white"  *ngSwitchCase="DataState.ERROR_STATE">
+                <div class="col-md-12 text-center">
+                  <div class="text-danger" >{{appState.error}}</div>
+                </div>
+              </ng-container>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="tab-pane tabs-animation fade show" id="tab-content-1" role="tabpanel">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="main-card mb-3 card " id="htmlData" #htmlData>
+          <div class="card-header">
+            Liste des coupons
+            <div class="btn-actions-pane-right">
+              <div role="group" class="btn-group-sm btn-group">
+                <button class="btn btn-icon btn-pill border-0 btn-transition" [ngClass]="onFilterCP? 'btn-outline-light' : 'btn-light'" (click)="showFilterCP()">
+                  <i class="fa btn-icon-wrapper fa-sliders-h"></i>
+                  {{!onFilterCP ? "Filtrer" : "Annuler"}}
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="card-body bg-tempting-azure card-header-tab-animation fadeInLeft"  *ngIf="onFilterCP">
+
+            <div class="menu-header-subtitle">
+              <div role="group" class="btn-group-sm btn-group">
+                <form class="form-row">
+                  <div class="position-relative form-group  mr-2 ">
+                    <label for="typ" class="text-dark font-weight-bold">Type de coupon</label>
+                    <select name="stat" id="typ" class="form-control form-control-sm mr-3" [(ngModel)]="typeFilter" (ngModelChange)="getCouponByStation()">
+                      <option value="" selected disabled hidden>Type</option>
+                      <option value="{{v.internalReference}}" *ngFor="let v of vouchers">{{v.amount}}</option>
+                      <option value="">Tout afficher</option>
+                    </select>
+                  </div>
+                  <div class="position-relative form-group  mr-2">
+                    <label for="client" class="text-dark font-weight-bold">Recherche par client</label>
+                    <input type="text" id="client" name="client" [(ngModel)]="clientName" (ngModelChange)="findClients($event); " autocomplete="off"
+                           class="form-control form-control-sm mr-3" list="clientsListOption"
+                           placeholder="cherchez un client">
+                    <datalist id="clientsListOption">
+                      <option *ngFor="let client of clients" [value]="client.completeName"></option>
+                    </datalist>
+                  </div>
+
+                  <div class="position-relative form-group  mr-2">
+                    <label for="serial" class="text-dark font-weight-bold">Recherche par N° Série</label>
+                    <input type="text" name="serial" id="serial" placeholder="Rechercher numéro" [(ngModel)]="serialNumber" (ngModelChange)="getCouponByStation()"
+                           class="form-control form-control-sm mr-3">
+                  </div>
+                  <!--            <button class="btn btn-sm mr-3 text-primary" (click)="filterOrders()"><i class="fa fa-search"></i></button>-->
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+
+            <ng-container class="bg-white" *ngIf="(appStateCoupon$ | async) as appState" [ngSwitch]="appState.dataState">
+              <ng-container class="bg-white" *ngSwitchCase="DataState.LOADING_STATE">
+                <div class="col-md-12 text-center my-3">
+                  <!--                <div class="spinner-border text-primary my-3" role="status"></div>-->
+                  <div class="ball-clip-rotate">
+                    <div style="background-color: rgb(68, 64, 84);"></div>
+                  </div>
+                </div>
+              </ng-container>
+              <ng-container class="bg-white py-1 px-1" *ngSwitchCase="DataState.LOADED_STATE">
+                <table class="table table-hover bg-white">
+                  <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Ref. interne</th>
+                    <th>Numéro de série</th>
+                    <th>Coupon</th>
+                    <th>Client</th>
+                    <th>Carnet</th>
+                    <th>Statut</th>
+                    <th>Pompiste</th>
+                    <th>Note credit</th>
+                    <th>Date Cr.</th>
+                    <th>Date Mod.</th>
+                    <!--                <th>Actions</th>-->
+                  </tr>
+                  </thead>
+                  <tbody
+                    *ngFor="let coupon of appState.appData.content | paginate: { id: 'couponByStation',itemsPerPage: appState.appData.size, currentPage: pageCoupon, totalItems: appState.appData.totalElements }; let i = index">
+
+                  <tr>
+                    <td>{{i + 1}}</td>
+                    <td>{{coupon.internalReference}}</td>
+                    <td>{{padWithZero(coupon.serialNumber, 7)}}</td>
+                    <td>{{formatNumber(coupon.amount)}}</td>
+                    <td>{{coupon.nameClient}}</td>
+                    <td>{{coupon.idNotebook}}</td>
+                    <td>{{getStatuts(coupon.status.name)}}</td>
+                    <td>{{coupon.pompisteName}}</td>
+                    <td>{{coupon.idCreditNote}}</td>
+                    <td>{{coupon.createdAt | formatDateHour}}</td>
+                    <td>{{coupon.updateAt | formatDateHour}}</td>
+                  </tr>
+                </table>
+                <div class="text-center">
+                  <p *ngIf="!appState.appData.content.length" style="color: grey; font-size: 1.8rem;" class="mx-auto">Aucun
+                    Coupon trouvé !</p>
+                </div>
+                <div class="card-footer">
+                  <div class="btn-actions-pane-left">
+                    <div role="group" class="btn-group-sm btn-group">
+                      Total coupons: <b>{{ appState.appData.totalElements }} </b>
+                    </div>
+                  </div>
+                  <div class="btn-actions-pane-right">
+                    <div role="group" class="btn-group-sm btn-group">
+                      <!--              <pagination-controls id="client" (pageChange)="pageChange($event)" ></pagination-controls>-->
+                      <pagination-controls
+                        id="couponByStation"
+                        previousLabel="Précédent"
+                        nextLabel="Suivant"
+                        (pageChange)="pageChangeCP($event)"></pagination-controls>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+              <ng-container class="bg-white" *ngSwitchCase="DataState.ERROR_STATE">
+                <div class="col-md-12 text-center">
+                  <div class="text-danger">{{appState.error}}</div>
+                </div>
+              </ng-container>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<ng-template #mymodal let-modal>
+  <div class="modal-header">
+    <h6 class="modal-title timeline-title" id="modal-basic-title"><b>Accepter coupon</b></h6>
+    <div class="close vertical-timeline-element-content bounce-in" (click)=" modal.close('save click')">
+      <p><i class="fa fa-times"></i></p>
+    </div>
+  </div>
+  <div class="modal-body">
+    <div class="">
+      <div class="">
+        <form [formGroup]="couponForm">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="position-relative form-group">
+                <label for="localisation" class="">Coupon</label>
+                <input name="amount" id="localisation" placeholder="numéro de série du coupon"
+                       type="text" class="form-control" formControlName="coupon">
+              </div>
+            </div>
+<!--            <div class="col-md-12">-->
+<!--              <div class="position-relative form-group">-->
+<!--                <label for="localisation" class="">Station</label>-->
+<!--                <select class="form-control" formControlName="idStation">-->
+<!--                  <option *ngFor="let station of stations"-->
+<!--                          value="{{station.internalReference}}">{{station.designation}}</option>-->
+<!--                </select>-->
+<!--              </div>-->
+<!--            </div>-->
+            <div class="col-md-12">
+              <div class="position-relative form-group">
+                <div>
+                  <div class="custom-checkbox custom-control">
+                    <input type="checkbox" id="exampleCustomCheckbox" class="custom-control-input" formControlName="verif">
+                    <label class="custom-control-label" for="exampleCustomCheckbox">Confirmez-vous avoir le coupon en main?</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <button class="mt-1 btn btn-secondary float-right ml-3" (click)="annuler()"><i class="pe-7s-back"></i>Annuler
+          </button>
+          <button class="mt-1 btn btn-primary float-right" [disabled]="couponForm.invalid || (isLoading$ | async)"
+                  (click)="accepterCoupon()">
+            <i *ngIf="isLoading$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
+            <span *ngIf="isLoading$ | async">Acceptation ...</span>
+            <span
+              *ngIf="!(isLoading$ | async)">Accepter coupon</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</ng-template>

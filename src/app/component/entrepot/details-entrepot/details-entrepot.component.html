@@ -1,0 +1,405 @@
+
+<div class="app-page-title" *ngIf="roleUser === 'MANAGER_SPACES_2' || roleUser === 'SALES_MANAGER' || roleUser === 'MANAGER_SPACES_1' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN')">
+  <ng-container class="bg-white" *ngIf="load">
+    <div class="col-md-12 text-center my-3">
+      <div class="ball-clip-rotate">
+        <div style="background-color: rgb(68, 64, 84);"></div>
+      </div>
+    </div>
+  </ng-container>
+  <div class="page-title-wrapper" *ngIf="!load">
+    <div class="page-title-heading">
+      <div class="page-title-icon">
+        <i class="pe-7s-server icon-gradient bg-danger">
+        </i>
+      </div>
+      <div>Espace de {{storeHouse.name}}
+        <div class="page-title-subheading">Réference interne: #{{storeHouse.internalReference}}</div>
+      </div>
+    </div>
+    <div class="page-title-actions">
+      <button (click)="back()" type="button" data-toggle="tooltip" title="cartons" data-placement="bottom"
+              class="btn-shadow mr-3 btn btn-outline-dark">
+           <span class="btn-icon-wrapper pr-2 opacity-7">
+                                            <i class="fa fa-backward fa-w-20"></i>
+                                        </span>
+        Retour
+      </button>
+    </div>
+  </div>
+</div>
+
+<app-items  *ngIf="items && (roleUser === 'MANAGER_SPACES_2' || roleUser === 'SALES_MANAGER' || roleUser === 'MANAGER_SPACES_1' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))"></app-items>
+<!--<div class="row" *ngIf="items && (roleUser === 'MANAGER_SPACES_2' || roleUser === 'SALES_MANAGER' || roleUser === 'MANAGER_SPACES_1' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))">-->
+<!--  <div class="col-md-6 "  style="cursor: pointer;" *ngFor="let cdp of items" [ngClass]="items.length == 3 ? 'col-lg-4' : items.length == 2 ? 'col-lg-6' : 'col-lg-3'">-->
+<!--    <div class="mb-3 widget-chart widget-chart2 text-left card" [ngClass]="cdp.amount == 5000 ? 'card-shadow-danger' :-->
+<!--            (cdp.amount == 3000 ? 'card-shadow-warning' : 'card-shadow-success')">-->
+<!--      <div class="widget-content p-0 w-100">-->
+<!--        <div class="widget-content-outer">-->
+<!--          <div class="widget-content-left fsize-2">-->
+<!--            <div class="text-muted opacity-6" *ngIf="storeHouse.type === 'stockage'">Quantité de cartons <span class="float-right text-primary">{{cdp.quantityCarton}} </span></div>-->
+<!--            <div class="text-muted opacity-6" *ngIf="storeHouse.type === 'vente'">Quantité de carnets <span class="float-right text-primary">{{formatNumber(cdp.quantityNoteBook)}} </span></div>-->
+<!--          </div>-->
+<!--          <div class="widget-content-wrapper">-->
+<!--            <div class="widget-content-left pr-2 fsize-1">-->
+<!--              <div class="widget-numbers mb-0 fsize-3" [ngClass]="cdp.amount == 5000 ? 'text-danger' :-->
+<!--            cdp.amount == 3000 ? 'text-warning' : 'text-success'">{{formatNumber(cdp.amount)}} <small>FCFA</small></div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--</div>-->
+
+<!--<div class="row">-->
+<!--  <div class="col-md-12">-->
+<!--    <div class="main-card mb-3 card " id="htmlData">-->
+<!--      <div class="card-header">-->
+<!--        Liste de ses pièces-->
+<!--      </div>-->
+
+<!--      <div class="table-responsive" >-->
+<!--        <table class="align-middle mb-0 table table-sm table-borderless table-hover" id="element-pannes">-->
+<!--          <thead>-->
+<!--          <tr>-->
+<!--&lt;!&ndash;            <th class="">Ref#</th>&ndash;&gt;-->
+<!--&lt;!&ndash;            <th class="">Date</th>&ndash;&gt;-->
+<!--            <th *ngIf="storeHouse.type === 'stockage'" class="">Quantité de cartons</th>-->
+<!--            <th *ngIf="storeHouse.type === 'vente'" class="">Quantité de carnets</th>-->
+<!--            <th class="">Type de coupon</th>-->
+<!--&lt;!&ndash;            <th class="">Statut</th>&ndash;&gt;-->
+<!--            &lt;!&ndash;<th class="text-center">Actions</th>&ndash;&gt;-->
+<!--          </tr>-->
+<!--          </thead>-->
+<!--          <tbody>-->
+<!--          <tr style="cursor: pointer" *ngFor="let item of items">-->
+<!--&lt;!&ndash;            <td class="text-left">{{item.internalReference}}</td>&ndash;&gt;-->
+<!--&lt;!&ndash;            <td class="text-left">{{item.createdAt | date: 'dd/MM/yyyy'}}</td>&ndash;&gt;-->
+<!--            <td *ngIf="storeHouse.type === 'stockage'" class="text-left">{{item.quantityCarton}}</td>-->
+<!--            <td *ngIf="storeHouse.type === 'vente'" class="text-left">{{item.quantityNoteBook}}</td>-->
+<!--            <td class="text-left">{{item.amount}}</td>-->
+<!--&lt;!&ndash;            <td class="text-left"><span *ngFor="let voucher of vouchers">{{voucher.internalReference == item.idTypeVoucher ? voucher.amount : ''}}</span></td>&ndash;&gt;-->
+<!--&lt;!&ndash;            <td class="text-left"><span class="text-focus">{{item.status.name}}</span> </td>&ndash;&gt;-->
+<!--          </tr>-->
+
+<!--          </tbody>-->
+
+<!--        </table>-->
+<!--        &lt;!&ndash;          dans le cas où aucune commande n'est trouvée&ndash;&gt;-->
+<!--        <ng-template [ngIf]="!items.length">-->
+<!--          <p style="color: grey; font-size: 1.8rem;" class="text-center" >Aucune pièce trouvée pour cet entrepôt</p>-->
+<!--        </ng-template>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--</div>-->
+
+<!--<div class="row" >-->
+<!--  <div class="col-md-12">-->
+<!--    <div class="main-card mb-3 card " >-->
+<!--      <div class="card-header">-->
+<!--        Liste de ses cartons-->
+<!--      </div>-->
+
+<!--      <div class="table-responsive" >-->
+<!--        <table class="table table-hover bg-white" >-->
+<!--          <thead>-->
+<!--          <tr>-->
+<!--            <th>#</th>-->
+<!--            <th>Ref. interne</th>-->
+<!--            <th>Numéro du carton</th>-->
+<!--            <th>Série</th>-->
+<!--            &lt;!&ndash;                <th>Magasin</th>&ndash;&gt;-->
+<!--            <th>Magasinier</th>-->
+<!--            <th>Statut</th>-->
+<!--            <th>Date création</th>-->
+<!--            <th>Date modification</th>-->
+<!--            &lt;!&ndash;                <th>Actions</th>&ndash;&gt;-->
+<!--          </tr>-->
+<!--          </thead>-->
+<!--          <tbody *ngFor="let carton of cartons | paginate: { id: 'cartonStorehouse', itemsPerPage: size, currentPage: page, totalItems: totalElements }; let i = index">-->
+
+<!--          <tr>-->
+<!--            <td>{{i + 1}}</td>-->
+<!--            <td>{{carton.internalReference}}</td>-->
+<!--            <td>{{carton.number}}</td>-->
+<!--            <td>{{removeZeros(carton.typeVoucher.toString())}} - -->
+<!--              {{padWithZero(carton.serialTo, 7)}} A {{removeZeros(carton.typeVoucher.toString())}} - -->
+<!--              {{padWithZero(carton.serialFrom, 7)}}</td>-->
+
+<!--            <td>{{carton.idStoreKeeper}}</td>-->
+<!--            <td>-->
+<!--              <span class="mb-2 mr-2 badge " [ngClass]="carton.status.name == 'AVAILABLE' ? 'badge-success' : 'badge-danger'">-->
+<!--                {{getStatuts(carton.status.name)}}-->
+<!--              </span>-->
+<!--            </td>-->
+<!--            <td>{{carton.createdAt}}</td>-->
+<!--            <td>{{carton.updateAt}}</td>-->
+<!--          </tr>-->
+<!--        </table>-->
+<!--        <div class="text-center">-->
+<!--          <p *ngIf="cartons.length === 0" style="color: grey; font-size: 1.8rem;" class="mx-auto" >Aucun carton trouvé !</p>-->
+<!--        </div>-->
+<!--        <div class="card-footer">-->
+<!--          <div class="btn-actions-pane-left">-->
+<!--            <div role="group" class="btn-group-sm btn-group">-->
+<!--              Total cartons: <b>{{ cartons.length }} </b>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--          <div class="btn-actions-pane-right">-->
+<!--            <div role="group" class="btn-group-sm btn-group">-->
+<!--              <pagination-controls id="cartonStorehouse"-->
+<!--                                   previousLabel="Précédent"-->
+<!--                                   nextLabel="Suivant"-->
+<!--                                   (pageChange)="pageChangeCarton($event)"></pagination-controls>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--</div>-->
+
+<div class="row" *ngIf="storeHouse.type === 'stockage' && (roleUser === 'SALES_MANAGER' || roleUser === 'MANAGER_SPACES_1' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))">
+  <div class="col-md-12">
+    <div class="main-card mb-3 card ">
+      <div class="card-header">
+        Liste de ses cartons
+        <div class="btn-actions-pane-right">
+          <div role="group" class="btn-group-sm btn-group">
+          </div>
+        </div>
+
+        <div class="btn-actions-pane-right">
+          <div role="group" class="btn-group-sm btn-group">
+            <div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+
+        <ng-container class="bg-white" *ngIf="(cartonState$ | async) as appState" [ngSwitch]="appState.dataState">
+          <ng-container class="bg-white" *ngSwitchCase="DataState.LOADING_STATE">
+            <div class="col-md-12 text-center my-3">
+              <div class="ball-clip-rotate">
+                <div style="background-color: rgb(68, 64, 84);"></div>
+              </div>
+            </div>
+          </ng-container>
+          <ng-container class="bg-white py-1 px-1" *ngSwitchCase="DataState.LOADED_STATE">
+            <table class="table table-hover bg-white">
+              <thead>
+              <tr>
+                <th>#</th>
+                <th>Ref. interne</th>
+                <th>Numéro du carton</th>
+                <th>Série</th>
+                <!--                <th>Magasin</th>-->
+                <th>Magasinier</th>
+                <th>Statut</th>
+                <th>Date création</th>
+                <th>Date modification</th>
+                <!--                <th>Actions</th>-->
+              </tr>
+              </thead>
+              <tbody
+                *ngFor="let carton of appState.appData.content | paginate: { id: 'cartonStoreHouse', itemsPerPage: appState.appData.size, currentPage: page, totalItems: appState.appData.totalElements }; let i = index">
+              <tr>
+                <td>{{i + 1}}</td>
+                <td>{{carton.internalReference}}</td>
+                <td>{{carton.number}}</td>
+                <td>{{removeZeros(carton.typeVoucher.toString())}} -
+                  {{padWithZero(carton.serialTo, 7)}} A {{removeZeros(carton.typeVoucher.toString())}} -
+                  {{padWithZero(carton.serialFrom, 7)}}</td>
+
+                <td>{{carton.idSpaceManager1}}</td>
+                <td>
+              <span class="mb-2 mr-2 badge " [ngClass]="carton.status.name == 'AVAILABLE' ? 'badge-success' : 'badge-danger'">
+                {{getStatuts(carton.status.name)}}
+              </span>
+                </td>
+                <td>{{carton.createdAt | formatDateHour}}</td>
+                <td>{{carton.updateAt | formatDateHour}}</td>
+              </tr>
+            </table>
+            <div class="text-center">
+              <p *ngIf="!appState.appData.content.length" style="color: grey; font-size: 1.8rem;" class="mx-auto">Aucun carton
+                trouvé !</p>
+            </div>
+            <div class="card-footer">
+              <div class="btn-actions-pane-left">
+                <div role="group" class="btn-group-sm btn-group">
+                  Total Cartons: <b>{{ appState.appData.totalElements }} </b>
+                </div>
+              </div>
+              <div class="btn-actions-pane-right">
+                <div role="group" class="btn-group-sm btn-group">
+                  <!--              <pagination-controls id="client" (pageChange)="pageChange($event)" ></pagination-controls>-->
+                  <pagination-controls
+                    id="cartonStoreHouse"
+                    previousLabel="Précédent"
+                    nextLabel="Suivant"
+                    (pageChange)="pageChangeCarton($event)"></pagination-controls>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          <ng-container class="bg-white"  *ngSwitchCase="DataState.ERROR_STATE">
+            <div class="col-md-12 text-center">
+              <div class="text-danger" >{{appState.error}}</div>
+            </div>
+          </ng-container>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--<div class="row">-->
+<!--  <div class="col-md-12">-->
+<!--    <div class="main-card mb-3 card " >-->
+<!--      <div class="card-header">-->
+<!--        Liste de ses carnets-->
+<!--      </div>-->
+
+<!--      <div class="table-responsive" >-->
+<!--        <ng-container class="bg-white">-->
+<!--          <ng-container class="bg-white py-1 px-1">-->
+<!--            <table class="table table-hover bg-white" >-->
+<!--              <thead>-->
+<!--              <tr>-->
+<!--                <th>#</th>-->
+<!--                <th>Ref. interne</th>-->
+<!--                <th>Numéro de série</th>-->
+<!--                <th>Carton</th>-->
+<!--                <th>Statut</th>-->
+<!--                <th>Date création</th>-->
+<!--                <th>Date modification</th>-->
+<!--              </tr>-->
+<!--              </thead>-->
+<!--              <tbody *ngFor="let carnet of carnets | paginate: { id: 'carnetStorehouse', itemsPerPage: size1, currentPage: page1, totalItems: totalElements1 }; let i = index">-->
+
+<!--              <tr>-->
+<!--                <td>{{i + 1}}</td>-->
+<!--                <td>{{carnet.internalReference}}</td>-->
+<!--                <td>{{carnet.serialNumber}}</td>-->
+<!--                <td>{{carnet.idCarton}}</td>-->
+<!--                <td>-->
+<!--              <span class="mb-2 mr-2 badge " [ngClass]="carnet.status.name == 'AVAILABLE' ? 'badge-success' : 'badge-danger'">-->
+<!--                {{getStatuts(carnet.status.name)}}-->
+<!--              </span>-->
+<!--                </td>-->
+<!--                <td>{{carnet.createdAt}}</td>-->
+<!--                <td>{{carnet.updateAt}}</td>-->
+<!--              </tr>-->
+<!--            </table>-->
+<!--            <div class="text-center">-->
+<!--              <p *ngIf="totalElements1 == 0" style="color: grey; font-size: 1.8rem;" class="mx-auto" >Aucun Carnet trouvé !</p>-->
+<!--            </div>-->
+<!--          </ng-container>-->
+<!--        </ng-container>-->
+<!--      </div>-->
+<!--      <div class="card-footer">-->
+<!--        <div class="btn-actions-pane-left">-->
+<!--          <div role="group" class="btn-group-sm btn-group">-->
+<!--            Total carnets: <b>{{ totalElements1 }} </b>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        <div class="btn-actions-pane-right">-->
+<!--          <div role="group" class="btn-group-sm btn-group">-->
+<!--            &lt;!&ndash;              <pagination-controls id="client" (pageChange)="pageChange($event)" ></pagination-controls>&ndash;&gt;-->
+<!--            <pagination-controls id="carnetStorehouse"-->
+<!--                                 previousLabel="Précédent"-->
+<!--                                 nextLabel="Suivant"-->
+<!--                                 (pageChange)="pageChangeCarnet($event)"></pagination-controls>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--</div>-->
+<div class="row"  *ngIf="storeHouse.type === 'vente' && (roleUser === 'SALES_MANAGER' || roleUser === 'MANAGER_SPACES_2' || role.includes('ROLE_ADMIN') || role.includes('ROLE_SUPERADMIN'))">
+  <div class="col-md-12">
+    <div class="main-card mb-3 card " id="htmlData" #htmlData>
+      <div class="card-header">
+        Liste de ses carnets
+      </div>
+
+      <div class="table-responsive" >
+
+        <ng-container class="bg-white" *ngIf="(carnetState$ | async) as appState" [ngSwitch]="appState.dataState">
+          <ng-container class="bg-white" *ngSwitchCase="DataState.LOADING_STATE">
+            <div class="col-md-12 text-center my-3">
+              <!--                <div class="spinner-border text-primary my-3" role="status"></div>-->
+              <div class="ball-clip-rotate">
+                <div style="background-color: rgb(68, 64, 84);"></div>
+              </div>
+            </div>
+          </ng-container>
+          <ng-container class="bg-white py-1 px-1" *ngSwitchCase="DataState.LOADED_STATE">
+            <table class="table table-hover bg-white" >
+              <thead>
+              <tr>
+                <th>#</th>
+                <th>Ref. interne</th>
+                <th>Numéro de série</th>
+                <th>Carton</th>
+                <th>Gestionnaire d'espace 2</th>
+                <th>Statut</th>
+                <th>Date création</th>
+                <th>Date modification</th>
+              </tr>
+              </thead>
+              <tbody *ngFor="let carnet of appState.appData.content |
+              paginate: { id: 'carnetsStorehouse', itemsPerPage: appState.appData.size, currentPage: page1, totalItems: appState.appData.totalElements }; let i = index">
+              <tr>
+                <td>{{i + 1}}</td>
+                <td>{{carnet.internalReference}}</td>
+                <td>{{carnet.serialNumber}}</td>
+                <td>{{carnet.numberCarton}} </td>
+<!--                <td>{{carnet.nameStoreHouse}}</td>-->
+                <td>{{carnet.nameStoreKeeper}}</td>
+                <td>
+                  <span class="mb-2 mr-2 badge " [ngClass]="carnet.status.name == 'AVAILABLE' ? 'badge-success' : 'badge-danger'">
+                    {{getStatuts(carnet.status.name) != 'DISPONIBLE' ? 'NON DISPONIBLE' : getStatuts(carnet.status.name)}}
+                  </span>
+                </td>
+                <td>{{carnet.createdAt | formatDateHour}}</td>
+                <td>{{carnet.updateAt | formatDateHour}}</td>
+              </tr>
+            </table>
+            <div class="text-center">
+              <p *ngIf="!appState.appData.content.length" style="color: grey; font-size: 1.8rem;" class="mx-auto" >Aucun Carnet trouvé !</p>
+            </div>
+            <div class="card-footer">
+              <div class="btn-actions-pane-left">
+                <div role="group" class="btn-group-sm btn-group">
+                  Total carnets: <b>{{ appState.appData.totalElements }} </b>
+                </div>
+              </div>
+              <div class="btn-actions-pane-right">
+                <div role="group" class="btn-group-sm btn-group">
+                  <!--              <pagination-controls id="client" (pageChange)="pageChange($event)" ></pagination-controls>-->
+                  <pagination-controls
+                    id="carnetsStorehouse"
+                    previousLabel="Précédent"
+                    nextLabel="Suivant"
+                    (pageChange)="pageChangeCarnet($event)"></pagination-controls>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          <ng-container class="bg-white"  *ngSwitchCase="DataState.ERROR_STATE">
+            <div class="col-md-12 text-center">
+              <div class="text-danger" >{{appState.error}}</div>
+            </div>
+          </ng-container>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>
+
