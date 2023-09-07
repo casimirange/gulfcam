@@ -11,6 +11,7 @@ import {NavigationStart, Router} from "@angular/router";
 import {TokenService} from "./_services/token/token.service";
 import {Location} from "@angular/common";
 import {ConnectionService} from "ng-connection-service";
+import {HttpConnectivity, InternetConnectivity, NgxConnectivityModule} from "ngx-connectivity";
 const Toast = Swal.mixin({
   toast: true,
   position: 'bottom-end',
@@ -38,8 +39,13 @@ export class AppComponent implements OnInit, OnDestroy{
   online$: Observable<boolean>;
   networkStatus: boolean = false;
   networkStatus$: Subscription = Subscription.EMPTY;
+
+  internetSubscription: Subscription;
+  internet_status: Boolean;
+
   constructor(private notifsService: NotifsService, private tokenService: TokenService, private _http: HttpClient, private connectionService: ConnectionService,
-              private bnIdle: BnNgIdleService, private router: Router, private _location: Location) {
+              private bnIdle: BnNgIdleService, private router: Router, private _location: Location, public internetConnectivity: InternetConnectivity,
+              public httpConnectivity: HttpConnectivity) {
     // this.connectionService.monitor().subscribe(isConnected => {
     //   console.log(isConnected)
     //   this.isConnected = isConnected.hasInternetAccess;
@@ -61,7 +67,7 @@ export class AppComponent implements OnInit, OnDestroy{
   }
 
   ngOnInit(): void {
-
+    // this.connectivityService.n
     // this.router.events.subscribe((val) => {
     //   // console.log(this._location.path())
     //   this.url = this._location.path()
@@ -77,26 +83,53 @@ export class AppComponent implements OnInit, OnDestroy{
       // });
     // }
     // this.checkNetworkStatus();
+  //   this.internetSubscription = this.internetConnectivity.isOnline$.subscribe(
+  //     d => {
+  //       console.log(d);
+  //       this.internet_status = d;
+  //     }
+  //   )
+  //
+  //   // statistics of every http connection
+  //   this.httpConnectivity.connectionSpy$.subscribe(
+  //     d => {
+  //       console.log(d);
+  //     }
+  //   )
+  //
+  //   // true is any http connection is open else false
+  //   this.httpConnectivity.isConnected$.subscribe(
+  //     d => {
+  //       console.log(d);
+  //     }
+  //   )
+  //
+  //   // count of open http connection
+  //   this.httpConnectivity.connectionCount$.subscribe(
+  //     d => {
+  //       console.log(d);
+  //     }
+  //   )
   }
 
   ngOnDestroy(): void {
-
+    // this.internetSubscription.unsubscribe();
     // this.networkStatus$.unsubscribe();
   }
 
   // To check internet connection stability
-  checkNetworkStatus() {
-    this.networkStatus = navigator.onLine;
-    this.networkStatus$ = merge(
-      of(null),
-      fromEvent(window, 'online'),
-      fromEvent(window, 'offline')
-    )
-      .pipe(map(() => navigator.onLine))
-      .subscribe(status => {
-        console.log('status', status);
-        this.networkStatus = status;
-      });
-  }
+  // checkNetworkStatus() {
+  //   this.networkStatus = navigator.onLine;
+  //   this.networkStatus$ = merge(
+  //     of(null),
+  //     fromEvent(window, 'online'),
+  //     fromEvent(window, 'offline')
+  //   )
+  //     .pipe(map(() => navigator.onLine))
+  //     .subscribe(status => {
+  //       console.log('status', status);
+  //       this.networkStatus = status;
+  //     });
+  // }
 
 }

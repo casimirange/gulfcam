@@ -15,8 +15,8 @@ import {ResetPassword} from "../../../_model/resetPassword";
 })
 export class ResetPasswordComponent implements OnInit {
 
-  project = 'Gulfcam';
-  socity = 'Gulfcam';
+  project = 'ADELI';
+  socity = 'ADELI';
   forgetForm: FormGroup;
   credentials: ResetPassword = new ResetPassword()
   user?: IToken;

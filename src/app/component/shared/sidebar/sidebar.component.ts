@@ -35,7 +35,7 @@ export class SidebarComponent implements OnInit {
       }
     });
 
-    console.log(this.globals.toggleSidebar)
+    // console.log(this.globals.toggleSidebar)
 
     this.extraParameter = this.activatedRoute.snapshot.firstChild.data.extraParameter;
 

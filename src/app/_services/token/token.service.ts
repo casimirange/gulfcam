@@ -35,10 +35,10 @@ export class TokenService {
   saveUserInfo(user: ISignup){
     localStorage.setItem('firstName', user.firstName)
     localStorage.setItem('lastName', user.lastName)
-    localStorage.setItem('uid', user.internalReference.toString())
+    localStorage.setItem('uid', user.userId.toString())
+    localStorage.setItem('id', user.userId.toString())
     localStorage.setItem('email', user.email)
-    localStorage.setItem('userAccount', user.typeAccount.name)
-    localStorage.setItem('store', user.idStore.toString())
+    localStorage.setItem('userAccount', user.typeAccount.name.toString())
   }
 
   userInactivity(){
@@ -85,6 +85,7 @@ export class TokenService {
     localStorage.removeItem('firstName')
     localStorage.removeItem('lastName')
     localStorage.removeItem('uid')
+    localStorage.removeItem('id')
     // localStorage.setItem('roles', <string>token.roles);
     this.router.navigate(['auth']);
     this.bnIdle.stopTimer()
@@ -97,6 +98,7 @@ export class TokenService {
     localStorage.removeItem('userAccount')
     localStorage.removeItem('lastName')
     localStorage.removeItem('uid')
+    localStorage.removeItem('id')
     localStorage.removeItem('Roles')
     localStorage.removeItem('exp')
     this.router.navigate(['auth']);

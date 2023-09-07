@@ -83,47 +83,6 @@
                 </div>
                 <div class="col-md-6">
                   <div class="position-relative form-group">
-                    <label>Code pin</label>
-                    <input id="pinCode" placeholder="Code pin" type="text" name="pinCode" class="form-control form-control-sm"
-                           formControlName="pinCode" >
-                  </div>
-                  <div *ngIf="form['pinCode'].invalid && (form['pinCode'].dirty || form['pinCode'].touched)"
-                       class="mb-2"  style="color: #f65656; font-style: italic;">
-
-                    <div *ngIf="form['pinCode'].errors?.['required']" class="ml-3">
-                      le code pin est obligatoire.
-                    </div>
-                    <div *ngIf="form['pinCode'].errors?.['pattern']" class="ml-3">
-                      Le code pin est un nombre
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="position-relative form-group">
-                    <!--                        <input id="idStore" placeholder="Magasin" type="text" name="idStore" class="form-control form-control-sm"  formControlName="idStore">-->
-                    <!--                    <input type="text" id="clientref" class="form-control" formControlName="idStore" placeholder="choisir un magasin" -->
-                    <!--                           list="storeListOption"  [(ngModel)]="user.idStore">-->
-                    <label>Magasin</label>
-<!--                    <select formControlName="idStore" class="form-control form-control-sm">-->
-<!--                      <option *ngFor="let store of stores" [value]="user.idStore">{{store.localization}}</option>-->
-<!--                    </select>-->
-                    <input type="text" id="tb" placeholder="Sélectionner un magasin" autocomplete="off" class="form-control form-control-sm"
-                           formControlName="idStore" list="storeListOption">
-                    <datalist id="storeListOption">
-<!--                      <option value="" selected disabled hidden></option>-->
-                      <option *ngFor="let store of stores" [value]="store.localization"></option>
-                    </datalist>
-                  </div>
-                  <div *ngIf="form['idStore'].invalid && (form['idStore'].dirty || form['idStore'].touched)"
-                       class="mb-2"  style="color: #f65656; font-style: italic;">
-
-                    <div *ngIf="form['idStore'].errors?.['required']" class="ml-3">
-                      le magasin est obligatoire.
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="position-relative form-group">
                     <label>Mot de passe</label>
                     <input  id="examplePassword" name="pwd" placeholder="Mot de passe" type="password" class="form-control form-control-sm" formControlName="password"></div>
                   <div *ngIf="form['password'].invalid && (form['password'].dirty || form['password'].touched)"
@@ -171,17 +130,17 @@
                 </div>
                 <div class="col-md-6">
                   <div class="position-relative form-group">
-                    <label>Poste</label>
-                    <input  id="position" placeholder="Poste occupé" type="text" class="form-control form-control-sm"
-                             formControlName="position"></div>
-                  <div *ngIf="form['position'].invalid && (form['position'].dirty || form['position'].touched)"
+                    <label>Montant</label>
+                    <input  id="lastName" placeholder="Prénom" type="text" class="form-control form-control-sm" formControlName="montant"
+                            ></div>
+                  <div *ngIf="form['montant'].invalid && (form['montant'].dirty || form['montant'].touched)"
                        class=""  style="color: #f65656; font-style: italic;">
 
-                    <div *ngIf="form['position'].errors?.['required']" class="ml-3">
-                      le nom est obligatoire.
+                    <div *ngIf="form['montant'].errors?.['required']" class="ml-3">
+                      le montant est obligatoire.
                     </div>
-                    <div *ngIf="form['position'].errors?.['minlength']" class="ml-3">
-                      le nom doit comporter au moins 4 caractères..
+                    <div *ngIf="form['montant'].errors?.['minlength']" class="ml-3">
+                      le montant doit comporter des chiffres.
                     </div>
                   </div>
                 </div>
@@ -192,14 +151,13 @@
 <!--                                                 formControlName="typeAccount">-->
                     <select formControlName="typeAccount" class="form-control form-control-sm">
                       <option value="" selected disabled hidden>Sélectionner un type de compte</option>-->
-                      <option value="STORE_KEEPER">Magasinier </option>
-                      <option value="MANAGER_COUPON">Gestionnaire de coupon </option>
-                      <option value="MANAGER_ORDER">Gestionnaire de commande </option>
-                      <option value="MANAGER_STORE">Gestionnaire de magasin </option>
-                      <option value="TREASURY">Caissier/Trésorier</option>
-                      <option value="CUSTOMER_SERVICE">Service client</option>
-                      <option value="MANAGER_STATION">Gestionnaire de station</option>
-                      <option value="POMPIST">Pompiste</option>
+                      <option value="ADHERANT">ADHERANT </option>
+                      <option value="COMISSAIRE_AU_COMPTE">COMISSAIRE AU COMPTE</option>
+                      <option value="PORTE_PAROLE">PORTE PAROLE </option>
+                      <option value="PRESIDENT">PRESIDENT</option>
+                      <option value="SECRETAIRE">SECRETAIRE</option>
+                      <option value="SENSCEUR">SENSCEUR</option>
+                      <option value="TRESORIER">TRESORIER</option>
                     </select>
                   </div>
                   <div *ngIf="form['typeAccount'].invalid && (form['typeAccount'].dirty || form['typeAccount'].touched)"
@@ -220,9 +178,8 @@
 <!--                                                 formControlName="role">-->
                     <select formControlName="roleName" class="form-control form-control-sm">
                       <option value="" selected disabled hidden>Sélectionner un rôle</option>
-                      <option value="ROLE_ADMIN">Admin </option>
-                      <option value="ROLE_AGENT">Agent </option>
-                      <option value="ROLE_SUPER_ADMIN">Super admin</option>
+<!--                      <option value="ROLE_ADMIN">Admin </option>-->
+                      <option value="ROLE_SUPERADMIN">Super admin</option>
                       <option value="ROLE_USER">simple utilisateur</option>
                     </select>
                   </div>

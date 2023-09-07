@@ -21,6 +21,10 @@ export class AuthService {
     return this.http.post<IToken>(environment.signin, credentials);
   }
 
+  // refreshToken(token: any): Observable<any>{
+  //   return this.http.get<any>(environment.refresh+`?${token}`,);
+  // }
+
   forgetPassword(email: ForgetPassword): Observable<any>{
     return this.http.post<any>(environment.resetPassword, email);
   }

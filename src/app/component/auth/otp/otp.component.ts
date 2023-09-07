@@ -4,6 +4,7 @@ import {TokenService} from "../../../_services/token/token.service";
 import {NotifsService} from "../../../_services/notifications/notifs.service";
 import {Router} from "@angular/router";
 import {BnNgIdleService} from "bn-ng-idle";
+import {BehaviorSubject} from "rxjs";
 
 @Component({
   selector: 'app-otp',
@@ -13,12 +14,14 @@ import {BnNgIdleService} from "bn-ng-idle";
 export class OtpComponent implements OnInit {
 
   otp!: string;
-  inputDigitLeft: string = "Verifier le code";
+  inputDigitLeft: string = "Entrer le code";
   btnStatus: string = "btn-light";
   timer: number = 0;
   minutes: number = 0;
   seconds: number = 0;
   sendNewVerifyCode: boolean = false;
+  private isLoading = new BehaviorSubject<boolean>(false);
+  isLoading$ = this.isLoading.asObservable();
   userEmail: string = localStorage.getItem('email').toString()
   newOtp = {
     appProvider: '',
@@ -28,13 +31,13 @@ export class OtpComponent implements OnInit {
   firstName: string | null = '';
 
   public configOptions = {
-    length: 4,
+    length: 5,
     inputClass: 'digit-otp',
     containerClass: 'd-flex justify-content-between'
   }
 
   constructor(private authService: AuthService, private token: TokenService, private notifService: NotifsService,
-              private router: Router, private bnIdle: BnNgIdleService,) {
+              private router: Router) {
   }
 
   ngOnInit() {
@@ -67,26 +70,27 @@ export class OtpComponent implements OnInit {
     }
 
     if(this.otp.length == this.configOptions.length) {
-      this.inputDigitLeft = "Vérifier";
+      this.inputDigitLeft = "Vérifier le code";
       this.btnStatus = 'btn-primary';
     }
   }
 
   verifyOtp(){
-
+    this.isLoading.next(true);
+    this.inputDigitLeft = 'Vérification ...'
       this.authService.verifyOtp(this.otp).subscribe(
         (resp) => {
+          this.isLoading.next(false);
           this.token.saveRefreshToken(resp.refreshToken);
           this.token.saveAuthorities(resp.roles)
           this.token.saveUserInfo(resp.user)
           this.firstName = localStorage.getItem('firstName')
           this.notifService.onSuccess(`Bienvenue ${this.firstName}`)
-          // this.bnIdle.stopTimer()
-          this.bnIdle.resetTimer()
 
         }, (error) => {
           // this.inputDigitLeft = "Reéssayer";
           // this.btnStatus = 'btn-danger';
+          this.isLoading.next(false);
           this.token.clearTokenExpired()
         }
       )

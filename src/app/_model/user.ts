@@ -1,10 +1,12 @@
 import {Status} from "./status";
 
-export class IUser{
+export interface IUser{
   id?: string;
+  userId?: string;
   name?: string;
   firstname?: string;
   firstName?: string;
+  lastName?: string;
   username?: string;
   password?: string;
   pinCode?: number;

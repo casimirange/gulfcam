@@ -14,8 +14,8 @@ import {ForgetPassword} from "../../../_interfaces/forget-password";
 })
 export class ForgetPasswordComponent implements OnInit {
 
-  project = 'Gulfcam';
-  socity = 'Gulfcam';
+  project = 'ADELI';
+  socity = 'ADELI';
   forgetForm: FormGroup;
   credentials: ForgetPassword = new ForgetPassword()
   user?: IToken;

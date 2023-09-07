@@ -1,0 +1,140 @@
+<div class="app-page-title">
+  <div class="page-title-wrapper">
+    <div class="page-title-heading">
+      <div class="page-title-icon">
+        <i class="pe-7s-box1 icon-gradient bg-night-fade">
+        </i>
+      </div>
+      <div>Gestion des Amandes
+        <div class="page-title-subheading">Suivez toutes les amaandes</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="main-card mb-3 card " id="htmlData" #htmlData>
+      <div class="card-header">
+        Liste des amandes.
+        <div class="btn-actions-pane-right">
+          <div role="group" class="btn-group-sm btn-group">
+          </div>
+        </div>
+
+        <div class="btn-actions-pane-right" >
+          <div role="group" class="">
+            <form class="form-row">
+              <div class="position-relative mr-2" >
+<!--                <label for="mag" class="text-dark font-weight-bold">Membre</label>-->
+                <select name="mag" id="mag" class="form-control form-control-sm mr-3" [(ngModel)]="userFilter" (ngModelChange)="getAmande()" >
+                  <option value="" selected disabled hidden>Sélectionner un membre</option>
+                  <option *ngFor="let user of users.content" ngValue="{{user.userId}}">{{user.firstName | titlecase}}&nbsp;{{user.lastName| titlecase}}</option>
+                  <option value="" disabled *ngIf="!loadUser && users.totalElements == 0">Aucun membre trouvé</option>
+                  <option value="">Tout afficher</option>
+                </select>
+              </div>
+              <div class="position-relative  mr-2 ">
+<!--                <label for="statut" class="text-dark font-weight-bold">Filtrer par statut</label>-->
+                <select name="stat" id="statut" class="form-control form-control-sm mr-3" [(ngModel)]="statusFilter" (ngModelChange)="getAmande()">
+                  <option value="" selected disabled hidden>Choix statut</option>
+                  <option value="NON_PAYE">NON PAYE</option>
+                  <option value="DEPOT">PAYE</option>
+                  <option value="">Tout afficher</option>
+                </select>
+              </div>
+              <div class="position-relative  mr-2">
+<!--                <label for="date" class="text-dark font-weight-bold">Recherche par date</label>-->
+                <input type="date" name="date" id="date" placeholder="Rechercher date" [(ngModel)]="date" (ngModelChange)="getAmande()"
+                       class="form-control form-control-sm mr-3">
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+
+        <ng-container class="bg-white" *ngIf="(appState$ | async) as appState" [ngSwitch]="appState.dataState">
+          <ng-container class="bg-white" *ngSwitchCase="DataState.LOADING_STATE">
+            <div class="col-md-12 text-center my-3">
+              <div class="ball-clip-rotate">
+                <div style="background-color: rgb(68, 64, 84);"></div>
+              </div>
+            </div>
+          </ng-container>
+          <ng-container class="bg-white py-1 px-1" *ngSwitchCase="DataState.LOADED_STATE">
+            <table class="table table-hover bg-white">
+              <thead>
+              <tr>
+                <th>#</th>
+                <th>Date</th>
+                <th>Membre</th>
+                <th>Montant</th>
+                <th>Description</th>
+                <th>Transaction</th>
+                <th>Date de création</th>
+                <th>Date de modification</th>
+<!--                <th class="text-center">Action</th>-->
+              </tr>
+              </thead>
+              <tbody
+                *ngFor="let amande of appState.appData.content | paginate: { id: 'amandes', itemsPerPage: appState.appData.size, currentPage: page, totalItems: appState.appData.totalElements }; let i = index">
+              <tr>
+                <td>{{i + 1}}</td>
+                <td>{{amande.date |date: 'dd-MM-yyyy'}}</td>
+                <td>{{amande.user.firstName | titlecase}}&nbsp;{{amande.user.lastName | titlecase}}</td>
+                <td  class="mb-2 mr-2 font-weight-bold" [ngClass]="amande.typeTransaction.name == 'DEPOT' ? 'text-success' : 'text-warning'">
+                  <span><i class="fa" [ngClass]="amande.typeTransaction.name == 'DEPOT' ? 'fa-arrow-up' : 'fa-arrow-right'"></i>&nbsp;{{amande.montant | number: '1.2-2'}}&nbsp;€</span>
+                </td>
+                <td>{{amande.motif}}&nbsp;</td>
+                <td>
+                  <span class="badge " [ngClass]="amande.typeTransaction.name == 'DEPOT' ? 'badge-success' : 'badge-warning'">
+                    {{amande.typeTransaction.name == 'DEPOT' ? 'PAYEE' : 'NON PAYEE'}}&nbsp;
+                  </span>
+                </td>
+                <td>{{amande.createdAt | date: 'dd-MM-yyyy à HH:mm'}}</td>
+                <td>{{amande.updatedAt | date: 'dd-MM-yyyy à HH:mm'}}</td>
+<!--                <td>-->
+<!--                  <button class="btn btn-sm btn-secondary mr-2" data-toggle="tooltip" title="détails de la séance">-->
+<!--                    <i class="pe-7s-pen"></i>-->
+<!--                    modifier-->
+<!--                  </button>-->
+<!--                  <button class="btn btn-sm btn-danger mr-2"-->
+<!--                          data-toggle="tooltip" title="supprimer le prêt">-->
+<!--                    <i class="pe-7s-trash"></i>-->
+<!--                    supprimer-->
+<!--                  </button>-->
+<!--                </td>-->
+            </table>
+            <div class="text-center">
+              <p *ngIf="!appState.appData.content.length" style="color: grey; font-size: 1.8rem;" class="mx-auto">Aucun prêt trouvé !</p>
+            </div>
+            <div class="card-footer">
+              <div class="btn-actions-pane-left">
+                <div role="group" class="btn-group-sm btn-group">
+                  Total : <b>{{ appState.appData.totalElements }} </b>
+                </div>
+              </div>
+              <div class="btn-actions-pane-right">
+                <div role="group" class="btn-group-sm btn-group">
+                  <!--              <pagination-controls id="client" (pageChange)="pageChange($event)" ></pagination-controls>-->
+                  <pagination-controls
+                    id="amandes"
+                    previousLabel="Précédent"
+                    nextLabel="Suivant"
+                    (pageChange)="pageChange($event)"></pagination-controls>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          <ng-container class="bg-white" *ngSwitchCase="DataState.ERROR_STATE">
+            <div class="col-md-12 text-center">
+              <div class="text-danger">{{appState.error}}</div>
+            </div>
+          </ng-container>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>

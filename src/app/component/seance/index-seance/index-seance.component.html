@@ -1,0 +1,209 @@
+<div class="app-page-title">
+  <div class="page-title-wrapper">
+    <div class="page-title-heading">
+      <div class="page-title-icon">
+        <i class="pe-7s-news-paper icon-gradient bg-danger">
+        </i>
+      </div>
+      <div>Gestion des séances
+        <div class="page-title-subheading">Enregistrez et gérez le suivi des séances</div>
+      </div>
+    </div>
+    <div class="page-title-actions">
+      <div class="d-inline-block ">
+        <button (click)="openSeanceModal(orderModal)" type="button" data-toggle="tooltip" title="nouvelle séance"
+                class="btn-shadow btn btn-primary">
+                                        <span class="btn-icon-wrapper pr-2 opacity-7">
+                                            <i class="fa fa-plus fa-w-20"></i>
+                                        </span>
+          Séance
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-12">
+    <div class="main-card mb-3 card " id="htmlData">
+      <div class="card-header">
+        Liste des séances
+      </div>
+
+      <ng-container class="bg-white" *ngIf="(seanceState$ | async) as seanceState" [ngSwitch]="seanceState.dataState">
+        <div class="table-responsive">
+          <ng-container class="bg-white" *ngSwitchCase="dataState.LOADING_STATE">
+            <div class="col-md-12 text-center my-3">
+              <!--                <div class="spinner-border text-primary my-3" role="status"></div>-->
+              <div class="ball-clip-rotate">
+                <div style="background-color: rgb(68, 64, 84);"></div>
+              </div>
+            </div>
+          </ng-container>
+          <ng-container class="bg-white py-1 px-1" *ngSwitchCase="dataState.LOADED_STATE">
+            <table class="table table-hover">
+              <thead>
+              <tr>
+                <th>Ref#</th>
+                <th>Date</th>
+                <th>Receptionniste</th>
+                <th>Compte rendu</th>
+                <th>Statut</th>
+                <th>Date création</th>
+                <th>Date modification</th>
+                <th class="text-center">Actions</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr style="cursor: pointer" *ngFor="let i = index; let seance of seanceState.appData.content
+           | paginate: { id: 'seances', itemsPerPage: seanceState.appData.size, currentPage: page, totalItems: seanceState.appData.totalElements}">
+                <td>{{i + 1}}</td>
+                <td>{{seance.date | date: 'dd/MM/yyyy'}}</td>
+                <td>{{seance.users.firstName }}</td>
+                <td><a *ngIf="seance.linkCompteRendu" data-toggle="tooltip" title="Télécharger le compte rendu"
+                       class="text-primary" (click)="generateCompteRendu(seance)"><i
+                  class="fa fa-file-pdf text-danger"></i> CR_{{seance.date | date: 'dd/MM/yyyy'}}.pdf</a></td>
+<!--                <td>{{seance.status.name}}</td>-->
+                <td>
+                  <span class="badge "
+                        [ngClass]="seance.status.name == 'CREEE' ? 'badge-success' : 'badge-danger'">
+                    {{seance.status.name}}&nbsp;
+                  </span>
+                </td>
+                <td>{{seance.createdAt | date: 'dd/MM/yyyy à HH:mm'}}</td>
+                <td>{{seance.updatedAt | date: 'dd/MM/yyyy à HH:mm'}}</td>
+                <td>
+                  <button class="btn btn-sm btn-secondary mr-2" (click)="seanceDetails(seance)" data-toggle="tooltip" title="détails de la séance">
+                    <i class="pe-7s-look"></i>
+                  </button>
+                  <button class="btn btn-sm btn-primary mr-2" (click)="openCompteRenduModal(crModal, seance)"
+                          *ngIf="!seance.linkCompteRendu" data-toggle="tooltip" title="ajouter le compte rendu">
+                    <i class="pe-7s-note"></i>
+                  </button>
+                </td>
+              </tr>
+
+              </tbody>
+
+            </table>
+            <div class="text-center">
+              <p *ngIf="seanceState.appData.totalElements == 0" style="color: grey; font-size: 1.8rem;" class="mx-auto">
+                Aucune séance trouvée !</p>
+            </div>
+            <div class="card-footer">
+              <div class="btn-actions-pane-left">
+                <div role="group" class="btn-group-sm btn-group">
+                  Total : &nbsp;<b>{{ seanceState.appData.totalElements }} </b>
+                </div>
+              </div>
+              <div class="btn-actions-pane-right">
+                <div role="group" class="btn-group-sm btn-group">
+                  <pagination-controls
+                    id="seances"
+                    previousLabel="Précédent"
+                    nextLabel="Suivant"
+                    (pageChange)="pageChange($event)"></pagination-controls>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          <ng-container class="bg-white" *ngSwitchCase="dataState.ERROR_STATE">
+            <div class="col-md-12 text-center">
+              <div class="text-danger">{{seanceState.error}}</div>
+            </div>
+          </ng-container>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div>
+
+<!--formulaire création seance-->
+<ng-template #orderModal let-modal>
+  <div class="modal-header">
+    <h6 class="modal-title timeline-title" id="modal-basic-titles"><b>{{title}}</b></h6>
+    <div class="close vertical-timeline-element-content bounce-in" (click)=" modal.close('save click'); annuler()">
+      <p><i class="fa fa-times"></i></p>
+    </div>
+  </div>
+  <div class="modal-body">
+    <div class="">
+      <div class="">
+        <form [formGroup]="seanceForm">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="position-relative form-group">
+                <label for="email" class="">Date de la séance</label>
+                <input name="email" id="email" placeholder="email" type="date" class="form-control"
+                       formControlName="date">
+              </div>
+              <div
+                *ngIf="seanceForm.controls['date'].invalid && (seanceForm.controls['date'].dirty || seanceForm.controls['date'].touched)"
+                class="mb-2" style="color: #f65656; font-style: italic;">
+                <div *ngIf="seanceForm.controls['date'].errors?.['require']" class="ml-3">
+                  entrez une date valide : example@example.com
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="position-relative form-group">
+                <label for="name" class="">Réceptionniste</label>
+                <select name="name" id="name" class="form-control" formControlName="user">
+                  <option value="" selected disabled hidden>Sélectionner un membre</option>
+                  <option *ngFor="let user of users" [value]="user.userId">{{user.firstName}}</option>
+                </select>
+              </div>
+              <div
+                *ngIf="seanceForm.controls['user'].invalid && (seanceForm.controls['user'].dirty || seanceForm.controls['user'].touched)"
+                class="mb-2" style="color: #f65656; font-style: italic;">
+
+                <div *ngIf="seanceForm.controls['user'].errors?.['required']" class="ml-3">
+                  le nom est obligatoire.
+                </div>
+              </div>
+            </div>
+          </div>
+          <button class="mt-1 btn btn-primary float-right ml-3" [disabled]="seanceForm.invalid || (isLoading$ | async)"
+                  (click)="saveSeance()">
+            <i *ngIf="isLoading$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
+            <span *ngIf="isLoading$ | async">Enregistrement ...</span>
+            <span *ngIf="!(isLoading$ | async)">Enregistrer séance</span>
+          </button>
+          <button class="mt-1 btn btn-secondary float-right" (click)="annuler()"><i class="pe-7s-back"></i>Annuler
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<!--formulaire création seance-->
+<ng-template #crModal let-modal>
+  <div class="modal-header">
+    <h6 class="modal-title timeline-title" id="modal-basic-title"><b>Compte rendu de la séance</b></h6>
+    <div class="close vertical-timeline-element-content bounce-in" (click)=" modal.close('save click'); annuler()">
+      <p><i class="fa fa-times"></i></p>
+    </div>
+  </div>
+  <div class="modal-body">
+    <div class="">
+      <div class="">
+        <form [formGroup]="crForm">
+          <div class="row">
+            <div class="position-relative form-group">
+              <label for="exampleFile" class="">Importer le compte rendu de la séance</label>
+              <input name="file" id="exampleFile" type="file" class="form-control-file" formControlName="file"
+                     (change)="selectFile($event)" accept="application/pdf">
+            </div>
+          </div>
+          <button class="mt-1 btn btn-primary float-right ml-3" [disabled]="crForm.invalid || (isLoading$ | async)"
+                  (click)="saveCompteRendu()">
+            <i *ngIf="isLoading$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
+            <span *ngIf="isLoading$ | async">Enregistrement ...</span>
+            <span *ngIf="!(isLoading$ | async)">Enregistrer compte rendu</span>
+          </button>
+          <button class="mt-1 btn btn-secondary float-right" (click)="annuler()"><i class="pe-7s-back"></i>Annuler
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</ng-template>

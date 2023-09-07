@@ -1,0 +1,234 @@
+<div class="app-page-title">
+  <div class="page-title-wrapper">
+    <div class="page-title-heading">
+      <div class="page-title-icon">
+        <i class="pe-7s-box1 icon-gradient bg-night-fade">
+        </i>
+      </div>
+      <div>Gestion des prêts
+        <div class="page-title-subheading">Managez vos prêts</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="main-card mb-3 card " id="htmlData" #htmlData>
+      <div class="card-header">
+        Liste des prêts
+        <div class="btn-actions-pane-right">
+          <div role="group" class="btn-group-sm btn-group">
+          </div>
+        </div>
+
+        <div class="btn-actions-pane-right" >
+          <div role="group" class="">
+            <form class="form-row">
+              <div class="position-relative mr-2" >
+                <!--                <label for="mag" class="text-dark font-weight-bold">Membre</label>-->
+                <select name="mag" id="mag" class="form-control form-control-sm mr-3" [(ngModel)]="userFilter" (ngModelChange)="getPrets()" >
+                  <option value="" selected disabled hidden>Sélectionner un membre</option>
+                  <option *ngFor="let user of users.content" ngValue="{{user.userId}}">{{user.firstName | titlecase}}&nbsp;{{user.lastName| titlecase}}</option>
+                  <option value="" disabled *ngIf="!loadUser && users.totalElements == 0">Aucun membre trouvé</option>
+                  <option value="">Tout afficher</option>
+                </select>
+              </div>
+              <div class="position-relative  mr-2 ">
+                <!--                <label for="statut" class="text-dark font-weight-bold">Filtrer par statut</label>-->
+                <select name="stat" id="statut" class="form-control form-control-sm mr-3" [(ngModel)]="statusFilter" (ngModelChange)="getPrets()">
+                  <option value="" selected disabled hidden>Choix statut</option>
+                  <option value="PRET">PRET</option>
+                  <option value="REMBOURSEMENT">REMBOURSEMENT</option>
+                  <option value="">Tout afficher</option>
+                </select>
+              </div>
+              <div class="position-relative  mr-2">
+                <!--                <label for="date" class="text-dark font-weight-bold">Recherche par date</label>-->
+                <input type="date" name="date" id="date" placeholder="Rechercher date" [(ngModel)]="date" (ngModelChange)="getPrets()"
+                       class="form-control form-control-sm mr-3">
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+
+        <ng-container class="bg-white" *ngIf="(appState$ | async) as appState" [ngSwitch]="appState.dataState">
+          <ng-container class="bg-white" *ngSwitchCase="DataState.LOADING_STATE">
+            <div class="col-md-12 text-center my-3">
+              <div class="ball-clip-rotate">
+                <div style="background-color: rgb(68, 64, 84);"></div>
+              </div>
+            </div>
+          </ng-container>
+          <ng-container class="bg-white py-1 px-1" *ngSwitchCase="DataState.LOADED_STATE">
+            <table class="table table-hover bg-white">
+              <thead>
+              <tr>
+                <th>#</th>
+                <th>Date</th>
+                <th>Membre</th>
+                <th>Montant Preté</th>
+                <th>Montant Remboursé</th>
+                <th>Date de Remboursement</th>
+                <th>Type de transaction</th>
+                <th>Statut</th>
+                <th>Date de création</th>
+                <th>Date de modification</th>
+                <th class="text-center">Action</th>
+              </tr>
+              </thead>
+              <tbody
+                *ngFor="let pret of appState.appData.content | paginate: { id: 'pret', itemsPerPage: appState.appData.size, currentPage: page, totalItems: appState.appData.totalElements }; let i = index">
+              <tr>
+                <td>{{i + 1}}</td>
+                <td>{{pret.seance.date |date: 'dd-MM-yyyy'}}</td>
+                <td>{{pret.user.firstName | titlecase}}&nbsp;{{pret.user.lastName | titlecase}}</td>
+                <td>{{pret.montant_prete}}&nbsp;€</td>
+                <td>{{pret.montant_rembourse}}&nbsp;€</td>
+                <td>{{pret.dateRemboursement | date: 'dd-MM-yyyy'}}</td>
+                <td>{{pret.typeTransaction.name}}</td>
+                <td>{{pret.statutPret.name}}</td>
+                <td>{{pret.createdAt | date: 'dd-MM-yyyy à HH:mm'}}</td>
+                <td>{{pret.updatedAt | date: 'dd-MM-yyyy à HH:mm'}}</td>
+                <td>
+                  <button class="btn btn-sm btn-secondary mr-2" data-toggle="tooltip" title="détails de la séance">
+                    <i class="pe-7s-pen"></i>
+                    modifier
+                  </button>
+                  <button class="btn btn-sm btn-primary mr-2" (click)="open(mymodal); selectedPret = pret"
+                          *ngIf="pret.typeTransaction.name === 'PRET'" data-toggle="tooltip" title="rembourser le prêt">
+                    <i class="pe-7s-note"></i>
+                    rembourser
+                  </button>
+                  <button class="btn btn-sm btn-danger mr-2"
+                          data-toggle="tooltip" title="supprimer le prêt">
+                    <i class="pe-7s-trash"></i>
+                    supprimer
+                  </button>
+                </td>
+            </table>
+            <div class="text-center">
+              <p *ngIf="!appState.appData.content.length" style="color: grey; font-size: 1.8rem;" class="mx-auto">Aucun prêt trouvé !</p>
+            </div>
+            <div class="card-footer">
+              <div class="btn-actions-pane-left">
+                <div role="group" class="btn-group-sm btn-group">
+                  Total : <b>{{ appState.appData.totalElements }} </b>
+                </div>
+              </div>
+              <div class="btn-actions-pane-right">
+                <div role="group" class="btn-group-sm btn-group">
+                  <!--              <pagination-controls id="client" (pageChange)="pageChange($event)" ></pagination-controls>-->
+                  <pagination-controls
+                    id="pret"
+                    previousLabel="Précédent"
+                    nextLabel="Suivant"
+                    (pageChange)="pageChange($event)"></pagination-controls>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          <ng-container class="bg-white" *ngSwitchCase="DataState.ERROR_STATE">
+            <div class="col-md-12 text-center">
+              <div class="text-danger">{{appState.error}}</div>
+            </div>
+          </ng-container>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #mymodal let-modal>
+  <div class="modal-header">
+    <h6 class="modal-title timeline-title" id="modal-basic-title"><b>Remboursement du prêt</b></h6>
+    <div class="close vertical-timeline-element-content bounce-in" (click)=" modal.close('save click')">
+      <p><i class="fa fa-times"></i></p>
+    </div>
+  </div>
+  <div class="modal-body">
+    <div class="">
+      <div class="">
+        <form [formGroup]="pretForm">
+
+          <div class="position-relative form-group">
+            <label for="date" class="">Date du remboursement</label>
+            <input type="date" id="date" formControlName="date" class="form-control" placeholder="date de la transaction">
+          </div>
+          <div
+            *ngIf="pretForm.controls['date'].invalid && (pretForm.controls['date'].dirty || pretForm.controls['date'].touched)"
+            class="mb-2" style="color: #f65656; font-style: italic;">
+            <div *ngIf="pretForm.controls['date'].errors?.['required']" class="ml-3">
+              la date de la transaction est requise.
+            </div>
+            <div *ngIf="pretForm.controls['date'].errors?.['pattern']" class="ml-3">
+              entrez une date valide
+            </div>
+          </div>
+
+          <div class="position-relative form-group">
+            <label for="montant" class="">Montant du remboursement</label>
+            <input type="text" id="montant" formControlName="montant" class="form-control" placeholder="montant de la transaction">
+          </div>
+          <div
+            *ngIf="pretForm.controls['montant'].invalid && (pretForm.controls['montant'].dirty || pretForm.controls['montant'].touched)"
+            class="mb-2" style="color: #f65656; font-style: italic;">
+            <div *ngIf="pretForm.controls['montant'].errors?.['required']" class="ml-3">
+              le montant de la transaction est requis.
+            </div>
+            <div *ngIf="pretForm.controls['montant'].errors?.['pattern']" class="ml-3">
+              entrez un montant valide
+            </div>
+            <div *ngIf="pretForm.controls['montant'].errors?.['min']" class="ml-3">
+              le montat doit être supérieur à 0
+            </div>
+          </div>
+
+          <div class="position-relative form-group">
+            <label for="montant" class="">Le prêt est-il remboursé en totalité ou en partialité?</label>
+
+              <div>
+                <div class="custom-radio custom-control custom-control-inline">
+                  <input type="radio" name="yo" formControlName="type" value="false" id="exampleCustomInline" class="custom-control-input">
+                  <label class="custom-control-label" for="exampleCustomInline">Partiel</label>
+                </div>
+                <div class="custom-radio custom-control custom-control-inline">
+                  <input type="radio" name="yo" formControlName="type" value="true" id="exampleCustomInline2" class="custom-control-input">
+                  <label class="custom-control-label" for="exampleCustomInline2">Total</label>
+                </div>
+              </div>
+
+<!--            <input type="text" id="montant" formControlName="montant" class="form-control" placeholder="montant de la transaction">-->
+<!--            <div *ngFor="let option of options" class="custom-radio custom-control custom-control-inline">-->
+<!--              <label>-->
+<!--                <input type="radio" name="options" [value]="option.value" formControlName="type" class="custom-control-input"/>-->
+<!--                {{ option.name }}-->
+<!--              </label>-->
+<!--            </div>-->
+
+          </div>
+          <div
+            *ngIf="pretForm.controls['type'].invalid && (pretForm.controls['type'].dirty || pretForm.controls['type'].touched)"
+            class="mb-2" style="color: #f65656; font-style: italic;">
+            <div *ngIf="pretForm.controls['type'].errors?.['type']" class="ml-3">
+              faites un choix.
+            </div>
+          </div>
+
+          <button class="mt-1 btn btn-secondary float-right ml-3" (click)="annuler()"><i class="pe-7s-back"></i> Annuler
+          </button>
+          <button class="mt-1 btn btn-primary float-right"
+                  [disabled]="pretForm.invalid || (isLoading$ | async)" (click)="rembourser();">
+            <i *ngIf="isLoading$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
+            <span *ngIf="isLoading$ | async">Enregistrement ...</span>
+            <span
+              *ngIf="!(isLoading$ | async)">Enregistrer</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</ng-template>

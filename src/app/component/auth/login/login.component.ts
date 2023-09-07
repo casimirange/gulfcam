@@ -18,8 +18,8 @@ import {NotifsService} from "../../../_services/notifications/notifs.service";
 })
 export class LoginComponent implements OnInit {
 
-  project = 'Gulfcam';
-  socity = 'Gulfcam';
+  project = 'ADELI';
+  socity = 'ADELI';
   loginForm: FormGroup ;
   credentials: ICredentials = { }
   user?: IToken;
@@ -58,40 +58,9 @@ export class LoginComponent implements OnInit {
     this.isLoading.next(true);
     this.credentials.login = this.loginForm.controls['username'].value;
     this.credentials.password = this.loginForm.controls['password'].value;
-    // console.log(this.credentials)
-    // this.appState$ = this.authService.login$(this.credentials)
-    //   .pipe(
-    //     map((response) => {
-    //       console.log('la reponse', response.access_token)
-    //       this.tokenService.saveToken(response.access_token);
-    //           // this.tokenService.saveAuthorities(data.roles);
-    //           // this.tokenService.saveUsername(data.username);
-    //           this.isLoginFailed = false;
-    //           this.isLoggedIn = true;
-    //       this.dataSubject.next(
-    //           {
-    //             ...response, data: { logins: [response.data.login, ...this.dataSubject.value.data.logins]}
-    //           }
-    //         );
-    //       this.isLoading.next(false);
-    //       return {dataState: DataState.LOADED_STATE, appData: this.dataSubject.value};
-    //     }),
-    //     startWith({dataState: DataState.LOADING_STATE, appData: null}),
-    //     catchError((error => {
-    //       // this.notificationService.onError(error);
-    //       this.isLoading.next(false);
-    //       // this.errorMessage = error.error.message.toString();
-    //       console.error("message d'erreur", error.message)
-    //       // console.log("message d'erreur1", this.errorMessage);
-    //       return of({dataState: DataState.ERROR_STATE, error: error});
-    //     }))
-    //   );
-    this.credentials.login = this.loginForm.controls['username'].value;
-    this.credentials.password = this.loginForm.controls['password'].value;
     this.authService.login(this.credentials).subscribe(
       (data) => {
         this.user = data;
-
         this.tokenService.saveToken(data);
         this.tokenService.saveEmail(this.credentials.login);
         this.isLoading.next(false);
@@ -101,8 +70,6 @@ export class LoginComponent implements OnInit {
       (error: any) => {
         this.errorMessage = error.error.error[0];
         this.count += this.count
-        console.log(this.count)
-        // this.notifsService.onError(error.error.error[0], 'Echec de connexioon')
         this.isLoginFailed = true;
         this.isLoading.next(false);
       }

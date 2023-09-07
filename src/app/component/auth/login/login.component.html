@@ -1,6 +1,6 @@
 <div class="app-container app-theme-white body-tabs-shadow">
   <div class="app-container">
-    <div class="h-100 bg-grow-early bg-animation">
+    <div class="h-100 bg-plum-plate bg-animation">
       <div class="d-flex h-100 justify-content-center align-items-center">
         <div class="mx-auto app-login-box col-md-8">
 <!--          <div class="app-logo-inverse mx-auto mb-3">Gulfcam</div>-->
@@ -12,14 +12,14 @@
               <div class="modal-body">
                 <div class="h5 modal-title text-center">
                   <h4 class="mt-2 mb-2">
-                    <img src="assets/images/logo-removebg-preview.png" width="60" alt="">
+                    <img src="assets/images/adeli.jpeg" width="60" alt="">
                   </h4>
                   <h4 class="mt-2">
                     <div>Bienvenue,</div>
                     <span>Veuillez entrer les informations de votre compte</span>
                   </h4>
                 </div>
-                <form [formGroup]="loginForm">
+                <form [formGroup]="loginForm" (keydown.enter)="loginForm.valid ? login() : ''" >
                   <div class="form-row">
                     <div class="col-md-12">
                       <div class="position-relative form-group">
@@ -72,7 +72,7 @@
               <div class="modal-footer clearfix">
                 <div class="float-right">
 <!--                  <button class="btn btn-primary btn-lg" [disabled]="loginForm.invalid " (click)="onSubmit()">Login</button>-->
-                  <button type="submit" class="btn btn-success" [disabled]="loginForm.invalid || (isLoading$ | async)" (click)="login()">
+                  <button type="submit" class="btn btn-primary" [disabled]="loginForm.invalid || (isLoading$ | async)" (click)="login()">
                     <i *ngIf="isLoading$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
                     <span *ngIf="isLoading$ | async">Connexion ...</span>
                     <span *ngIf="!(isLoading$ | async)">Login</span>
@@ -80,6 +80,8 @@
                 </div>
               </div>
             </div>
+
+
           </div>
           <div class="text-center text-white opacity-8 mt-3">Copyright © {{socity}} 2023</div>
         </div>

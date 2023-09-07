@@ -1,0 +1,239 @@
+<div class="app-page-title">
+  <div class="page-title-wrapper">
+    <div class="page-title-heading">
+      <div class="page-title-icon">
+        <i class="pe-7s-box1 icon-gradient bg-night-fade">
+        </i>
+      </div>
+      <div>Gestion du mangwa
+        <div class="page-title-subheading">Managez vos cartons</div>
+      </div>
+    </div>
+    <div class="page-title-actions">
+      <div class="d-inline-block ">
+        <button type="button" data-toggle="tooltip" title="sortie de caisse" class="btn-shadow mr-3 btn btn-primary"
+                (click)="open(mymodal)" [disabled]="(isLoading$ | async)">
+                                        <span class="btn-icon-wrapper pr-2 opacity-7">
+                                            <i class="fa fa-plus fa-w-20"></i>
+                                        </span>
+          Sortie de caisse
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="main-card mb-3 card " id="htmlData" #htmlData>
+      <div class="card-header">
+        Liste des transactions du mangwa
+        <div class="btn-actions-pane-right">
+          <div role="group" class="btn-group-sm btn-group">
+          </div>
+        </div>
+
+        <div class="btn-actions-pane-right">
+          <div role="group" class="">
+            <form class="form-row">
+              <div class="position-relative  mr-2 ">
+                <!--                <label for="statut" class="text-dark font-weight-bold">Filtrer par statut</label>-->
+                <select name="stat" id="statut" class="form-control form-control-sm mr-3" [(ngModel)]="statusFilter"
+                        (ngModelChange)="getMangwas()">
+                  <option value="" selected disabled hidden>Type de transaction</option>
+                  <option value="DEPOT">DEPOT</option>
+                  <option value="RETRAIT">RETRAIT</option>
+                  <option value="">Tout afficher</option>
+                </select>
+              </div>
+              <div class="position-relative  mr-2">
+                <!--                <label for="date" class="text-dark font-weight-bold">Recherche par date</label>-->
+                <input type="date" name="date" id="date" placeholder="Rechercher date" [(ngModel)]="date"
+                       (ngModelChange)="getMangwas()"
+                       class="form-control form-control-sm mr-3">
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div class="btn-actions-pane-right" *ngIf="(soldeState$ | async) as soldeState"
+             [ngSwitch]="soldeState.dataState">
+          <div role="group" class="btn-group-sm btn-group">
+            <div *ngSwitchCase="DataState.LOADING_STATE">
+              <div class="ball-clip-rotate">
+                <div style="background-color: rgb(68, 64, 84);"></div>
+              </div>
+            </div>
+            <div *ngSwitchCase="DataState.LOADED_STATE">
+              Solde Mangwa : <span class="text-primary">{{soldeState.appData}} €</span>
+            </div>
+            <div *ngSwitchCase="DataState.ERROR_STATE">
+              {{soldeState.error}}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+
+        <ng-container class="bg-white" *ngIf="(appState$ | async) as appState" [ngSwitch]="appState.dataState">
+          <ng-container class="bg-white" *ngSwitchCase="DataState.LOADING_STATE">
+            <div class="col-md-12 text-center my-3">
+              <div class="ball-clip-rotate">
+                <div style="background-color: rgb(68, 64, 84);"></div>
+              </div>
+            </div>
+          </ng-container>
+          <ng-container class="bg-white py-1 px-1" *ngSwitchCase="DataState.LOADED_STATE">
+            <table class="table table-hover bg-white">
+              <thead>
+              <tr>
+                <th>#</th>
+                <th>Date</th>
+                <th>Membre</th>
+                <th>Montant</th>
+                <th>Motif</th>
+                <th>Type de transaction</th>
+                <th>Action</th>
+              </tr>
+              </thead>
+              <tbody
+                *ngFor="let mangwa of appState.appData.content | paginate: { id: 'mangwa', itemsPerPage: appState.appData.size, currentPage: page, totalItems: appState.appData.totalElements }; let i = index">
+              <tr>
+                <td>{{i + 1}}</td>
+                <td>{{mangwa.date |date: 'dd-MM-yyyy'}}</td>
+                <td>{{mangwa.user.firstName | titlecase}}</td>
+                <td class="mb-2 mr-2 font-weight-bold" [ngClass]="mangwa.typeTransaction.name == 'DEPOT' ? 'text-success' : 'text-danger'">{{mangwa.montant | number: '1.2-2'}}&nbsp;€</td>
+                <td>{{mangwa.motif}}</td>
+                <td>
+                  <span class="badge "
+                        [ngClass]="mangwa.typeTransaction.name == 'DEPOT' ? 'badge-success' : 'badge-danger'">
+                    {{mangwa.typeTransaction.name}}&nbsp;
+                  </span>
+                </td>
+                <td></td>
+            </table>
+            <div class="text-center">
+              <p *ngIf="!appState.appData.content.length" style="color: grey; font-size: 1.8rem;" class="mx-auto">Aucune
+                transaction trouvée !</p>
+            </div>
+            <div class="card-footer">
+              <div class="btn-actions-pane-left">
+                <div role="group" class="btn-group-sm btn-group">
+                  Total : <b>{{ appState.appData.totalElements }} </b>
+                </div>
+              </div>
+              <div class="btn-actions-pane-right">
+                <div role="group" class="btn-group-sm btn-group">
+                  <!--              <pagination-controls id="client" (pageChange)="pageChange($event)" ></pagination-controls>-->
+                  <pagination-controls
+                    id="mangwa"
+                    previousLabel="Précédent"
+                    nextLabel="Suivant"
+                    (pageChange)="pageChange($event)"></pagination-controls>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          <ng-container class="bg-white" *ngSwitchCase="DataState.ERROR_STATE">
+            <div class="col-md-12 text-center">
+              <div class="text-danger">{{appState.error}}</div>
+            </div>
+          </ng-container>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #mymodal let-modal>
+  <div class="modal-header">
+    <h6 class="modal-title timeline-title" id="modal-basic-title"><b>{{modalTitle}}</b></h6>
+    <div class="close vertical-timeline-element-content bounce-in" (click)=" modal.close('save click')">
+      <p><i class="fa fa-times"></i></p>
+    </div>
+  </div>
+  <div class="modal-body">
+    <div class="">
+      <div class="">
+        <form [formGroup]="mangwaForm">
+
+          <div class="position-relative form-group">
+            <label for="date" class="">Date</label>
+            <input type="date" id="date" formControlName="date" class="form-control"
+                   placeholder="date de la transaction">
+          </div>
+          <div
+            *ngIf="mangwaForm.controls['date'].invalid && (mangwaForm.controls['date'].dirty || mangwaForm.controls['date'].touched)"
+            class="mb-2" style="color: #f65656; font-style: italic;">
+            <div *ngIf="mangwaForm.controls['date'].errors?.['required']" class="ml-3">
+              la date de la transaction est requise.
+            </div>
+            <div *ngIf="mangwaForm.controls['date'].errors?.['pattern']" class="ml-3">
+              entrez une date valide
+            </div>
+          </div>
+
+          <div class="position-relative form-group">
+            <label for="montant" class="">Montant</label>
+            <input type="text" id="montant" formControlName="montant" class="form-control"
+                   placeholder="montant de la transaction">
+          </div>
+          <div
+            *ngIf="mangwaForm.controls['montant'].invalid && (mangwaForm.controls['montant'].dirty || mangwaForm.controls['montant'].touched)"
+            class="mb-2" style="color: #f65656; font-style: italic;">
+            <div *ngIf="mangwaForm.controls['montant'].errors?.['required']" class="ml-3">
+              le montant de la transaction est requis.
+            </div>
+            <div *ngIf="mangwaForm.controls['montant'].errors?.['pattern']" class="ml-3">
+              entrez un montant valide
+            </div>
+            <div *ngIf="mangwaForm.controls['montant'].errors?.['min']" class="ml-3">
+              le montat doit être supérieur à 0
+            </div>
+          </div>
+
+          <div class="position-relative form-group">
+            <label for="motif" class="">Motif</label>
+            <input type="text" id="motif" formControlName="motif" class="form-control"
+                   placeholder="motif de la transaction">
+          </div>
+          <div
+            *ngIf="mangwaForm.controls['motif'].invalid && (mangwaForm.controls['motif'].dirty || mangwaForm.controls['motif'].touched)"
+            class="mb-2" style="color: #f65656; font-style: italic;">
+            <div *ngIf="mangwaForm.controls['motif'].errors?.['required']" class="ml-3">
+              le montif de la transaction est requis.
+            </div>
+            <div *ngIf="mangwaForm.controls['motif'].errors?.['minLength']" class="ml-3">
+              au moins 10 caractères requis
+            </div>
+          </div>
+
+          <div class="position-relative form-group">
+            <label for="tb" class="">Membre</label>
+            <select name="select" id="tb" class="form-control" formControlName="user">
+              <option value="" selected hidden>Sélectionner un membre</option>
+              <option *ngFor="let user of users.content" [value]="user.userId">{{user.firstName}}</option>
+            </select>
+          </div>
+          <div
+            *ngIf="mangwaForm.controls['user'].invalid && (mangwaForm.controls['user'].dirty || mangwaForm.controls['user'].touched)"
+            class="mb-2" style="color: #f65656; font-style: italic;">
+            <div *ngIf="mangwaForm.controls['user'].errors?.['required']" class="ml-3">
+              le choix du membre est obligatoire.
+            </div>
+          </div>
+          <button class="mt-1 btn btn-secondary float-right ml-3" (click)="annuler()"><i class="pe-7s-back"></i> Annuler
+          </button>
+          <button class="mt-1 btn btn-primary float-right"
+                  [disabled]="mangwaForm.invalid || (isLoading$ | async)" (click)="saveMangwa()">
+            <i *ngIf="isLoading$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
+            <span *ngIf="isLoading$ | async">Enregistrement ...</span>
+            <span
+              *ngIf="!(isLoading$ | async)">Enregistrer</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</ng-template>

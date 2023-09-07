@@ -1,7 +1,7 @@
-<div class="app-header header-shadow bg-danger header-text-light" [ngClass]="globals.toggleSidebar ? 'closed-sidebar' : ''">
+<div class="app-header header-shadow bg-alternate header-text-light" [ngClass]="globals.toggleSidebar ? 'closed-sidebar' : ''">
   <div class="app-header__logo">
     <div class="logo-src">
-      <img src="assets/images/gulflogo-removebg-preview.png" width="50" alt="">
+      <img src="assets/images/adeli.jpeg" width="50" alt="">
     </div>
     <div class="header__pane ml-auto">
       <div>
@@ -67,7 +67,7 @@
                             <div class="widget-content-left">
                               <div class="widget-heading text-dark">{{lastName | titlecase}}
                               </div>
-                              <div class="widget-subheading opacity-8 text-dark">{{getStatusAccount(roleUser) | titlecase}}
+                              <div class="widget-subheading opacity-8 text-dark">{{roleUser | titlecase}}
                               </div>
                             </div>
   <!--                            <div class="widget-content-right mr-2">-->
@@ -82,7 +82,7 @@
                     <div class="scrollbar-container ps">
                       <ul class="nav flex-column">
                         <li class="nav-item-header nav-item" style="cursor: pointer" (click)="showProfile()">
-                          <span ><i class="pe-7s-key"></i> Modifier mot de passe</span>
+                          <span ><i class="pe-7s-user"></i> Voir mon profile</span>
                         </li>
                       </ul>
                     </div>
@@ -103,7 +103,7 @@
                 {{lastName | titlecase}}
               </div>
               <div class="widget-subheading text-white">
-                {{getStatusAccount(roleUser) | titlecase}}
+                {{roleUser | titlecase}}
               </div>
             </div>
           </div>

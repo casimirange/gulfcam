@@ -18,7 +18,7 @@
             </div>
             <div class="page-title-actions">
             <div class="d-inline-block ">
-              <img src="assets/images/logo-removebg-preview.png" class="img-fluid" height="60" width="60" alt="">
+              <img src="assets/images/adeli.jpeg" class="img-fluid" height="60" width="60" alt="">
             </div>
           </div>
           </div>
@@ -29,81 +29,29 @@
 <!--              <h5 class="card-title">Grid Menu Bigger</h5>-->
               <div class="grid-menu grid-menu-3col">
                 <div class="no-gutters row">
-                  <div class="col-sm-6 col-xl-4" routerLink="/commandes">
-                  <!--<div class="col-sm-6 col-xl-4" routerLink="/commandes" *ngIf="roleUser === 'MANAGER_STORE' ||-->
-                  <!-- roleUser === 'MANAGER_ORDER' || roleUser === 'MANAGER_COUPON' || role.includes('ROLE_ADMIN')">-->
+                  <div class="col-sm-6 col-xl-4" routerLink="/session">
                     <button class="btn-icon-vertical btn-square btn-transition btn btn-outline-link">
-                      <i class="pe-7s-news-paper btn-icon-wrapper btn-icon-lg mb-3"></i>Commandes
+                      <i class="pe-7s-news-paper btn-icon-wrapper btn-icon-lg mb-3"></i>Sessios
                     </button>
                   </div>
-                  <div class="col-sm-6 col-xl-4" routerLink="/cartons">
+                  <div class="col-sm-6 col-xl-4" routerLink="/seance">
                     <button class="btn-icon-vertical btn-square btn-transition btn btn-outline-link">
-                      <i class="pe-7s-box1 btn-icon-wrapper btn-icon-lg mb-3"></i>Cartons
+                      <i class="pe-7s-news-paper btn-icon-wrapper btn-icon-lg mb-3"></i>Séances
                     </button>
                   </div>
-                  <div class="col-sm-6 col-xl-4" routerLink="/magasins" *ngIf="roleUser === 'MANAGER_STORE' || roleUser === 'MANAGER_COUPON'">
+                  <div class="col-sm-6 col-xl-4" routerLink="/mangwa">
                     <button class="btn-icon-vertical btn-square btn-transition btn btn-outline-link">
-                      <i class="pe-7s-home btn-icon-wrapper btn-icon-lg mb-3"></i>Magasins
+                      <i class="pe-7s-box1 btn-icon-wrapper btn-icon-lg mb-3"></i>Mangwa
                     </button>
                   </div>
-                  <div class="col-sm-6 col-xl-4" routerLink="/coupons" >
+                  <div class="col-sm-6 col-xl-4" routerLink="/prets">
                     <button class="btn-icon-vertical btn-square btn-transition btn btn-outline-link">
-                      <i class="pe-7s-ribbon btn-icon-wrapper btn-icon-lg mb-3"></i>Coupons
-                    </button>
-                  </div>
-                  <div class="col-sm-6 col-xl-4" routerLink="/stations" >
-                    <button class="btn-icon-vertical btn-square btn-transition btn btn-outline-link">
-                      <i class="pe-7s-paint-bucket btn-icon-wrapper btn-icon-lg mb-3"></i>Station
-                    </button>
-                  </div>
-                  <div class="col-sm-6 col-xl-4" routerLink="/carnets" >
-                    <button class="btn-icon-vertical btn-square btn-transition btn btn-outline-link">
-                      <i class="pe-7s-note2 btn-icon-wrapper btn-icon-lg mb-3"></i>Carnets
-                    </button>
-                  </div>
-                  <div class="col-sm-6 col-xl-4" routerLink="/paiement-method" >
-                    <button class="btn-icon-vertical btn-square btn-transition btn btn-outline-link">
-                      <i class="pe-7s-piggy btn-icon-wrapper btn-icon-lg mb-3"></i>Modes de paiement
+                      <i class="pe-7s-home btn-icon-wrapper btn-icon-lg mb-3"></i>Prêts
                     </button>
                   </div>
                   <div class="col-sm-6 col-xl-4" routerLink="/users" >
                     <button class="btn-icon-vertical btn-square btn-transition btn btn-outline-link">
                       <i class="pe-7s-user btn-icon-wrapper btn-icon-lg mb-3"></i>Utilisateurs
-                    </button>
-                  </div>
-                  <div class="col-sm-6 col-xl-4" routerLink="/clients" >
-                    <button class="btn-icon-vertical btn-square btn-transition btn btn-outline-link">
-                      <i class="pe-7s-users btn-icon-wrapper btn-icon-lg mb-3"></i>Clients
-                    </button>
-                  </div>
-                  <div class="col-sm-6 col-xl-4" routerLink="/entrepots" >
-                    <button class="btn-icon-vertical btn-square btn-transition btn btn-outline-link">
-                      <i class="pe-7s-server btn-icon-wrapper btn-icon-lg mb-3"></i>Espace de stockage
-                    </button>
-                  </div>
-                  <div class="col-sm-6 col-xl-4" routerLink="/request-opposition">
-                    <button class="btn-icon-vertical btn-square btn-transition btn btn-outline-link">
-                      <i class="pe-7s-close-circle btn-icon-wrapper btn-icon-lg mb-3"></i>Demande d'opposition
-                    </button>
-                  </div>
-                  <div class="col-sm-6 col-xl-4" routerLink="/credit-note">
-                    <button class="btn-icon-vertical btn-square btn-transition btn btn-outline-link">
-                      <i class="pe-7s-cash btn-icon-wrapper btn-icon-lg mb-3"></i>Note de credit
-                    </button>
-                  </div>
-                  <div class="col-sm-6 col-xl-4" routerLink="/caisse">
-                    <button class="btn-icon-vertical btn-square btn-transition btn btn-outline-link">
-                      <i class="pe-7s-wallet btn-icon-wrapper btn-icon-lg mb-3"></i>Trésorerie
-                    </button>
-                  </div>
-                  <div class="col-sm-6 col-xl-4" routerLink="/stock" >
-                    <button class="btn-icon-vertical btn-square btn-transition btn btn-outline-link">
-                      <i class="pe-7s-drawer btn-icon-wrapper btn-icon-lg mb-3"></i>Stock
-                    </button>
-                  </div>
-                  <div class="col-sm-6 col-xl-4" routerLink="/typeBon" >
-                    <button class="btn-icon-vertical btn-square btn-transition btn btn-outline-link">
-                      <i class="pe-7s-credit btn-icon-wrapper btn-icon-lg mb-3"></i>Type de bon
                     </button>
                   </div>
                 </div>

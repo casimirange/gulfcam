@@ -5,26 +5,25 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import {PreloaderComponent} from "./preloader/preloader.component";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
-import {HttpClientModule} from "@angular/common/http";
+import {HTTP_INTERCEPTORS, HttpClientModule} from "@angular/common/http";
 import {SharedModule} from "./component/shared/shared.module";
 import {Erreur404Component} from "./component/erreur404/erreur404.component";
 import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
-// import {SweetAlert2Module} from "@sweetalert2/ngx-sweetalert2";
 import {TokenInterceptorProvider} from "./_helpers/token.interceptor";
 import { CopyAndPasteDirective } from './directive/copy-and-paste.directive';
 import {NgOtpInputModule} from "ng-otp-input";
-import {ClientService} from "./_services/clients/client.service";
 import {NgxPaginationModule} from "ngx-pagination";
-import { CouponLayoutComponent } from './component/coupons/coupon-layout/coupon-layout.component';
-import { IndexCouponComponent } from './component/coupons/index-coupon/index-coupon.component';
 import {BnNgIdleService} from "bn-ng-idle";
-import { CreditNoteLayoutComponent } from './component/creditNote/credit-note-layout/credit-note-layout.component';
 import {ReactiveFormsModule} from "@angular/forms";
 import { LoaderComponent } from './preloader/loader/loader.component';
 import {ConnectionServiceModule} from "ng-connection-service";
-// import {OnlineStatusModule} from "ngx-online-status";
-// import {Ng2SearchPipeModule} from "ng2-search-filter";
-// import {Ng2OrderModule} from "ng2-order-pipe";
+import {
+  HttpConnectivity,
+  HttpConnectivityInterceptor,
+  InternetConnectivity,
+  NgxConnectivityModule
+} from "ngx-connectivity";
+import {LocationStrategy, PathLocationStrategy} from "@angular/common";
 
 @NgModule({
   declarations: [
@@ -32,12 +31,7 @@ import {ConnectionServiceModule} from "ng-connection-service";
     PreloaderComponent,
     Erreur404Component,
     CopyAndPasteDirective,
-    CouponLayoutComponent,
-    IndexCouponComponent,
-    CreditNoteLayoutComponent,
     LoaderComponent,
-
-
   ],
   imports: [
     BrowserModule,
@@ -49,15 +43,20 @@ import {ConnectionServiceModule} from "ng-connection-service";
     NgOtpInputModule,
     NgxPaginationModule,
     ReactiveFormsModule,
-    ConnectionServiceModule
-    // SweetAlert2Module.forRoot(),
-    // Ng2SearchPipeModule,
-    // Ng2OrderModule
-    // OnlineStatusModule
+    ConnectionServiceModule,
+    NgxConnectivityModule
   ],
   providers: [
     TokenInterceptorProvider,
-    BnNgIdleService
+    BnNgIdleService,
+    { provide: LocationStrategy, useClass: PathLocationStrategy},
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: HttpConnectivityInterceptor, // <--- Important to use **InternetConnectivity**
+      multi: true
+    },
+    InternetConnectivity,
+      HttpConnectivity
     // ClientService
   ],
   bootstrap: [AppComponent],

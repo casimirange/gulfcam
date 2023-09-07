@@ -46,29 +46,25 @@
             <th class="">Nom</th>
             <th class="">Prénom</th>
             <th class="">Email</th>
-            <th class="">Magasin</th>
-            <th class="">Code pin</th>
-            <th class="">Fonction</th>
             <th class="">Téléphone</th>
+            <th class="">Cotisation</th>
             <th class="">Type de compte</th>
             <th class="">Statut</th>
             <th class="text-center">Actions</th>
           </tr>
           </thead>
           <tbody>
-          <tr *ngFor="let user of users | paginate: { id: 'users', itemsPerPage: size, currentPage: page, totalItems: totalElements }">
-            <td class="text-left">{{user.internalReference}}</td>
+          <tr *ngFor="let user of users | paginate: { id: 'users', itemsPerPage: size, currentPage: page, totalItems: totalElements }; let i = index">
+            <td class="text-left">{{i+1}}</td>
             <td class="text-left">{{user.lastName}}</td>
             <td class="text-left">{{user.firstName}}</td>
             <td class="text-left">{{user.email}}</td>
-            <td class="text-left">{{user.nameStore}}</td>
-            <td class="text-left">{{user.pinCode }}</td>
-            <td class="text-left">{{user.position }}</td>
             <td class="text-left">{{user.telephone }}</td>
-            <td class="text-left">{{getStatusAccount(user.typeAccount.name)}}</td>
+            <td class="text-left">{{user.montant }} €</td>
+            <td class="text-left">{{user.typeAccount.name}}</td>
             <td class="text-left">
               <span class="mb-2 mr-2 badge " [ngClass]="user.status.name == 'USER_ENABLED' ? 'badge-success' : 'badge-danger'">
-                {{getStatusUser(user.status.name)}}
+                {{user.status.name}}
               </span>
               </td>
             <td class="text-center">

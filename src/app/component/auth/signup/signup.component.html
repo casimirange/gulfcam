@@ -1,6 +1,6 @@
 <div class="app-container app-theme-white body-tabs-shadow">
   <div class="app-container">
-    <div class="h-100 bg-grow-early bg-animation">
+    <div class="h-100 bg-plum-plate bg-animation">
       <div class="d-flex h-100 justify-content-center align-items-center">
         <div class="mx-auto app-login-box col-md-8">
           <div class="app-logo-inverse mx-auto mb-3">Gulfcam</div>
@@ -45,40 +45,40 @@
                         </div>
                       </div>
                     </div>
-                    <div class="col-md-12">
-                      <div class="position-relative form-group">
-                        <input id="pinCode" placeholder="Code pin" type="text" name="pinCode" class="form-control form-control-sm"  formControlName="pinCode">
-                      </div>
-                      <div *ngIf="form['pinCode'].invalid && (form['pinCode'].dirty || form['pinCode'].touched)"
-                           class="mb-2"  style="color: #f65656; font-style: italic;">
+<!--                    <div class="col-md-12">-->
+<!--                      <div class="position-relative form-group">-->
+<!--                        <input id="pinCode" placeholder="Code pin" type="text" name="pinCode" class="form-control form-control-sm"  formControlName="pinCode">-->
+<!--                      </div>-->
+<!--                      <div *ngIf="form['pinCode'].invalid && (form['pinCode'].dirty || form['pinCode'].touched)"-->
+<!--                           class="mb-2"  style="color: #f65656; font-style: italic;">-->
 
-                        <div *ngIf="form['pinCode'].errors?.['required']" class="ml-3">
-                          le code pin est obligatoire.
-                        </div>
-                        <div *ngIf="form['pinCode'].errors?.['pattern']" class="ml-3">
-                          Le code pin est un nombre
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col-md-12">
-                      <div class="position-relative form-group">
-<!--                        <input id="idStore" placeholder="Magasin" type="text" name="idStore" class="form-control form-control-sm"  formControlName="idStore">-->
-                        <input type="text" autocomplete="off" id="clientref" class="form-control" formControlName="idStore" placeholder="choisir un magasin" list="storeListOption">
-                        <datalist id="storeListOption">
-                          <option *ngFor="let store of stores" [value]="store.localization"></option>
-                        </datalist>
-                      </div>
-                      <div *ngIf="form['idStore'].invalid && (form['idStore'].dirty || form['idStore'].touched)"
-                           class="mb-2"  style="color: #f65656; font-style: italic;">
-
-                        <div *ngIf="form['idStore'].errors?.['required']" class="ml-3">
-                          le magasin est obligatoire.
-                        </div>
-<!--                        <div *ngIf="form['idStore'].errors?.['pattern']" class="ml-3">-->
-<!--                          Le magasin est un nombre-->
+<!--                        <div *ngIf="form['pinCode'].errors?.['required']" class="ml-3">-->
+<!--                          le code pin est obligatoire.-->
 <!--                        </div>-->
-                      </div>
-                    </div>
+<!--                        <div *ngIf="form['pinCode'].errors?.['pattern']" class="ml-3">-->
+<!--                          Le code pin est un nombre-->
+<!--                        </div>-->
+<!--                      </div>-->
+<!--                    </div>-->
+<!--                    <div class="col-md-12">-->
+<!--                      <div class="position-relative form-group">-->
+<!--&lt;!&ndash;                        <input id="idStore" placeholder="Magasin" type="text" name="idStore" class="form-control form-control-sm"  formControlName="idStore">&ndash;&gt;-->
+<!--                        <input type="text" autocomplete="off" id="clientref" class="form-control" formControlName="idStore" placeholder="choisir un magasin" list="storeListOption">-->
+<!--                        <datalist id="storeListOption">-->
+<!--                          <option *ngFor="let store of stores" [value]="store.localization"></option>-->
+<!--                        </datalist>-->
+<!--                      </div>-->
+<!--                      <div *ngIf="form['idStore'].invalid && (form['idStore'].dirty || form['idStore'].touched)"-->
+<!--                           class="mb-2"  style="color: #f65656; font-style: italic;">-->
+
+<!--                        <div *ngIf="form['idStore'].errors?.['required']" class="ml-3">-->
+<!--                          le magasin est obligatoire.-->
+<!--                        </div>-->
+<!--&lt;!&ndash;                        <div *ngIf="form['idStore'].errors?.['pattern']" class="ml-3">&ndash;&gt;-->
+<!--&lt;!&ndash;                          Le magasin est un nombre&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--                      </div>-->
+<!--                    </div>-->
 <!--                    <div class="col-md-12">-->
 <!--                      <div class="position-relative form-group">-->
 <!--                        <input  id="username" placeholder="Nom d'utilisateur" type="text" class="form-control form-control-sm" formControlName="username"></div>-->
@@ -149,20 +149,20 @@
                         </div>
                       </div>
                     </div>
-                    <div class="col-md-12">
-                      <div class="position-relative form-group">
-                        <input  id="position" placeholder="Poste occupé" type="text" class="form-control form-control-sm" formControlName="position"></div>
-                      <div *ngIf="form['position'].invalid && (form['position'].dirty || form['position'].touched)"
-                           class=""  style="color: #f65656; font-style: italic;">
+<!--                    <div class="col-md-12">-->
+<!--                      <div class="position-relative form-group">-->
+<!--                        <input  id="position" placeholder="Poste occupé" type="text" class="form-control form-control-sm" formControlName="position"></div>-->
+<!--                      <div *ngIf="form['position'].invalid && (form['position'].dirty || form['position'].touched)"-->
+<!--                           class=""  style="color: #f65656; font-style: italic;">-->
 
-                        <div *ngIf="form['position'].errors?.['required']" class="ml-3">
-                          le nom est obligatoire.
-                        </div>
-                        <div *ngIf="form['position'].errors?.['minlength']" class="ml-3">
-                          le nom doit comporter au moins 4 caractères..
-                        </div>
-                      </div>
-                    </div>
+<!--                        <div *ngIf="form['position'].errors?.['required']" class="ml-3">-->
+<!--                          le nom est obligatoire.-->
+<!--                        </div>-->
+<!--                        <div *ngIf="form['position'].errors?.['minlength']" class="ml-3">-->
+<!--                          le nom doit comporter au moins 4 caractères..-->
+<!--                        </div>-->
+<!--                      </div>-->
+<!--                    </div>-->
                   </div>
                 </form>
 <!--                <ng-container *ngIf="(appState$ | async) as appState" [ngSwitch]="appState.dataState">-->

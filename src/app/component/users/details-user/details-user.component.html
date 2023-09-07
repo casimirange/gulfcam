@@ -31,7 +31,7 @@
       <div class="col-md-6">
         <div class="main-card mb-3 card">
           <div class="card-body">
-            <h5 class="card-title">Référence Interne: {{user.internalReference}}</h5>
+            <h5 class="card-title">Référence Interne: </h5>
             <div class="row">
               <div class="col-md-6">
                 <div
@@ -91,7 +91,7 @@
 </span>
                       <div class="vertical-timeline-element-content bounce-in">
                         <h4 class="timeline-title">Code pin</h4>
-                        <p>{{user.pinCode}}
+                        <p>
                         </p>
                       </div>
                     </div>
@@ -108,7 +108,7 @@
 </span>
                       <div class="vertical-timeline-element-content bounce-in">
                         <h4 class="timeline-title">Fonction</h4>
-                        <p>{{user.position}}
+                        <p>
                         </p>
                       </div>
                     </div>
@@ -120,7 +120,7 @@
                       </span>
                       <div class="vertical-timeline-element-content bounce-in">
                         <h4 class="timeline-title">Type de compte</h4>
-                        <p>{{getStatusAccount(typeAccount)}}</p>
+                        <p>{{typeAccount}}</p>
                       </div>
                     </div>
                   </div>
@@ -131,7 +131,7 @@
 </span>
                       <div class="vertical-timeline-element-content bounce-in">
                         <h4 class="timeline-title">Statut</h4>
-                        <p>{{getStatus(statusUser)}}
+                        <p>{{statusUser}}
                         </p>
                       </div>
                     </div>
@@ -208,60 +208,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="col-md-6">
-                  <div class="position-relative form-group">
-                    <label>Code pin</label>
-                    <input id="pinCode" placeholder="Code pin" type="text" name="pinCode"
-                           class="form-control form-control-sm"
-                           formControlName="pinCode" [(ngModel)]="user.pinCode">
-                  </div>
-                  <div *ngIf="form['pinCode'].invalid && (form['pinCode'].dirty || form['pinCode'].touched)"
-                       class="mb-2" style="color: #f65656; font-style: italic;">
 
-                    <div *ngIf="form['pinCode'].errors?.['required']" class="ml-3">
-                      le code pin est obligatoire.
-                    </div>
-                    <div *ngIf="form['pinCode'].errors?.['pattern']" class="ml-3">
-                      Le code pin est un nombre
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="position-relative form-group">
-                    <!--                        <input id="idStore" placeholder="Magasin" type="text" name="idStore" class="form-control form-control-sm"  formControlName="idStore">-->
-                    <!--                    <input type="text" id="clientref" class="form-control" formControlName="idStore" placeholder="choisir un magasin" -->
-                    <!--                           list="storeListOption"  [(ngModel)]="user.idStore">-->
-                    <label>Magasin</label>
-                    <select [(ngModel)]="user.idStore" formControlName="idStore" class="form-control form-control-sm">
-                      <option *ngFor="let store of stores" [value]="user.idStore">{{store.localization}}</option>
-                    </select>
-                  </div>
-                  <div *ngIf="form['idStore'].invalid && (form['idStore'].dirty || form['idStore'].touched)"
-                       class="mb-2" style="color: #f65656; font-style: italic;">
-
-                    <div *ngIf="form['idStore'].errors?.['required']" class="ml-3">
-                      le magasin est obligatoire.
-                    </div>
-                    <!--                        <div *ngIf="form['idStore'].errors?.['pattern']" class="ml-3">-->
-                    <!--                          Le magasin est un nombre-->
-                    <!--                        </div>-->
-                  </div>
-                </div>
-                <!--                <div class="col-md-12">-->
-                <!--                  <div class="position-relative form-group">-->
-                <!--                    <input  id="examplePassword" name="pwd" placeholder="Mot de passe" type="password" class="form-control form-control-sm"-->
-                <!--                            [(ngModel)]="user.email" formControlName="password"></div>-->
-                <!--                  <div *ngIf="form['password'].invalid && (form['password'].dirty || form['password'].touched)"-->
-                <!--                       class=""  style="color: #f65656; font-style: italic;">-->
-
-                <!--                    <div *ngIf="form['password'].errors?.['required']" class="ml-3">-->
-                <!--                      le mot de passe est obligatoire.-->
-                <!--                    </div>-->
-                <!--                    <div *ngIf="form['password'].errors?.['pattern']" class="ml-3">-->
-                <!--                      au moins 8 caractères avec 1 minuscule, 1 majuscule et 1 caractère spécial-->
-                <!--                    </div>-->
-                <!--                  </div>-->
-                <!--                </div>-->
                 <div class="col-md-6">
                   <div class="position-relative form-group">
                     <label>Nom</label>
@@ -293,22 +240,6 @@
                     </div>
                     <div *ngIf="form['lastName'].errors?.['minlength']" class="ml-3">
                       le prénom doit comporter au moins 4 caractères..
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="position-relative form-group">
-                    <label>Poste</label>
-                    <input id="position" placeholder="Poste occupé" type="text" class="form-control form-control-sm"
-                           [(ngModel)]="user.position" formControlName="position"></div>
-                  <div *ngIf="form['position'].invalid && (form['position'].dirty || form['position'].touched)"
-                       class="" style="color: #f65656; font-style: italic;">
-
-                    <div *ngIf="form['position'].errors?.['required']" class="ml-3">
-                      le nom est obligatoire.
-                    </div>
-                    <div *ngIf="form['position'].errors?.['minlength']" class="ml-3">
-                      le nom doit comporter au moins 4 caractères..
                     </div>
                   </div>
                 </div>

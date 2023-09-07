@@ -3,7 +3,7 @@ import {Status} from "./status";
 export class ICredentialsSignup{
   email?: string;
   telephone?: string;
-  pinCode?: number;
+  montant?: number;
   idStore?: number;
   // username?: string,
   password?: string;
@@ -17,15 +17,12 @@ export class ICredentialsSignup{
 export class ISignup{
   userId: number;
   internalReference: number;
-  pinCode: number;
   email: string;
   username: string;
-  nameStore: string;
   telephone: string;
+  montant: number;
   lastName: string;
   firstName: string;
-  position: string;
-  idStore?: number;
   typeAccount: TypeAccount;
   roles: IRole[];
   status: Status;

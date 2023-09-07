@@ -1,0 +1,861 @@
+<ng-container *ngIf="(appState$ | async) as appState" [ngSwitch]="appState.dataState">
+  <ng-container class="bg-white" *ngSwitchCase="DataState.LOADING_STATE">
+    <div class="col-md-12 text-center my-3">
+      <div class="ball-clip-rotate">
+        <div style="background-color: rgb(68, 64, 84);"></div>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-container *ngSwitchCase="DataState.LOADED_STATE">
+    <div class="app-page-title">
+      <div class="page-title-wrapper">
+        <div class="page-title-heading">
+          <div>
+            <div class="page-title-head center-elem">
+              <span class="d-inline-block pr-2">
+              <i class="lnr-calendar-full icon-gradient bg-danger"></i> Séance du
+              </span>
+              <span class="d-inline-block">{{appState.appData.date | date: 'dd-MM-yyyy'}}</span>
+            </div>
+            <div class="page-title-subheading opacity-10">
+              <nav class="" aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                  <li class="breadcrumb-item">
+                    <a>
+                      <i aria-hidden="true" class="lnr-user"></i> Tenue chez: &nbsp; {{appState.appData.users.firstName}}
+                    </a>
+                  </li>
+                  <li class="active breadcrumb-item" aria-current="page">
+                    <a>
+                      <i class="fa fa-phone"></i>&nbsp;Session de {{appState.appData.session.name}}
+                    </a>
+                  </li>
+                  <li class="active breadcrumb-item" aria-current="page">
+                    <a>
+                      <i class="fa fa-star"></i>&nbsp;Statut : <span [ngClass]="statutSeance === 'TERMINEE' ? 'text-danger' : 'text-sucsess'"> {{appState.appData.status.name}}</span>
+                    </a>
+                  </li>
+                </ol>
+              </nav>
+            </div>
+          </div>
+        </div>
+        <div class="page-title-actions">
+          <button *ngIf="appState.appData.status.name != 'TERMINEE'" class="btn btn-alternate mr-3" data-toggle="tooltip" data-placement="left" title="nouveau bénéficiaire"  (click)="open(benef)">+ Bénéficiare</button>
+          <button *ngIf="appState.appData.status.name != 'TERMINEE'" class="btn btn-alternate mr-3" data-toggle="tooltip" data-placement="left" title="terminer la séance"
+                  [disabled]="(isLoading$ | async)"
+                  (click)="endSeance()">Clôturer la séance</button>
+          <button class="btn btn-secondary mr-3" data-toggle="tooltip" data-placement="left" title="Retourner à la page précédente" (click)="back()">Retour</button>
+        </div>
+      </div>
+    </div>
+
+
+  </ng-container>
+  <ng-container class="bg-white"  *ngSwitchCase="DataState.ERROR_STATE">
+    <div class="col-md-12 text-center">
+      <div class="text-danger" >{{appState.error}}</div>
+    </div>
+  </ng-container>
+</ng-container>
+
+<div  *ngIf="(benef$ | async) as benefState" [ngSwitch]="benefState.dataState">
+  <div *ngSwitchCase="DataState.LOADING_STATE">
+    <div class="ball-clip-rotate">
+      <div style="background-color: #FFFFFF;"></div>
+    </div>
+  </div>
+  <div *ngSwitchCase="DataState.LOADED_STATE">
+    <div class="mbg-3 alert alert-success alert-dismissible fade show" role="alert" *ngIf="benefState.appData.totalElements > 0">
+      <div *ngFor="let benef of benefState.appData.content">
+        <span class="pr-2">
+        <i class="fa fa-user-circle"></i>
+        </span>
+        Bénéficiaire de le séance: {{benef.user.firstName | titlecase}}
+
+        <div class="pull-right">montant: {{benef.montant}} €</div>
+      </div>
+
+  </div>
+  </div>
+</div>
+
+
+<!--<ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">-->
+<!--  <li class="nav-item">-->
+<!--    <a role="tab" class="nav-link active" routerLink="">-->
+<!--      <span>Cotisations</span>-->
+<!--    </a>-->
+<!--  </li>-->
+<!--  <li class="nav-item">-->
+<!--    <a role="tab" class="nav-link" href="dashboards-crm-variation.html">-->
+<!--      <span>Disciplines</span>-->
+<!--    </a>-->
+<!--  </li>-->
+<!--  <li class="nav-item">-->
+<!--    <a role="tab" class="nav-link" href="dashboards-crm-variation.html">-->
+<!--      <span>Amandes</span>-->
+<!--    </a>-->
+<!--  </li>-->
+<!--  <li class="nav-item">-->
+<!--    <a role="tab" class="nav-link" href="dashboards-crm-variation.html">-->
+<!--      <span>Prêts</span>-->
+<!--    </a>-->
+<!--  </li>-->
+<!--</ul>-->
+
+<div class="row">
+  <div class="col-md-6 col-xl-4" *ngIf="(soldeState$ | async) as soldeState" [ngSwitch]="soldeState.dataState">
+    <div class="card mb-3 widget-content bg-night-fade">
+      <div *ngSwitchCase="DataState.LOADING_STATE">
+        <div class="ball-clip-rotate">
+          <div style="background-color: #FFFFFF;"></div>
+        </div>
+      </div>
+      <div class="widget-content-wrapper text-white"  *ngSwitchCase="DataState.LOADED_STATE">
+        <div class="widget-content-left">
+          <div class="widget-heading">Solde Mangwa</div>
+          <div class="widget-subheading">Montant de la caisse mangwa</div>
+        </div>
+        <div class="widget-content-right">
+          <div class="widget-numbers text-white"><span>{{soldeState.appData}} €</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6 col-xl-4"  *ngIf="(soldeTontine$ | async) as soldeState" [ngSwitch]="soldeState.dataState">
+    <div class="card mb-3 widget-content bg-arielle-smile">
+      <div *ngSwitchCase="DataState.LOADING_STATE">
+        <div class="ball-clip-rotate">
+          <div style="background-color: #FFFFFF;"></div>
+        </div>
+      </div>
+      <div class="widget-content-wrapper text-white">
+        <div class="widget-content-left">
+          <div class="widget-heading">Solde Tontine</div>
+          <div class="widget-subheading">Montant de la caisse tontine</div>
+        </div>
+        <div class="widget-content-right">
+          <div class="widget-numbers text-white"><span>{{soldeState.appData}} €</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6 col-xl-4" *ngIf="(soldeTontine$ | async) && (soldeState$ | async)">
+    <div class="card mb-3 widget-content bg-happy-green">
+      <div class="widget-content-wrapper text-white">
+        <div class="widget-content-left">
+          <div class="widget-heading">Solde Caisse</div>
+          <div class="widget-subheading">Montant total en caisse</div>
+        </div>
+        <div class="widget-content-right">
+          <div class="widget-numbers text-white"><span>{{sm + st}} €</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="d-xl-none d-lg-block col-md-6 col-xl-4">
+    <div class="card mb-3 widget-content bg-premium-dark">
+      <div class="widget-content-wrapper text-white">
+        <div class="widget-content-left">
+          <div class="widget-heading">Products Sold</div>
+          <div class="widget-subheading">Revenue streams</div>
+        </div>
+        <div class="widget-content-right">
+          <div class="widget-numbers text-warning"><span>$14M</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="main-card mb-3 card " id="htmlData">
+      <div class="card-header">
+        Liste des cotisations
+        <div class="btn-actions-pane-right">
+          <div  class="btn-sm">
+            <button *ngIf="statutSeance != 'TERMINEE'" class="btn btn-primary mr-3" data-toggle="tooltip" data-placement="left" title="nouvelles cotisations" (click)="open(cotisation)">Cotisations</button>
+<!--            <input type="date" placeholder="Rechercher date" [(ngModel)]="date" class="form-control form-control-sm mr-3">-->
+<!--            <input type="text" placeholder="Rechercher ref commande" [(ngModel)]="internalRef" class="form-control form-control-sm mr-3">-->
+          </div>
+        </div>
+      </div>
+      <ng-container *ngIf="(cotisation$ | async) as cotisation" [ngSwitch]="cotisation.dataState">
+        <ng-container *ngSwitchCase="DataState.LOADING_STATE">
+          <div class="col-md-12 text-center my-3">
+            <div class="ball-clip-rotate">
+              <div style="background-color: rgb(68, 64, 84);"></div>
+            </div>
+          </div>
+        </ng-container>
+        <ng-container *ngSwitchCase="DataState.LOADED_STATE">
+          <div class="table-responsive" >
+            <table class="align-middle mb-0 table table-sm table-borderless table-hover" id="element-pannes">
+              <thead>
+              <tr>
+                <th class="">Ref#</th>
+                <th class="">Membre</th>
+                <th class="">Montant</th>
+                <th class="">Description</th>
+                <th class="">Transaction</th>
+                <th class="">Date de création</th>
+                <th class="">Action</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr *ngFor="let cotisation of cotisation.appData.content | paginate: { id: 'cotisation', itemsPerPage: size, currentPage: page, totalItems: cotisation.appData.totalElements}; let i = index">
+                <td class="text-left">{{i + 1}}</td>
+                <td class="text-left">{{cotisation.user.firstName | titlecase}}</td>
+                <td class="text-left" >{{cotisation.montant }} €</td>
+                <td class="text-left" >{{cotisation.description }}</td>
+                <td class="text-left badge-alternate" >{{cotisation.typeTransaction.name }}</td>
+                <td class="text-left" >{{cotisation.createdAt | date: 'dd/MM/yyyy à hh:mm'}}</td>
+                <td class="text-left" >  </td>
+              </tr>
+
+              </tbody>
+
+            </table>
+            <div class="text-center">
+              <p *ngIf="cotisation.appData.content.length == 0" style="color: grey; font-size: 1.8rem;" class="mx-auto" >Aucune cotisation trouvée !</p>
+            </div>
+            <div class="card-footer">
+              <div class="btn-actions-pane-left">
+                <div role="group" class="btn-group-sm btn-group">
+                  Total : &nbsp;<b>{{ cotisation.appData.totalElements }} </b>
+                </div>
+              </div>
+              <div class="btn-actions-pane-right">
+                <div role="group" class="btn-group-sm btn-group">
+                  <pagination-controls
+                    id="cotisation"
+                    previousLabel="Précédent"
+                    nextLabel="Suivant"
+                    (pageChange)="pageChange($event)"></pagination-controls>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+        <ng-container class="bg-white"  *ngSwitchCase="DataState.ERROR_STATE">
+          <div class="col-md-12 text-center">
+            <div class="text-danger" >{{cotisation.error}}</div>
+          </div>
+        </ng-container>
+      </ng-container>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-6">
+    <div class="main-card mb-3 card " id="htmlData">
+      <div class="card-header">
+        Liste des amandes
+        <div class="btn-actions-pane-right">
+          <div  class="btn-sm">
+            <button *ngIf="statutSeance != 'TERMINEE'" class="btn btn-primary mr-3" data-toggle="tooltip" data-placement="left" title="nouvelle amande"  (click)="open(amande)">+ Amande</button>
+<!--            <input type="date" placeholder="Rechercher date" [(ngModel)]="date" class="form-control form-control-sm mr-3">-->
+<!--            <input type="text" placeholder="Rechercher ref commande" [(ngModel)]="internalRef" class="form-control form-control-sm mr-3">-->
+          </div>
+        </div>
+      </div>
+      <ng-container *ngIf="(amande$ | async) as amande" [ngSwitch]="amande.dataState">
+        <ng-container *ngSwitchCase="DataState.LOADING_STATE">
+          <div class="col-md-12 text-center my-3">
+            <div class="ball-clip-rotate">
+              <div style="background-color: rgb(68, 64, 84);"></div>
+            </div>
+          </div>
+        </ng-container>
+        <ng-container *ngSwitchCase="DataState.LOADED_STATE">
+          <div class="table-responsive" >
+            <table class="align-middle mb-0 table table-sm table-borderless table-hover" id="element-pannes">
+              <thead>
+              <tr>
+                <th class="">Ref#</th>
+                <th class="">Membre</th>
+                <th class="">Montant</th>
+                <th class="">Description</th>
+                <th class="">Transaction</th>
+                <th class="">Date de création</th>
+                <th class="">Action</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr *ngFor="let amande of amande.appData.content | paginate: { id: 'amande', itemsPerPage: size, currentPage: page, totalItems: amande.appData.totalElements}; let i = index">
+                <td class="text-left">{{i + 1}}</td>
+                <td class="text-left">{{amande.user.firstName | titlecase}}</td>
+                <td class="text-left" >{{amande.montant }} €</td>
+                <td class="text-left" >{{amande.motif }}</td>
+                <td class="text-left" >{{amande.typeTransaction.name }}</td>
+                <td class="text-left" >{{amande.createdAt | date: 'dd/MM/yyyy à hh:mm'}}</td>
+                <td class="text-left" >  </td>
+              </tr>
+
+              </tbody>
+
+            </table>
+            <div class="text-center">
+              <p *ngIf="amande.appData.content.length == 0" style="color: grey; font-size: 1.8rem;" class="mx-auto" >Aucune amande trouvée !</p>
+            </div>
+            <div class="card-footer">
+              <div class="btn-actions-pane-left">
+                <div role="group" class="btn-group-sm btn-group">
+                  Total : &nbsp;<b>{{ amande.appData.totalElements }} </b>
+                </div>
+              </div>
+              <div class="btn-actions-pane-right">
+                <div role="group" class="btn-group-sm btn-group">
+                  <pagination-controls
+                    id="amande"
+                    previousLabel="Précédent"
+                    nextLabel="Suivant"
+                    (pageChange)="pageChangeAmande($event)"></pagination-controls>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+        <ng-container class="bg-white"  *ngSwitchCase="DataState.ERROR_STATE">
+          <div class="col-md-12 text-center">
+            <div class="text-danger" >{{amande.error}}</div>
+          </div>
+        </ng-container>
+      </ng-container>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="main-card mb-3 card " id="htmlData">
+      <div class="card-header">
+        Liste de Sanctions
+        <div class="btn-actions-pane-right">
+          <div  class="btn-sm">
+            <button *ngIf="statutSeance != 'TERMINEE'" class="btn btn-primary mr-3" data-toggle="tooltip" data-placement="left" title="nouvelle discipline"  (click)="open(discipline)">+ discipline</button>
+          </div>
+        </div>
+      </div>
+      <ng-container *ngIf="(discipline$ | async) as discipline" [ngSwitch]="discipline.dataState">
+        <ng-container *ngSwitchCase="DataState.LOADING_STATE">
+          <div class="col-md-12 text-center my-3">
+            <div class="ball-clip-rotate">
+              <div style="background-color: rgb(68, 64, 84);"></div>
+            </div>
+          </div>
+        </ng-container>
+        <ng-container *ngSwitchCase="DataState.LOADED_STATE">
+          <div class="table-responsive" >
+            <table class="align-middle mb-0 table table-sm table-borderless table-hover" id="element-pannes">
+              <thead>
+              <tr>
+                <th class="">Ref#</th>
+                <th class="">Membre</th>
+                <th class="">Sanction</th>
+                <th class="">Type</th>
+                <th class="">Date de création</th>
+                <th class="">Action</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr *ngFor="let discipline of discipline.appData.content | paginate: { id: 'discipline', itemsPerPage: size, currentPage: page, totalItems: discipline.appData.totalElements}; let i = index">
+                <td class="text-left">{{i + 1}}</td>
+                <td class="text-left">{{discipline.user.firstName | titlecase}}</td>
+                <td class="text-left" >{{discipline.sanction }}</td>
+                <td class="text-left" >{{discipline.typeDiscipline.name}}</td>
+                <td class="text-left" >{{discipline.createdAt | date: 'dd/MM/yyyy à hh:mm'}}</td>
+<!--                <td class="text-left" >  </td>-->
+                <td class="text-left" >  </td>
+              </tr>
+
+              </tbody>
+
+            </table>
+            <div class="text-center">
+              <p *ngIf="discipline.appData.content.length == 0" style="color: grey; font-size: 1.8rem;" class="mx-auto" >Aucune discipline trouvée !</p>
+            </div>
+            <div class="card-footer">
+              <div class="btn-actions-pane-left">
+                <div role="group" class="btn-group-sm btn-group">
+                  Total : &nbsp;<b>{{ discipline.appData.totalElements }} </b>
+                </div>
+              </div>
+              <div class="btn-actions-pane-right">
+                <div role="group" class="btn-group-sm btn-group">
+                  <pagination-controls
+                    id="discipline"
+                    previousLabel="Précédent"
+                    nextLabel="Suivant"
+                    (pageChange)="pageChangeDiscipline($event)"></pagination-controls>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+        <ng-container class="bg-white"  *ngSwitchCase="DataState.ERROR_STATE">
+          <div class="col-md-12 text-center">
+            <div class="text-danger" >{{discipline.error}}</div>
+          </div>
+        </ng-container>
+      </ng-container>
+    </div>
+  </div>
+  <div class="col-md-12">
+    <div class="main-card mb-3 card " id="htmlData">
+      <div class="card-header">
+        Liste de prêts
+        <div class="btn-actions-pane-right">
+          <div  class="btn-sm">
+            <button *ngIf="statutSeance != 'TERMINEE'" class="btn btn-primary mr-3" data-toggle="tooltip" data-placement="left" title="nouvelle discipline"  (click)="open(pret)">+ Prêt</button>
+          </div>
+        </div>
+      </div>
+      <ng-container *ngIf="(pret$ | async) as pret" [ngSwitch]="pret.dataState">
+        <ng-container *ngSwitchCase="DataState.LOADING_STATE">
+          <div class="col-md-12 text-center my-3">
+            <div class="ball-clip-rotate">
+              <div style="background-color: rgb(68, 64, 84);"></div>
+            </div>
+          </div>
+        </ng-container>
+        <ng-container *ngSwitchCase="DataState.LOADED_STATE">
+          <div class="table-responsive" >
+            <table class="align-middle mb-0 table table-sm table-borderless table-hover" id="element-pannes">
+              <thead>
+              <tr>
+                <th class="">Ref#</th>
+                <th>Membre</th>
+                <th>Montant Preté</th>
+                <th>Montant Remboursé</th>
+                <th>Date de Remboursement</th>
+                <th>Type de transaction</th>
+                <th>Statut</th>
+                <th>Date de création</th>
+                <th>Date de modification</th>
+                <th class="text-center">Action</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr *ngFor="let pret of pret.appData.content | paginate: { id: 'pret', itemsPerPage: size, currentPage: page, totalItems: pret.appData.totalElements}; let i = index">
+                <td class="text-left">{{i + 1}}</td>
+                <td>{{pret.user.firstName | titlecase}}</td>
+                <td>{{pret.montant_prete}}&nbsp;€</td>
+                <td>{{pret.montant_rembourse}}&nbsp;€</td>
+                <td>{{pret.dateRemboursement | date: 'dd-MM-yyyy'}}</td>
+                <td>{{pret.typeTransaction.name}}</td>
+                <td>{{pret.statutPret?.name}}</td>
+                <td>{{pret.createdAt | date: 'dd-MM-yyyy à HH:mm'}}</td>
+                <td>{{pret.updatedAt | date: 'dd-MM-yyyy à HH:mm'}}</td>
+                <td>
+                  <button class="btn btn-sm btn-secondary mr-2" data-toggle="tooltip" title="détails de la séance">
+                    <i class="pe-7s-pen"></i>
+                    modifier
+                  </button>
+                  <button class="btn btn-sm btn-primary mr-2"
+                          *ngIf="pret.typeTransaction.name === 'PRET'" data-toggle="tooltip" title="rembourser le prêt">
+                    <i class="pe-7s-note"></i>
+                    rembourser
+                  </button>
+                  <button class="btn btn-sm btn-danger mr-2"
+                          data-toggle="tooltip" title="supprimer le prêt">
+                    <i class="pe-7s-trash"></i>
+                    supprimer
+                  </button>
+                </td>
+              </tr>
+
+              </tbody>
+
+            </table>
+            <div class="text-center">
+              <p *ngIf="pret.appData.content.length == 0" style="color: grey; font-size: 1.8rem;" class="mx-auto" >Aucun prêt trouvé !</p>
+            </div>
+            <div class="card-footer">
+              <div class="btn-actions-pane-left">
+                <div role="group" class="btn-group-sm btn-group">
+                  Total : &nbsp;<b>{{ pret.appData.totalElements }} </b>
+                </div>
+              </div>
+              <div class="btn-actions-pane-right">
+                <div role="group" class="btn-group-sm btn-group">
+                  <pagination-controls
+                    id="pret"
+                    previousLabel="Précédent"
+                    nextLabel="Suivant"
+                    (pageChange)="pageChangePret($event)"></pagination-controls>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+        <ng-container class="bg-white"  *ngSwitchCase="DataState.ERROR_STATE">
+          <div class="col-md-12 text-center">
+            <div class="text-danger" >{{pret.error}}</div>
+          </div>
+        </ng-container>
+      </ng-container>
+    </div>
+  </div>
+</div>
+
+
+
+<ng-template #cotisation let-modal>
+  <div class="modal-header">
+    <h6 class="modal-title timeline-title" id="modal-basic-title"><b>Nouvelle Cotisation</b></h6>
+    <div class="close vertical-timeline-element-content bounce-in" (click)=" modal.close('save click')">
+      <p><i class="fa fa-times"></i></p>
+    </div>
+  </div>
+  <div class="modal-body">
+    <div class="">
+      <div class="">
+          <div class="position-relative form-group">
+            Procéder à la cotisation de tous les membres de la réunion
+          </div>
+          <button class="mt-1 btn btn-primary float-right"
+                  [disabled]="isCotise$ | async" (click)="createCotisation()">
+            <i *ngIf="isCotise$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
+            <span *ngIf="isCotise$ | async">Cotisation ...</span>
+            <span
+              *ngIf="!(isCotise$ | async)">Cotiser</span>
+          </button>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+
+
+<ng-template #amande let-modal>
+  <div class="modal-header">
+    <h6 class="modal-title timeline-title" id="modal-basic-title"><b>Nouvelle Amande</b></h6>
+    <div class="close vertical-timeline-element-content bounce-in" (click)=" modal.close('save click')">
+      <p><i class="fa fa-times"></i></p>
+    </div>
+  </div>
+  <div class="modal-body">
+    <div class="">
+      <div class="">
+        <form [formGroup]="amandeForm">
+
+          <div class="position-relative form-group">
+            <label for="montant" class="">Montant</label>
+            <input type="text" id="montant" formControlName="montant" class="form-control" placeholder="montant de la transaction">
+          </div>
+          <div
+            *ngIf="amandeForm.controls['montant'].invalid && (amandeForm.controls['montant'].dirty || amandeForm.controls['montant'].touched)"
+            class="mb-2" style="color: #f65656; font-style: italic;">
+            <div *ngIf="amandeForm.controls['montant'].errors?.['required']" class="ml-3">
+              le montant de la transaction est requis.
+            </div>
+            <div *ngIf="amandeForm.controls['montant'].errors?.['pattern']" class="ml-3">
+              entrez un montant valide
+            </div>
+            <div *ngIf="amandeForm.controls['montant'].errors?.['min']" class="ml-3">
+              le montat doit être supérieur à 0
+            </div>
+          </div>
+
+          <div class="position-relative form-group">
+            <label for="motif" class="">Motif</label>
+            <input type="text" id="motif" formControlName="motif" class="form-control" placeholder="motif de la transaction">
+          </div>
+          <div
+            *ngIf="amandeForm.controls['motif'].invalid && (amandeForm.controls['motif'].dirty || amandeForm.controls['motif'].touched)"
+            class="mb-2" style="color: #f65656; font-style: italic;">
+            <div *ngIf="amandeForm.controls['motif'].errors?.['required']" class="ml-3">
+              le montif de la transaction est requis.
+            </div>
+            <div *ngIf="amandeForm.controls['motif'].errors?.['minLength']" class="ml-3">
+              au moins 10 caractères requis
+            </div>
+          </div>
+
+          <div class="position-relative form-group">
+            <label for="tb" class="">Membre</label>
+            <select name="select" id="tb" class="form-control" formControlName="idUser">
+              <option value="" selected hidden>Sélectionner un membre</option>
+              <option *ngFor="let user of users.content" [value]="user.userId">{{user.firstName}}</option>
+            </select>
+          </div>
+          <div
+            *ngIf="amandeForm.controls['idUser'].invalid && (amandeForm.controls['idUser'].dirty || amandeForm.controls['idUser'].touched)"
+            class="mb-2" style="color: #f65656; font-style: italic;">
+            <div *ngIf="amandeForm.controls['idUser'].errors?.['required']" class="ml-3">
+              le choix du membre est obligatoire.
+            </div>
+          </div>
+
+          <div class="col-md-12">
+            <div class="position-relative form-group">
+              <div>
+                <div class="custom-checkbox custom-control">
+                  <input type="checkbox" id="exampleCustomCheckbox" class="custom-control-input" formControlName="pay">
+                  <label class="custom-control-label" for="exampleCustomCheckbox">Le membre a-t-il payé l'amande??</label>
+                </div>
+              </div>
+            </div>
+          </div>
+          <button class="mt-1 btn btn-secondary float-right ml-3" (click)="annuler()"><i class="pe-7s-back"></i> Annuler
+          </button>
+          <button class="mt-1 btn btn-primary float-right"
+                  [disabled]="amandeForm.invalid || (isLoading$ | async)" (click)="saveAmande()">
+            <i *ngIf="isLoading$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
+            <span *ngIf="isLoading$ | async">Enregistrement ...</span>
+            <span
+              *ngIf="!(isLoading$ | async)">Enregistrer</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+
+
+<ng-template #pret let-modal>
+  <div class="modal-header">
+    <h6 class="modal-title timeline-title" id="modal-basic-title"><b>Nouveau Prêt</b></h6>
+    <div class="close vertical-timeline-element-content bounce-in" (click)=" modal.close('save click')">
+      <p><i class="fa fa-times"></i></p>
+    </div>
+  </div>
+  <div class="modal-body">
+    <div class="">
+      <div class="">
+        <form [formGroup]="pretForm">
+
+          <div class="position-relative form-group">
+            <label for="montant" class="">Montant à prêter</label>
+            <input type="text" id="montant" formControlName="montant" class="form-control" placeholder="montant de la transaction">
+          </div>
+          <div
+            *ngIf="pretForm.controls['montant'].invalid && (pretForm.controls['montant'].dirty || pretForm.controls['montant'].touched)"
+            class="mb-2" style="color: #f65656; font-style: italic;">
+            <div *ngIf="pretForm.controls['montant'].errors?.['required']" class="ml-3">
+              le montant de la transaction est requis.
+            </div>
+            <div *ngIf="pretForm.controls['montant'].errors?.['pattern']" class="ml-3">
+              entrez un montant valide
+            </div>
+            <div *ngIf="pretForm.controls['montant'].errors?.['min']" class="ml-3">
+              le montat doit être supérieur à 0
+            </div>
+          </div>
+
+          <div class="position-relative form-group">
+            <label for="tb" class="">Membre</label>
+            <select name="select" id="tb" class="form-control" formControlName="idUser">
+              <option value="" selected hidden>Sélectionner un membre</option>
+              <option *ngFor="let user of users.content" [value]="user.userId">{{user.firstName}}</option>
+            </select>
+          </div>
+          <div
+            *ngIf="pretForm.controls['idUser'].invalid && (pretForm.controls['idUser'].dirty || pretForm.controls['idUser'].touched)"
+            class="mb-2" style="color: #f65656; font-style: italic;">
+            <div *ngIf="pretForm.controls['idUser'].errors?.['required']" class="ml-3">
+              le choix du membre est obligatoire.
+            </div>
+          </div>
+
+          <button class="mt-1 btn btn-secondary float-right ml-3" (click)="annuler()"><i class="pe-7s-back"></i> Annuler
+          </button>
+          <button class="mt-1 btn btn-primary float-right"
+                  [disabled]="pretForm.invalid || (isLoading$ | async)" (click)="savePret()">
+            <i *ngIf="isLoading$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
+            <span *ngIf="isLoading$ | async">Enregistrement ...</span>
+            <span
+              *ngIf="!(isLoading$ | async)">Enregistrer</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+
+
+<ng-template #rembourserpret let-modal>
+  <div class="modal-header">
+    <h6 class="modal-title timeline-title" id="modal-basic-title"><b>Rembourser Prêt</b></h6>
+    <div class="close vertical-timeline-element-content bounce-in" (click)=" modal.close('save click')">
+      <p><i class="fa fa-times"></i></p>
+    </div>
+  </div>
+  <div class="modal-body">
+    <div class="">
+      <div class="">
+        <form [formGroup]="pretForm">
+
+          <div class="position-relative form-group">
+            <label for="montant" class="">Montant à rembourser</label>
+            <input type="text" id="montant" formControlName="montant" class="form-control" placeholder="montant de la transaction">
+          </div>
+          <div
+            *ngIf="pretForm.controls['montant'].invalid && (pretForm.controls['montant'].dirty || pretForm.controls['montant'].touched)"
+            class="mb-2" style="color: #f65656; font-style: italic;">
+            <div *ngIf="pretForm.controls['montant'].errors?.['required']" class="ml-3">
+              le montant de la transaction est requis.
+            </div>
+            <div *ngIf="pretForm.controls['montant'].errors?.['pattern']" class="ml-3">
+              entrez un montant valide
+            </div>
+            <div *ngIf="pretForm.controls['montant'].errors?.['min']" class="ml-3">
+              le montat doit être supérieur à 0
+            </div>
+          </div>
+
+          <div class="position-relative form-group">
+            <label for="tb" class="">Membre</label>
+            <select name="select" id="tb" class="form-control" formControlName="idUser">
+              <option value="" selected hidden>Sélectionner un membre</option>
+              <option *ngFor="let user of users.content" [value]="user.userId">{{user.firstName}}</option>
+            </select>
+          </div>
+          <div
+            *ngIf="pretForm.controls['idUser'].invalid && (pretForm.controls['idUser'].dirty || pretForm.controls['idUser'].touched)"
+            class="mb-2" style="color: #f65656; font-style: italic;">
+            <div *ngIf="pretForm.controls['idUser'].errors?.['required']" class="ml-3">
+              le choix du membre est obligatoire.
+            </div>
+          </div>
+
+          <button class="mt-1 btn btn-secondary float-right ml-3" (click)="annuler()"><i class="pe-7s-back"></i> Annuler
+          </button>
+          <button class="mt-1 btn btn-primary float-right"
+                  [disabled]="pretForm.invalid || (isLoading$ | async)" (click)="savePret()">
+            <i *ngIf="isLoading$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
+            <span *ngIf="isLoading$ | async">Enregistrement ...</span>
+            <span
+              *ngIf="!(isLoading$ | async)">Enregistrer</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+
+
+<ng-template #discipline let-modal>
+  <div class="modal-header">
+    <h6 class="modal-title timeline-title" id="modal-basic-title"><b>Nouvelle Discipline</b></h6>
+    <div class="close vertical-timeline-element-content bounce-in" (click)=" modal.close('save click')">
+      <p><i class="fa fa-times"></i></p>
+    </div>
+  </div>
+  <div class="modal-body">
+    <div class="">
+      <div class="">
+        <form [formGroup]="disciplineForm">
+
+          <div class="position-relative form-group">
+            <label for="tb" class="">Membre</label>
+            <select name="select" id="tb" class="form-control" formControlName="idUser">
+              <option value="" selected hidden>Sélectionner un membre</option>
+              <option *ngFor="let user of users.content" [value]="user.userId">{{user.firstName}}</option>
+            </select>
+          </div>
+          <div
+            *ngIf="disciplineForm.controls['idUser'].invalid && (disciplineForm.controls['idUser'].dirty || disciplineForm.controls['idUser'].touched)"
+            class="mb-2" style="color: #f65656; font-style: italic;">
+            <div *ngIf="disciplineForm.controls['idUser'].errors?.['required']" class="ml-3">
+              le choix du membre est obligatoire.
+            </div>
+          </div>
+
+          <div class="position-relative form-group">
+            <label for="tb" class="">Sanction</label>
+            <select name="select" id="tb" class="form-control" formControlName="sanction">
+              <option value="" selected hidden>Sélectionner une sanction</option>
+              <option value="Absence" >Absence</option>
+              <option value="Retard" >Retard</option>
+              <option value="Trouble" >Trouble</option>
+            </select>
+          </div>
+          <div
+            *ngIf="disciplineForm.controls['sanction'].invalid && (disciplineForm.controls['sanction'].dirty || disciplineForm.controls['sanction'].touched)"
+            class="mb-2" style="color: #f65656; font-style: italic;">
+            <div *ngIf="disciplineForm.controls['sanction'].errors?.['required']" class="ml-3">
+              le choix de la sanction est obligatoire.
+            </div>
+          </div>
+
+          <button class="mt-1 btn btn-secondary float-right ml-3" (click)="annuler()"><i class="pe-7s-back"></i> Annuler
+          </button>
+          <button class="mt-1 btn btn-primary float-right"
+                  [disabled]="disciplineForm.invalid || (isLoading$ | async)" (click)="saveDiscipline()">
+            <i *ngIf="isLoading$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
+            <span *ngIf="isLoading$ | async">Enregistrement ...</span>
+            <span
+              *ngIf="!(isLoading$ | async)">Enregistrer</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+
+<ng-template #benef let-modal>
+  <div class="modal-header">
+    <h6 class="modal-title timeline-title" id="modal-basic-title"><b>Nouveau Bénéficiaire</b></h6>
+    <div class="close vertical-timeline-element-content bounce-in" (click)=" modal.close('save click')">
+      <p><i class="fa fa-times"></i></p>
+    </div>
+  </div>
+  <div class="modal-body">
+    <div class="">
+      <div class="">
+        <form [formGroup]="benefForm">
+          <div class="position-relative form-group">
+            <label for="montant" class="">Montant</label>
+            <input type="text" id="montant" formControlName="montant" class="form-control" placeholder="montant de la transaction">
+          </div>
+          <div
+            *ngIf="benefForm.controls['montant'].invalid && (benefForm.controls['montant'].dirty || benefForm.controls['montant'].touched)"
+            class="mb-2" style="color: #f65656; font-style: italic;">
+            <div *ngIf="benefForm.controls['montant'].errors?.['required']" class="ml-3">
+              le montant de la transaction est requis.
+            </div>
+            <div *ngIf="benefForm.controls['montant'].errors?.['pattern']" class="ml-3">
+              entrez un montant valide
+            </div>
+            <div *ngIf="benefForm.controls['montant'].errors?.['min']" class="ml-3">
+              le montat doit être supérieur à 0
+            </div>
+          </div>
+
+          <div class="position-relative form-group">
+            <label for="tb" class="">Membre</label>
+            <select name="select" id="tb" class="form-control" formControlName="idUser">
+              <option value="" selected hidden>Sélectionner un membre</option>
+              <option *ngFor="let user of users.content" [value]="user.userId">{{user.firstName}}</option>
+            </select>
+          </div>
+          <div
+            *ngIf="benefForm.controls['idUser'].invalid && (benefForm.controls['idUser'].dirty || benefForm.controls['idUser'].touched)"
+            class="mb-2" style="color: #f65656; font-style: italic;">
+            <div *ngIf="benefForm.controls['idUser'].errors?.['required']" class="ml-3">
+              le choix du membre est obligatoire.
+            </div>
+          </div>
+          <button class="mt-1 btn btn-secondary float-right ml-3" (click)="annuler()"><i class="pe-7s-back"></i> Annuler
+          </button>
+          <button class="mt-1 btn btn-primary float-right"
+                  [disabled]="benefForm.invalid || (isLoading$ | async)" (click)="saveBenef()">
+            <i *ngIf="isLoading$ | async" class="fa fa-spinner fa-spin"></i>&nbsp;
+            <span *ngIf="isLoading$ | async">Enregistrement ...</span>
+            <span
+              *ngIf="!(isLoading$ | async)">Enregistrer</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+

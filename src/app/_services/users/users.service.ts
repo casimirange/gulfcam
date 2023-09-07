@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {ICredentials} from "../../_interfaces/credentials";
 import {Observable} from "rxjs";
-import {IToken} from "../../_model/token";
 import {environment} from "../../../environments/environment";
-import {ISignup} from "../../_model/signup";
+import {CustomResponse} from "../../_interfaces/custom-response";
+import {IUser} from "../../_model/user";
 
 @Injectable({
   providedIn: 'root'
@@ -15,6 +14,10 @@ export class UsersService {
 
   getUsers(): Observable<any>{
     return this.http.get<any>(environment.users);
+  }
+
+  getUserss(): Observable<CustomResponse<IUser>>{
+    return this.http.get<CustomResponse<IUser>>(environment.users);
   }
 
   getAllUsersWithPagination(page: number, size: number): Observable<any>{
@@ -31,6 +34,10 @@ export class UsersService {
 
   updateUser(user: any): Observable<any>{
     return this.http.put<any>(environment.users, user);
+  }
+
+  changePassword(userId: number, body: any): Observable<any>{
+    return this.http.put<any>(environment.changePassword + `/${userId}/password-update`, body);
   }
 
 }

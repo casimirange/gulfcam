@@ -1,16 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import {OrderService} from "../../../_services/order/order.service";
 import {NotifsService} from "../../../_services/notifications/notifs.service";
 import {ActivatedRoute} from "@angular/router";
 import {UsersService} from "../../../_services/users/users.service";
 import {ICredentialsSignup, ISignup} from "../../../_model/signup";
-import {StoreService} from "../../../_services/store/store.service";
-import {Store} from "../../../_model/store";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {IToken} from "../../../_model/token";
 import {BehaviorSubject} from "rxjs";
-import {StatusAccountService} from "../../../_services/status/status-account.service";
-import {StatusUserService} from "../../../_services/status/status-user.service";
 import {RoleUserService} from "../../../_services/role/role-user.service";
 
 @Component({
@@ -21,20 +16,17 @@ import {RoleUserService} from "../../../_services/role/role-user.service";
 export class DetailsUserComponent implements OnInit {
 
   user: ISignup = new ISignup();
-  store: Store = new Store();
   typeAccount: string = '';
   statusUser: string = '';
   updateUser: FormGroup ;
   credentials: ICredentialsSignup = new ICredentialsSignup()
   activeUser: boolean
   errorMessage = '';
-  stores: Store[] = [];
   form: any;
   private isLoading = new BehaviorSubject<boolean>(false);
   isLoading$ = this.isLoading.asObservable();
   constructor(private userService: UsersService,  private notifsService: NotifsService, private route: ActivatedRoute,
-              private storeService: StoreService, private fb: FormBuilder, private statusAccountService: StatusAccountService,
-              private statusUserService: StatusUserService, private roleUserService: RoleUserService) {
+              private fb: FormBuilder, private roleUserService: RoleUserService) {
     this.updateUser = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       telephone: ['', [Validators.required, Validators.pattern('^[2,6][0-9]{8}'), Validators.minLength(9), Validators.maxLength(9) ]],
@@ -52,19 +44,6 @@ export class DetailsUserComponent implements OnInit {
 
   ngOnInit(): void {
     this.getUser()
-    this.getStores()
-  }
-
-  getStores(){
-    this.storeService.getStore().subscribe(
-      resp => {
-        console.log(resp)
-        this.stores = resp.content
-      },
-      error => {
-
-      }
-    )
   }
 
   getUser() {
@@ -75,13 +54,6 @@ export class DetailsUserComponent implements OnInit {
         this.user = resp
         this.typeAccount = this.user.typeAccount.name
         this.statusUser = this.user.status.name
-        console.log(resp)
-
-        this.storeService.getStoreByInternalref(this.user.idStore).subscribe(
-          resp => {
-            this.store = resp
-          }
-        )
       },
       err => {
         this.notifsService.onError(err.error.message, 'échec chargement de l\'utilisateur')
@@ -105,9 +77,9 @@ export class DetailsUserComponent implements OnInit {
   onSubmit() {
     this.isLoading.next(true);
     this.credentials = this.updateUser.value;
-    const store = this.stores.filter(store => store.localization === this.updateUser.controls['idStore'].value)
-    // for (let st of store){
-    this.credentials.idStore = store[0].internalReference;
+    // const store = this.stores.filter(store => store.localization === this.updateUser.controls['idStore'].value)
+    // // for (let st of store){
+    // this.credentials.idStore = store[0].internalReference;
     // }
 
     this.userService.updateUser(this.credentials).subscribe(
@@ -121,14 +93,6 @@ export class DetailsUserComponent implements OnInit {
         this.errorMessage = error.error.message;
       }
     )
-  }
-
-  getStatusAccount(status: string): string {
-    return this.statusAccountService.allStatus(status)
-  }
-
-  getStatus(status: string): string {
-    return this.statusUserService.allStatus(status)
   }
 
   getRole(status: string): string {

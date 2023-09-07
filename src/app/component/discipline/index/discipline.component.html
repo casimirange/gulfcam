@@ -1,0 +1,146 @@
+<div class="app-page-title">
+  <div class="page-title-wrapper">
+    <div class="page-title-heading">
+      <div class="page-title-icon">
+        <i class="pe-7s-box1 icon-gradient bg-night-fade">
+        </i>
+      </div>
+      <div>Gestion de la discipline
+        <div class="page-title-subheading">Suivez tous les manquements à l'ordre</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="main-card mb-3 card " id="htmlData" #htmlData>
+      <div class="card-header">
+        Liste des sanctions.
+        <div class="btn-actions-pane-right">
+          <div role="group" class="">
+            <form class="form-row">
+              <div class="position-relative mr-2">
+                <!--                <label for="mag" class="text-dark font-weight-bold">Membre</label>-->
+                <select name="mag" id="mag" class="form-control form-control-sm mr-3" [(ngModel)]="userFilter"
+                        (ngModelChange)="getDiscipline()">
+                  <option value="" selected disabled hidden>Sélectionner un membre</option>
+                  <option *ngFor="let user of users.content" ngValue="{{user.userId}}">{{user.firstName | titlecase}}&nbsp;{{user.lastName| titlecase}}</option>
+                  <option value="" disabled *ngIf="!loadUser && users.totalElements == 0">Aucun membre trouvé</option>
+                  <option value="">Tout afficher</option>
+                </select>
+              </div>
+              <div class="position-relative  mr-2 ">
+                <!--                <label for="statut" class="text-dark font-weight-bold">Filtrer par statut</label>-->
+                <select name="stat" id="statut" class="form-control form-control-sm mr-3" [(ngModel)]="statusFilter"
+                        (ngModelChange)="getDiscipline()">
+                  <option value="" selected disabled hidden>Choix statut</option>
+                  <option value="ABSENCE">ABSENCE</option>
+                  <option value="RETARD">RETARD</option>
+                  <option value="TROUBLE">TROUBLE</option>
+                  <option value="">Tout afficher</option>
+                </select>
+              </div>
+              <div class="position-relative  mr-2">
+                <!--                <label for="date" class="text-dark font-weight-bold">Recherche par date</label>-->
+                <input type="date" name="date" id="date" placeholder="Rechercher date" [(ngModel)]="date"
+                       (ngModelChange)="getDiscipline()"
+                       class="form-control form-control-sm mr-3">
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!--        <div class="btn-actions-pane-right" >-->
+        <!--          <div role="group" class="btn-group-sm btn-group">-->
+        <!--            <select name="" id="" class="form-control form-control-sm">-->
+        <!--              <option value="" hidden selected disabled>&#45;&#45; Filtrer &#45;&#45;</option>-->
+        <!--              <option value="en cours">En cours</option>-->
+        <!--              <option value="en cours">Terminés</option>-->
+        <!--              <option value="en cours">Tous</option>-->
+        <!--            </select>-->
+        <!--          </div>-->
+        <!--        </div>-->
+      </div>
+
+      <div class="table-responsive">
+
+        <ng-container class="bg-white" *ngIf="(appState$ | async) as appState" [ngSwitch]="appState.dataState">
+          <ng-container class="bg-white" *ngSwitchCase="DataState.LOADING_STATE">
+            <div class="col-md-12 text-center my-3">
+              <div class="ball-clip-rotate">
+                <div style="background-color: rgb(68, 64, 84);"></div>
+              </div>
+            </div>
+          </ng-container>
+          <ng-container class="bg-white py-1 px-1" *ngSwitchCase="DataState.LOADED_STATE">
+            <table class="table table-hover bg-white">
+              <thead>
+              <tr>
+                <th>#</th>
+                <th>Date</th>
+                <th>Membre</th>
+                <th>Motif</th>
+                <th>Date de création</th>
+                <th>Date de modification</th>
+                <!--                <th class="text-center">Action</th>-->
+              </tr>
+              </thead>
+              <tbody
+                *ngFor="let disciplines of appState.appData.content | paginate: { id: 'disciplines', itemsPerPage: appState.appData.size, currentPage: page, totalItems: appState.appData.totalElements }; let i = index">
+              <tr>
+                <td>{{i + 1}}</td>
+                <td>{{disciplines.date |date: 'dd-MM-yyyy'}}</td>
+                <td>{{disciplines.user.firstName | titlecase}}&nbsp;{{disciplines.user.lastName | titlecase}}</td>
+                <td>
+                  <span class="badge "
+                        [ngClass]="disciplines.typeDiscipline.name == 'RETARD' ? 'badge-alternate' : (disciplines.typeDiscipline.name == 'ABSENCE' ? 'badge-danger' :'badge-warning')">
+                  {{disciplines.typeDiscipline.name}}&nbsp;
+                  </span>
+                </td>
+                <td>{{disciplines.createdAt | date: 'dd-MM-yyyy à HH:mm'}}</td>
+                <td>{{disciplines.updatedAt | date: 'dd-MM-yyyy à HH:mm'}}</td>
+                <!--                <td>-->
+                <!--                  <button class="btn btn-sm btn-secondary mr-2" data-toggle="tooltip" title="détails de la séance">-->
+                <!--                    <i class="pe-7s-pen"></i>-->
+                <!--                    modifier-->
+                <!--                  </button>-->
+                <!--                  <button class="btn btn-sm btn-danger mr-2"-->
+                <!--                          data-toggle="tooltip" title="supprimer le prêt">-->
+                <!--                    <i class="pe-7s-trash"></i>-->
+                <!--                    supprimer-->
+                <!--                  </button>-->
+                <!--                </td>-->
+            </table>
+            <div class="text-center">
+              <p *ngIf="!appState.appData.content.length" style="color: grey; font-size: 1.8rem;" class="mx-auto">Aucune
+                donnée trouvée !</p>
+            </div>
+            <div class="card-footer">
+              <div class="btn-actions-pane-left">
+                <div role="group" class="btn-group-sm btn-group">
+                  Total : <b>{{ appState.appData.totalElements }} </b>
+                </div>
+              </div>
+              <div class="btn-actions-pane-right">
+                <div role="group" class="btn-group-sm btn-group">
+                  <!--              <pagination-controls id="client" (pageChange)="pageChange($event)" ></pagination-controls>-->
+                  <pagination-controls
+                    id="disciplines"
+                    previousLabel="Précédent"
+                    nextLabel="Suivant"
+                    (pageChange)="pageChange($event)"></pagination-controls>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          <ng-container class="bg-white" *ngSwitchCase="DataState.ERROR_STATE">
+            <div class="col-md-12 text-center">
+              <div class="text-danger">{{appState.error}}</div>
+            </div>
+          </ng-container>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>
